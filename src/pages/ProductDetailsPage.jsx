@@ -1,19 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { ShoppingCart, Heart, Star, ChevronLeft, ChevronRight, Check, Truck, Shield, RefreshCw } from 'lucide-react';
-import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import 'react-tabs/style/react-tabs.css';
-import { addToCart } from '../redux/slices/cartSlice';
-import { fetchProductById, clearSelectedProduct } from '../redux/slices/productSlice';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  ShoppingCart,
+  Heart,
+  Star,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  Truck,
+  Shield,
+  RefreshCw,
+} from "lucide-react";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
+import { addToCart } from "../redux/slices/cartSlice";
+import {
+  fetchProductById,
+  clearSelectedProduct,
+} from "../redux/slices/productSlice";
 
 // Fallback image (inline SVG)
-const fallbackImage = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50' y='115' font-family='Arial' font-size='16' fill='%23999'%3ENo image%3C/text%3E%3C/svg%3E";
+const fallbackImage =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50' y='115' font-family='Arial' font-size='16' fill='%23999'%3ENo image%3C/text%3E%3C/svg%3E";
 
 // Helper to get numeric rating from possible object
 const getRatingValue = (rating) => {
-  if (typeof rating === 'number') return rating;
-  if (rating && typeof rating === 'object') {
+  if (typeof rating === "number") return rating;
+  if (rating && typeof rating === "object") {
     return parseFloat(rating.avg) || 0;
   }
   return 0;
@@ -21,8 +35,8 @@ const getRatingValue = (rating) => {
 
 // Helper to extract numeric price from possible object
 const getDisplayPrice = (price) => {
-  if (typeof price === 'number') return price;
-  if (price && typeof price === 'object') {
+  if (typeof price === "number") return price;
+  if (price && typeof price === "object") {
     return parseFloat(price.after) || parseFloat(price.before) || 0;
   }
   return 0;
@@ -35,7 +49,11 @@ const ProductDetailsPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
 
-  const { selectedProduct: product, loading, error } = useSelector((state) => state.product);
+  const {
+    selectedProduct: product,
+    loading,
+    error,
+  } = useSelector((state) => state.product);
 
   useEffect(() => {
     if (id) {
@@ -46,25 +64,33 @@ const ProductDetailsPage = () => {
     };
   }, [dispatch, id]);
 
-  // useEffect(() => {
-  //   if (product) {
-  //     console.log('🖼️ Product image URL:', product.image);
-  //     console.log('🖼️ Images array:', product.images);
-  //   }
-  // }, [product]);
+  useEffect(() => {
+    if (product) {
+      console.log("🖼️ Product image URL:", product);
+    }
+  }, [product]);
 
-  if (loading) return <div className="text-center py-10">Loading product...</div>;
-  if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
-  if (!product) return <div className="text-center py-10">Product not found</div>;
+  if (loading)
+    return <div className="text-center py-10">Loading product...</div>;
+  if (error)
+    return <div className="text-center py-10 text-red-500">{error}</div>;
+  if (!product)
+    return <div className="text-center py-10">Product not found</div>;
 
   // Safely extract numeric values
   const productPrice = getDisplayPrice(product.price);
   const originalPrice = getDisplayPrice(product.originalPrice) || productPrice;
   const ratingValue = getRatingValue(product.rating);
-  const discount = product.discount || (originalPrice > productPrice ? `${Math.round(((originalPrice - productPrice) / originalPrice) * 100)}% OFF` : null);
+  const discount =
+    product.discount ||
+    (originalPrice > productPrice
+      ? `${Math.round(((originalPrice - productPrice) / originalPrice) * 100)}% OFF`
+      : null);
 
   // ✅ FIX: images array may contain objects with 'url' property
-  const images = product.images?.map(img => img.url) || (product.image ? [product.image] : []);
+  const images =
+    product.images?.map((img) => img.url) ||
+    (product.image ? [product.image] : []);
 
   const handlePrevImage = () => {
     setSelectedImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -83,9 +109,11 @@ const ProductDetailsPage = () => {
   };
 
   const handleImageError = (e) => {
-    console.error('Image failed to load:', e.target.src);
+    console.error("Image failed to load:", e.target.src);
     e.target.src = fallbackImage;
   };
+
+  const descriptionHtml = product?.description?.join("") || "";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -93,7 +121,11 @@ const ProductDetailsPage = () => {
         {/* Breadcrumb */}
         <nav className="flex mb-8 text-sm" aria-label="Breadcrumb">
           <ol className="flex items-center space-x-2">
-            <li><a href="/" className="text-gray-500 hover:text-gray-700">Home</a></li>
+            <li>
+              <a href="/" className="text-gray-500 hover:text-gray-700">
+                Home
+              </a>
+            </li>
             <li className="text-gray-400">/</li>
             <li className="text-gray-900 font-medium">{product.name}</li>
           </ol>
@@ -137,26 +169,38 @@ const ProductDetailsPage = () => {
 
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                {product.name}
+              </h1>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-5 h-5 ${i < Math.floor(ratingValue) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-300'}`}
+                      className={`w-5 h-5 ${i < Math.floor(ratingValue) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
                     />
                   ))}
                 </div>
-                <span className="text-sm text-gray-600">{ratingValue.toFixed(1)} ⭐</span>
+                <span className="text-sm text-gray-600">
+                  {ratingValue.toFixed(1)} ⭐
+                </span>
               </div>
             </div>
 
             <div className="flex items-baseline gap-3">
-              <span className="text-4xl font-bold text-gray-900">₹{productPrice.toLocaleString()}</span>
+              <span className="text-4xl font-bold text-gray-900">
+                ₹{productPrice.toLocaleString()}
+              </span>
               {originalPrice > productPrice && (
-                <span className="text-2xl text-gray-400 line-through">₹{originalPrice.toLocaleString()}</span>
+                <span className="text-2xl text-gray-400 line-through">
+                  ₹{originalPrice.toLocaleString()}
+                </span>
               )}
-              {discount && <span className="text-red-600 font-semibold text-lg">{discount}</span>}
+              {discount && (
+                <span className="text-red-600 font-semibold text-lg">
+                  {discount}
+                </span>
+              )}
             </div>
 
             <div className="flex items-center gap-2">
@@ -165,7 +209,9 @@ const ProductDetailsPage = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-900 mb-3">Quantity</label>
+              <label className="block text-sm font-semibold text-gray-900 mb-3">
+                Quantity
+              </label>
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => handleQuantityChange(-1)}
@@ -173,7 +219,9 @@ const ProductDetailsPage = () => {
                 >
                   -
                 </button>
-                <span className="w-12 text-center font-semibold text-lg">{quantity}</span>
+                <span className="w-12 text-center font-semibold text-lg">
+                  {quantity}
+                </span>
                 <button
                   onClick={() => handleQuantityChange(1)}
                   className="w-10 h-10 border-2 border-gray-300 rounded-lg hover:border-gray-400 font-semibold"
@@ -192,9 +240,11 @@ const ProductDetailsPage = () => {
               </button>
               <button
                 onClick={() => setIsWishlisted(!isWishlisted)}
-                className={`px-4 py-4 border-2 rounded-lg transition-all ${isWishlisted ? 'border-red-500 bg-red-50' : 'border-gray-300 hover:border-gray-400'}`}
+                className={`px-4 py-4 border-2 rounded-lg transition-all ${isWishlisted ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-gray-400"}`}
               >
-                <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-red-500 text-red-500' : ''}`} />
+                <Heart
+                  className={`w-5 h-5 ${isWishlisted ? "fill-red-500 text-red-500" : ""}`}
+                />
               </button>
             </div>
 
@@ -224,7 +274,7 @@ const ProductDetailsPage = () => {
           </div>
         </div>
 
-        <div className="mt-12">
+        {/* <div className="mt-12">
           <Tabs>
             <TabList>
               <Tab>How to wear?</Tab>
@@ -232,12 +282,44 @@ const ProductDetailsPage = () => {
             </TabList>
             <TabPanel>
               <h2>1. Wear on your right wrist for optimal energy flow.</h2>
-              <h2>2. Start wearing it every morning and set your daily intentions.</h2>
+              <h2>
+                2. Start wearing it every morning and set your daily intentions.
+              </h2>
               <h2>3. Wear on Fridays to align with the energy of wealth.</h2>
               <h2>4. Match with bright outfits for prosperity.</h2>
             </TabPanel>
             <TabPanel>
-              <h2>Presented in a sturdy black kappa box with foam, designed especially for safekeeping and gifting.</h2>
+              <h2>
+                Presented in a sturdy black kappa box with foam, designed
+                especially for safekeeping and gifting.
+              </h2>
+            </TabPanel>
+          </Tabs>
+        </div> */}
+        <div className="mt-12">
+          <Tabs>
+            <TabList className="flex border-b border-gray-200 gap-6">
+              <Tab className="py-3 px-1 text-gray-600 font-semibold cursor-pointer border-b-2 border-transparent focus:outline-none">
+                Description
+              </Tab>
+
+              <Tab className="py-3 px-1 text-gray-600 font-semibold cursor-pointer border-b-2 border-transparent focus:outline-none">
+                Packaging
+              </Tab>
+            </TabList>
+
+            <TabPanel className="pt-6">
+              <div
+                className="prose max-w-none text-gray-700 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+              />
+            </TabPanel>
+
+            <TabPanel className="pt-6">
+              <p className="text-gray-700">
+                Presented in a sturdy premium box with protective foam, designed
+                for safe delivery and elegant gifting.
+              </p>
             </TabPanel>
           </Tabs>
         </div>
