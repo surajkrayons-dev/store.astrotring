@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { CATEGORIES } from "../../constants/categories";
 import StarRating from "../common/StarRating";
-// import { products } from "../../data/Data";
-import { sections } from "@/Data/Data";
+import { products } from "../../data/Data";
 
 const FilterSidebar = ({
   selected,
