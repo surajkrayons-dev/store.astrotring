@@ -4,16 +4,23 @@ import { CATEGORIES } from "../../constants/categories";
 import StarRating from "../common/StarRating";
 import { products } from "../../data/Data";
 
-const FilterSidebar = ({ selected, onSelect, filters, setFilters, onClearFilters, className = '' }) => {
+const FilterSidebar = ({
+  selected,
+  onSelect,
+  filters,
+  setFilters,
+  onClearFilters,
+  className = "",
+}) => {
   const [expandedSections, setExpandedSections] = useState({
     categories: true,
     price: true,
     rating: true,
-    discount: false
+    discount: false,
   });
 
   const toggleSection = (section) => {
-    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
   const SectionHeader = ({ title, section }) => (
@@ -66,15 +73,18 @@ const FilterSidebar = ({ selected, onSelect, filters, setFilters, onClearFilters
           <div className="space-y-1">
             {CATEGORIES.map((cat) => {
               const active = selected === cat.id;
-              const count = cat.id === "all" ? products.length : products.filter(p => p.category === cat.id).length;
+              const count =
+                cat.id === "all"
+                  ? products.length
+                  : products.filter((p) => p.category === cat.id).length;
               return (
                 <button
                   key={cat.id}
                   onClick={() => onSelect(cat.id)}
                   className={`w-full flex items-center gap-2 sm:gap-2.5 text-left px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-[9px] border-none cursor-pointer text-xs sm:text-sm transition-all ${
                     active
-                      ? 'bg-gradient-to-br from-amber-100 to-amber-200 text-amber-900 font-bold shadow-[inset_0_0_0_1.5px_#fcd34d]'
-                      : 'bg-transparent text-stone-600 font-medium hover:bg-stone-50'
+                      ? "bg-gradient-to-br from-amber-100 to-amber-200 text-amber-900 font-bold shadow-[inset_0_0_0_1.5px_#fcd34d]"
+                      : "bg-transparent text-stone-600 font-medium hover:bg-stone-50"
                   }`}
                 >
                   <span className="text-base sm:text-lg">{cat.icon}</span>
@@ -125,11 +135,18 @@ const FilterSidebar = ({ selected, onSelect, filters, setFilters, onClearFilters
               ].map((range, i) => (
                 <button
                   key={i}
-                  onClick={() => setFilters(f => ({ ...f, minPrice: range.min, maxPrice: range.max }))}
+                  onClick={() =>
+                    setFilters((f) => ({
+                      ...f,
+                      minPrice: range.min,
+                      maxPrice: range.max,
+                    }))
+                  }
                   className={`px-2.5 py-1.5 rounded-md border text-[11px] font-semibold cursor-pointer transition-all ${
-                    filters.minPrice === range.min && filters.maxPrice === range.max
-                      ? 'border-amber-300 bg-amber-100 text-amber-900'
-                      : 'border-gray-200 bg-white text-stone-500 hover:bg-gray-50'
+                    filters.minPrice === range.min &&
+                    filters.maxPrice === range.max
+                      ? "border-amber-300 bg-amber-100 text-amber-900"
+                      : "border-gray-200 bg-white text-stone-500 hover:bg-gray-50"
                   }`}
                 >
                   {range.label}
