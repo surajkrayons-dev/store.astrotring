@@ -189,7 +189,6 @@ const Footer = () => {
               >
                 <FaGooglePlay size={15} />
                 <div className="flex flex-col leading-tight text-left">
-                  <span className="text-[10px]">GET IT ON</span>
                   <span className="text-sm font-semibold">Google Play</span>
                 </div>
               </a>
@@ -206,7 +205,6 @@ const Footer = () => {
               >
                 <FaApple size={15} />
                 <div className="flex flex-col leading-tight text-left">
-                  <span className="text-[10px]">Download on the</span>
                   <span className="text-sm font-semibold">App Store</span>
                 </div>
               </a>
