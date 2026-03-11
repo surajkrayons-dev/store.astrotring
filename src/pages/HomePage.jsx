@@ -317,6 +317,7 @@ import FilterSidebar from "../components/features/FilterSidebar";
 import { CATEGORIES } from "../constants/categories";
 import { addToCart } from "../redux/slices/cartSlice";
 import { fetchAllProducts } from '../redux/slices/productSlice';
+import HeroBanner from "../components/features/HeroBanner";
 
 // Helpers
 const getDisplayPrice = (price) => {
@@ -474,6 +475,7 @@ const HomePage = () => {
 
   return (
     <div className="px-2 sm:px-4">
+      <HeroBanner />
       <div className="flex gap-3 sm:gap-4 md:gap-6">
         {/* Main Content */}
         <div className="flex-1 min-w-0">

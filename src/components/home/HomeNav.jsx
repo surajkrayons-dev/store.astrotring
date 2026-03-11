@@ -21,7 +21,7 @@ const HomeNav = ({
         {/* Filter Icon Button - same for all devices */}
         <button
           onClick={onToggleSidebar}
-          className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition text-stone-600 flex items-center gap-1"
+          className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition text-stone-600 flex items-center gap-1 cursor-pointer"
           aria-label="Toggle filters"
         >
           <Filter className="w-4 h-4 sm:w-5 sm:h-5" />

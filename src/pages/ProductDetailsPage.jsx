@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
+import { toast } from "react-toastify"; // 👈 Import toast
 import { addToCart } from "../redux/slices/cartSlice";
 import {
   fetchProductById,
@@ -33,11 +34,22 @@ const getRatingValue = (rating) => {
   return 0;
 };
 
-// Helper to extract numeric price from possible object
-const getDisplayPrice = (price) => {
+// Helper to get after price (current price) from price object
+const getAfterPrice = (price) => {
+  if (!price) return 0;
   if (typeof price === "number") return price;
-  if (price && typeof price === "object") {
-    return parseFloat(price.after) || parseFloat(price.before) || 0;
+  if (typeof price === "object") {
+    return parseFloat(price.after) || 0;
+  }
+  return 0;
+};
+
+// Helper to get before price (original price) from price object
+const getBeforePrice = (price) => {
+  if (!price) return 0;
+  if (typeof price === "number") return price;
+  if (typeof price === "object") {
+    return parseFloat(price.before) || 0;
   }
   return 0;
 };
@@ -48,6 +60,7 @@ const ProductDetailsPage = () => {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const { id } = useParams();
   const dispatch = useDispatch();
+  const thumbnailContainerRef = useRef(null);
 
   const {
     selectedProduct: product,
@@ -64,11 +77,21 @@ const ProductDetailsPage = () => {
     };
   }, [dispatch, id]);
 
+  console.log("product", product);
+
+  // Scroll thumbnail into view when selected image changes
   useEffect(() => {
-    if (product) {
-      console.log("🖼️ Product image URL:", product);
+    if (thumbnailContainerRef.current && images.length > 0) {
+      const thumb = thumbnailContainerRef.current.children[selectedImage];
+      if (thumb) {
+        thumb.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+          inline: "center",
+        });
+      }
     }
-  }, [product]);
+  }, [selectedImage]);
 
   if (loading)
     return <div className="text-center py-10">Loading product...</div>;
@@ -77,17 +100,18 @@ const ProductDetailsPage = () => {
   if (!product)
     return <div className="text-center py-10">Product not found</div>;
 
-  // Safely extract numeric values
-  const productPrice = getDisplayPrice(product.price);
-  const originalPrice = getDisplayPrice(product.originalPrice) || productPrice;
+  // Extract prices correctly
+  const afterPrice = getAfterPrice(product.price);
+  const beforePrice = getBeforePrice(product.price);
   const ratingValue = getRatingValue(product.rating);
-  const discount =
-    product.discount ||
-    (originalPrice > productPrice
-      ? `${Math.round(((originalPrice - productPrice) / originalPrice) * 100)}% OFF`
-      : null);
+  
+  // Calculate discount percentage
+  const discountPercent = beforePrice > afterPrice && afterPrice > 0
+    ? Math.round(((beforePrice - afterPrice) / beforePrice) * 100)
+    : 0;
+  const discountText = discountPercent > 0 ? `${discountPercent}% OFF` : null;
 
-  // ✅ FIX: images array may contain objects with 'url' property
+  // Images array: handle different formats
   const images =
     product.images?.map((img) => img.url) ||
     (product.image ? [product.image] : []);
@@ -105,7 +129,8 @@ const ProductDetailsPage = () => {
   };
 
   const handleAddToCart = () => {
-    dispatch(addToCart({ ...product, qty: quantity, price: productPrice }));
+    dispatch(addToCart({ ...product, qty: quantity, price: afterPrice }));
+    toast.success(`${product.name} added to cart!`);
   };
 
   const handleImageError = (e) => {
@@ -134,6 +159,7 @@ const ProductDetailsPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
           {/* Image Gallery */}
           <div className="space-y-4">
+            {/* Main Image */}
             <div className="relative aspect-square bg-white rounded-lg overflow-hidden group">
               <img
                 src={images[selectedImage] || fallbackImage}
@@ -145,31 +171,64 @@ const ProductDetailsPage = () => {
                 <>
                   <button
                     onClick={handlePrevImage}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-gradient-to-br from-amber-100 to-amber-200 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
                     aria-label="Previous image"
                   >
-                    <ChevronLeft className="w-5 h-5" />
+                    <ChevronLeft className="w-5 h-5 text-amber-900" />
                   </button>
                   <button
                     onClick={handleNextImage}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white p-2 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-gradient-to-br from-amber-100 to-amber-200 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity"
                     aria-label="Next image"
                   >
-                    <ChevronRight className="w-5 h-5" />
+                    <ChevronRight className="w-5 h-5 text-amber-900" />
                   </button>
                 </>
               )}
-              {discount && (
-                <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                  {discount}
+              {/* Discount Badge - top-right with project colors */}
+              {discountText && (
+                <div className="absolute top-4 right-4">
+                  <span className="bg-gradient-to-br from-amber-600 to-amber-700 text-white px-3 py-1 rounded-full text-sm font-semibold shadow-md">
+                    {discountText}
+                  </span>
                 </div>
               )}
             </div>
+
+            {/* Thumbnails Preview */}
+            {images.length > 1 && (
+              <div className="relative">
+                <div
+                  ref={thumbnailContainerRef}
+                  className="flex gap-2 overflow-x-auto scrollbar-hide pb-2"
+                >
+                  {images.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedImage(idx)}
+                      className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 overflow-hidden transition-all ${
+                        selectedImage === idx
+                          ? "border-amber-600 shadow-md"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`Thumbnail ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={handleImageError}
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
+          {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
                 {product.name}
               </h1>
               <div className="flex items-center gap-4">
@@ -177,7 +236,11 @@ const ProductDetailsPage = () => {
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-5 h-5 ${i < Math.floor(ratingValue) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`}
+                      className={`w-4 h-4 sm:w-5 sm:h-5 ${
+                        i < Math.floor(ratingValue)
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-gray-300"
+                      }`}
                     />
                   ))}
                 </div>
@@ -187,27 +250,30 @@ const ProductDetailsPage = () => {
               </div>
             </div>
 
-            <div className="flex items-baseline gap-3">
-              <span className="text-4xl font-bold text-gray-900">
-                ₹{productPrice.toLocaleString()}
+            {/* Price */}
+            <div className="flex items-baseline gap-3 flex-wrap">
+              <span className="text-3xl sm:text-4xl font-bold text-gray-900">
+                ₹{afterPrice.toLocaleString()}
               </span>
-              {originalPrice > productPrice && (
-                <span className="text-2xl text-gray-400 line-through">
-                  ₹{originalPrice.toLocaleString()}
+              {beforePrice > afterPrice && (
+                <span className="text-xl sm:text-2xl text-gray-400 line-through">
+                  ₹{beforePrice.toLocaleString()}
                 </span>
               )}
-              {discount && (
-                <span className="text-red-600 font-semibold text-lg">
-                  {discount}
+              {discountText && (
+                <span className="text-amber-600 font-semibold text-base sm:text-lg">
+                  {discountText}
                 </span>
               )}
             </div>
 
+            {/* In Stock */}
             <div className="flex items-center gap-2">
               <Check className="w-5 h-5 text-green-600" />
               <span className="text-green-600 font-medium">In Stock</span>
             </div>
 
+            {/* Quantity */}
             <div>
               <label className="block text-sm font-semibold text-gray-900 mb-3">
                 Quantity
@@ -215,7 +281,7 @@ const ProductDetailsPage = () => {
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => handleQuantityChange(-1)}
-                  className="w-10 h-10 border-2 border-gray-300 rounded-lg hover:border-gray-400 font-semibold"
+                  className="w-10 h-10 border-2 border-gray-300 rounded-lg hover:border-gray-400 font-semibold cursor-pointer"
                 >
                   -
                 </button>
@@ -224,30 +290,38 @@ const ProductDetailsPage = () => {
                 </span>
                 <button
                   onClick={() => handleQuantityChange(1)}
-                  className="w-10 h-10 border-2 border-gray-300 rounded-lg hover:border-gray-400 font-semibold"
+                  className="w-10 h-10 border-2 border-gray-300 rounded-lg hover:border-gray-400 font-semibold cursor-pointer"
                 >
                   +
                 </button>
               </div>
             </div>
 
+            {/* Add to Cart & Wishlist */}
             <div className="flex gap-3">
               <button
                 onClick={handleAddToCart}
-                className="flex-1 bg-blue-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                className="flex-1 bg-amber-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-amber-700 transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 <ShoppingCart className="w-5 h-5" /> Add to Cart
               </button>
               <button
                 onClick={() => setIsWishlisted(!isWishlisted)}
-                className={`px-4 py-4 border-2 rounded-lg transition-all ${isWishlisted ? "border-red-500 bg-red-50" : "border-gray-300 hover:border-gray-400"}`}
+                className={`px-4 py-4 border-2 rounded-lg transition-all ${
+                  isWishlisted
+                    ? "border-red-500 bg-red-50"
+                    : "border-gray-300 hover:border-gray-400"
+                }`}
               >
                 <Heart
-                  className={`w-5 h-5 ${isWishlisted ? "fill-red-500 text-red-500" : ""}`}
+                  className={`w-5 h-5 cursor-pointer ${
+                    isWishlisted ? "fill-red-500 text-red-500" : ""
+                  }`}
                 />
               </button>
             </div>
 
+            {/* Shipping Info */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t pt-6">
               <div className="flex items-start gap-3">
                 <Truck className="w-6 h-6 text-gray-600" />
@@ -274,49 +348,27 @@ const ProductDetailsPage = () => {
           </div>
         </div>
 
-        {/* <div className="mt-12">
-          <Tabs>
-            <TabList>
-              <Tab>How to wear?</Tab>
-              <Tab>Packaging</Tab>
-            </TabList>
-            <TabPanel>
-              <h2>1. Wear on your right wrist for optimal energy flow.</h2>
-              <h2>
-                2. Start wearing it every morning and set your daily intentions.
-              </h2>
-              <h2>3. Wear on Fridays to align with the energy of wealth.</h2>
-              <h2>4. Match with bright outfits for prosperity.</h2>
-            </TabPanel>
-            <TabPanel>
-              <h2>
-                Presented in a sturdy black kappa box with foam, designed
-                especially for safekeeping and gifting.
-              </h2>
-            </TabPanel>
-          </Tabs>
-        </div> */}
+        {/* Tabs Section */}
         <div className="mt-12">
           <Tabs>
-            <TabList className="flex border-b border-gray-200 gap-6">
-              <Tab className="py-3 px-1 text-gray-600 font-semibold cursor-pointer border-b-2 border-transparent focus:outline-none">
+            <TabList className="flex border-b border-gray-200 gap-4 sm:gap-6 overflow-x-auto scrollbar-hide">
+              <Tab className="py-3 px-1 text-sm sm:text-base text-gray-600 font-semibold cursor-pointer border-b-2 border-transparent focus:outline-none">
                 Description
               </Tab>
-
-              <Tab className="py-3 px-1 text-gray-600 font-semibold cursor-pointer border-b-2 border-transparent focus:outline-none">
+              <Tab className="py-3 px-1 text-sm sm:text-base text-gray-600 font-semibold cursor-pointer border-b-2 border-transparent focus:outline-none">
                 Packaging
               </Tab>
             </TabList>
 
             <TabPanel className="pt-6">
               <div
-                className="prose max-w-none text-gray-700 leading-relaxed"
+                className="prose max-w-none text-gray-700 leading-relaxed text-sm sm:text-base"
                 dangerouslySetInnerHTML={{ __html: descriptionHtml }}
               />
             </TabPanel>
 
             <TabPanel className="pt-6">
-              <p className="text-gray-700">
+              <p className="text-gray-700 text-sm sm:text-base">
                 Presented in a sturdy premium box with protective foam, designed
                 for safe delivery and elegant gifting.
               </p>

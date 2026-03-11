@@ -1,76 +1,108 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
-import {
-  TiSocialFacebook,
-  TiSocialTwitter,
-  TiSocialYoutube,
-} from "react-icons/ti";
+import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import { SlSocialInstagram } from "react-icons/sl";
 import { FaGooglePlay, FaApple } from "react-icons/fa";
 import logo from "../../assets/logo.png";
+import { CATEGORIES } from "../../constants/categories";
 
 const Footer = () => {
-  const linkClass =
-    "flex items-center gap-2 text-sm text-black transition-all duration-300 hover:text-primary hover:translate-x-1";
+  // Filter out "all" from categories for collections
+  const collectionCategories = CATEGORIES.filter((cat) => cat.id !== "all");
 
   return (
     <footer className="bg-[#f7f5f2] border-t border-gray-300 mt-8 pt-8">
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-8">
-          {/* ABOUT */}
+        {/* ABOUT */}
+        <div className="lg:col-span-1">
+          <Link to="/">
+            <img src={logo} alt="Astrotring" className="h-10 mb-4" />
+          </Link>
+          <p className="text-sm text-gray-700 leading-relaxed">
+            AstroTring Store offers a curated collection of authentic astrology
+            and spiritual products designed to enhance positivity and balance in
+            life. Explore a wide range of gemstones, rudraksha, healing
+            bracelets, and vastu items carefully selected by experts.
+          </p>
+        </div>
+        <hr className="text-gray-300 mt-4" />
+        <br />
+        {/* Main Footer Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 pb-8">
+          {/* COLLECTIONS - Dynamic from CATEGORIES */}
           <div>
-            <Link to="/">
-              <img src={logo} alt="Astrotring" className="h-10 mb-4" />
-            </Link>
-
-            <p className="text-sm text-gray-900 leading-relaxed">
-              AstroTring Store offers authentic astrology and spiritual products including
-              gemstones, rudraksha, healing bracelets and vastu items designed to enhance
-              positivity, prosperity and balance in everyday life.
-            </p>
+            <h2 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
+              Collections
+            </h2>
+            <ul className="mt-4 space-y-2">
+              {collectionCategories.map((cat) => (
+                <li key={cat.id}>
+                  {/* <Link to={`/collections/${cat.id}`} className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">
+                    {cat.label}
+                  </Link> */}
+                  <Link
+                    to={""}
+                    className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                  >
+                    {cat.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* RESOURCES */}
-
           <div>
-            <h2 className="text-black border-b-2 border-b-primary inline-block pb-1 font-semibold text-lg">
+            <h2 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
               Resources
             </h2>
-
             <ul className="mt-4 space-y-2">
               <li>
-                <Link to="/blogs" className={linkClass}>
+                <Link
+                  to="/blogs"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
                   Astrology Blogs
                 </Link>
               </li>
-
               <li>
-                <Link to="/zodiac-signs" className={linkClass}>
+                <Link
+                  to="/zodiac-signs"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
                   Zodiac Signs
                 </Link>
               </li>
-
               <li>
-                <Link to="/numerology" className={linkClass}>
+                <Link
+                  to="/numerology"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
                   Numerology
                 </Link>
               </li>
-
               <li>
-                <Link to="/vastu-shastra" className={linkClass}>
+                <Link
+                  to="/vastu-shastra"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
                   Vastu Shastra
                 </Link>
               </li>
-
               <li>
-                <Link to="/tarot" className={linkClass}>
+                <Link
+                  to="/tarot"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
                   Tarot
                 </Link>
               </li>
-
               <li>
-                <Link to="/love-calculator" className={linkClass}>
+                <Link
+                  to="/love-calculator"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
                   Love Calculator
                 </Link>
               </li>
@@ -78,138 +110,183 @@ const Footer = () => {
           </div>
 
           {/* CORPORATE */}
-
           <div>
-            <h2 className="text-black border-b-2 border-b-primary inline-block pb-1 font-semibold text-lg">
+            <h2 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
               Corporate Info
             </h2>
-
             <ul className="mt-4 space-y-2">
               <li>
-                <Link to="/about-us" className={linkClass}>
+                <Link
+                  to="/about-us"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
                   About Us
                 </Link>
               </li>
-
               <li>
-                <Link to="/privacy-policy" className={linkClass}>
+                <Link
+                  to="/privacy-policy"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
                   Privacy Policy
                 </Link>
               </li>
-
               <li>
-                <Link to="/terms-conditions" className={linkClass}>
+                <Link
+                  to="/terms-conditions"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
                   Terms & Conditions
                 </Link>
               </li>
-
               <li>
-                <Link to="/refund-policy" className={linkClass}>
+                <Link
+                  to="/refund-policy"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
                   Refund & Cancellation
                 </Link>
               </li>
-
               <li>
-                <Link to="/pricing-policy" className={linkClass}>
+                <Link
+                  to="/pricing-policy"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
                   Pricing Policy
                 </Link>
               </li>
-
               <li>
-                <Link to="/disclaimer" className={linkClass}>
+                <Link
+                  to="/disclaimer"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
                   Disclaimer
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* CONTACT */}
-
+          {/* CONTACT  */}
           <div>
-            <h2 className="text-black border-b-2 border-b-primary inline-block pb-1 font-semibold text-lg">
+            <h2 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
               Contact us
             </h2>
-
-            <p className="text-sm text-gray-900 leading-relaxed mt-4 space-y-4">
+            <p className="text-sm text-gray-700 leading-relaxed mt-4">
               We are available 24x7 on chat support, click to start chat
             </p>
 
-            <div className="mt-4 space-y-4">
-              <div className="flex items-center gap-3 text-sm text-black ">
-                <a
-                  href="mailto:mail@astrotring.com"
-                  className="flex items-center gap-3 text-sm text-black hover:text-primary transition"
-                >
-                  <Mail className="size-8 border border-gray-900 p-1.5 rounded-full" />
-                  <span className="underline hover:bg-black hover:text-white transition px-1 rounded duration-300 hover:translate-x-1">
-                    mail@astrotring.com
-                  </span>
-                </a>
-              </div>
+            <div className="mt-4">
+              <a
+                href="mailto:mail@astrotring.com"
+                className="flex items-center gap-3 text-sm text-gray-700 hover:text-amber-600 transition group flex-wrap"
+              >
+                <Mail className="size-8 text-[#EA4335] border border-gray-600 p-1.5 rounded-full group-hover:bg-amber-600 group-hover:border-amber-600 group-hover:text-white transition" />
+                <span className="underline-offset-2 hover:underline">
+                  mail@astrotring.com
+                </span>
+              </a>
             </div>
 
             {/* SOCIAL */}
-
-            <div className="flex gap-3 mt-3">
+            <div className="flex gap-2 mt-5">
               {[
-                TiSocialFacebook,
-                SlSocialInstagram,
-                TiSocialTwitter,
-                TiSocialYoutube,
-              ].map((Icon, i) => (
-                <Link key={i} to="#">
-                  <div className="border border-black rounded-full h-10 w-10 grid place-items-center hover:bg-black hover:text-white transition">
-                    <Icon className="size-5" />
-                  </div>
-                </Link>
+                {
+                  Icon: FaFacebook,
+                  href: "https://facebook.com",
+                  textColor: "text-[#1877F2]",
+                },
+                {
+                  Icon: FaInstagram,
+                  href: "https://instagram.com",
+                  textColor: "text-[#E4405F]",
+                },
+                {
+                  Icon: FaTwitter,
+                  href: "https://twitter.com",
+                  textColor: "text-[#1DA1F2]",
+                },
+                {
+                  Icon: FaYoutube,
+                  href: "https://youtube.com",
+                  textColor: "text-[#FF0000]",
+                },
+              ].map(({ Icon, href, textColor }, i) => (
+                <a
+                  key={i}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border border-gray-600 rounded-full h-8 w-8 grid place-items-center text-gray-700 hover:bg-amber-600 hover:border-amber-600 hover:text-white transition"
+                >
+                  <Icon className={`size-5 ${textColor}`} />
+                </a>
               ))}
             </div>
-
-            {/* DOWNLOAD APP */}
-
-            <h3 className="mt-6 font-semibold text-black text-lg">
+          </div>
+          {/* APP */}
+          <div>
+            {/* DOWNLOAD APP - Astroyogi Style */}
+            <h3 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
               Download Our App
             </h3>
-
-            <div className="flex flex-col sm:flex-row gap-3 mt-4">
-              {/* GOOGLE PLAY */}
-
+            <div className="flex flex-col gap-3 mt-4">
               <a
                 href="#"
                 target="_blank"
-                className="flex items-center justify-center gap-3 bg-black text-white 
-                  rounded-lg px-5 py-2.5 
-                  hover:bg-gray-800 transition-all duration-300 
-                  hover:scale-105 shadow-md"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-black text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-all duration-300 hover:scale-105 shadow-md w-fit"
               >
-                <FaGooglePlay size={15} />
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg"
+                  alt="Google Play"
+                  className="w-4 h-4"
+                />
                 <div className="flex flex-col leading-tight text-left">
-                  <span className="text-sm font-semibold">Google Play</span>
+                  <span className="text-[8px] font-light">GET IT ON</span>
+                  <span className="text-xs font-semibold">Google Play</span>
                 </div>
               </a>
 
-              {/* APP STORE */}
-
               <a
                 href="#"
                 target="_blank"
-                className="flex items-center justify-center gap-3 bg-black text-white 
-                rounded-lg px-5 py-2.5 
-                hover:bg-gray-800 transition-all duration-300 
-                hover:scale-105 shadow-md"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 bg-black text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-all duration-300 hover:scale-105 shadow-md w-fit"
               >
-                <FaApple size={15} />
+                <FaApple size={20} />
                 <div className="flex flex-col leading-tight text-left">
-                  <span className="text-sm font-semibold">App Store</span>
+                  <span className="text-[8px] font-light">Download on the</span>
+                  <span className="text-xs font-semibold">App Store</span>
                 </div>
               </a>
             </div>
           </div>
         </div>
+
+        {/* DISCLAIMER */}
+        <div className="border-t border-gray-300 py-4">
+          <p className="text-xs text-gray-500 leading-relaxed text-center md:text-left">
+            <span className="font-semibold">Disclaimer:</span> Astrology
+            services on{" "}
+            <a
+              href="https://astrotring.com"
+              target="_blank"
+              className="text-amber-600 hover:underline"
+            >
+              www.astrotring.com
+            </a>{" "}
+            are provided for guidance and entertainment purposes only. Results
+            may vary. Please read our full{" "}
+            <Link to="/disclaimer" className="text-amber-600 hover:underline">
+              {" "}
+              Disclaimer
+            </Link>{" "}
+            before using the website.
+          </p>
+        </div>
       </div>
 
       {/* COPYRIGHT */}
-
       <div className="bg-black text-white text-center py-5">
         © {new Date().getFullYear()} Astrotring. All Rights Reserved.
       </div>

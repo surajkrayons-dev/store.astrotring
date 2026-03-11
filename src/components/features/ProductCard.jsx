@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StarRating from "../common/StarRating";
 
+// Helper to extract rating
 const getRatingValue = (rating) => {
   if (typeof rating === 'number') return rating;
   if (rating && typeof rating === 'object') {
@@ -10,10 +11,22 @@ const getRatingValue = (rating) => {
   return 0;
 };
 
-const getDisplayPrice = (price) => {
+// Helper to get after price (current price)
+const getAfterPrice = (price) => {
+  if (!price) return 0;
   if (typeof price === 'number') return price;
-  if (price && typeof price === 'object') {
-    return parseFloat(price.after) || parseFloat(price.before) || 0;
+  if (typeof price === 'object') {
+    return parseFloat(price.after) || 0;
+  }
+  return 0;
+};
+
+// Helper to get before price (original price)
+const getBeforePrice = (price) => {
+  if (!price) return 0;
+  if (typeof price === 'number') return price; // fallback
+  if (typeof price === 'object') {
+    return parseFloat(price.before) || 0;
   }
   return 0;
 };
@@ -22,12 +35,14 @@ const ProductCard = ({ product, addToCart }) => {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
   
-  const displayPrice = getDisplayPrice(product.price);
-  const displayOriginalPrice = getDisplayPrice(product.originalPrice);
+  // Extract prices correctly
+  const afterPrice = getAfterPrice(product.price);
+  const beforePrice = getBeforePrice(product.price);
   const ratingValue = getRatingValue(product.rating);
   
-  const savings = displayOriginalPrice > displayPrice
-    ? Math.round(((displayOriginalPrice - displayPrice) / displayOriginalPrice) * 100)
+  // Calculate discount percentage if before > after
+  const savings = beforePrice > afterPrice && afterPrice > 0
+    ? Math.round(((beforePrice - afterPrice) / beforePrice) * 100)
     : 0;
 
   return (
@@ -54,12 +69,16 @@ const ProductCard = ({ product, addToCart }) => {
               ⚡ Best Seller
             </span>
           )}
-          {savings > 0 && (
-            <span className="bg-white text-amber-700 border border-amber-300 text-[10px] font-bold px-2 py-0.5 rounded-md">
+        </div>
+        
+        {/* Discount badge - project colors (amber gradient) */}
+        {savings > 0 && (
+          <div className="absolute top-2 right-2">
+            <span className="bg-gradient-to-br from-amber-600 to-amber-700 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-md">
               {savings}% OFF
             </span>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Quick action overlay – visible on hover (desktop) */}
         <div
@@ -111,11 +130,11 @@ const ProductCard = ({ product, addToCart }) => {
         <div className="mt-auto flex items-end justify-between">
           <div>
             <div className="text-base sm:text-lg font-extrabold text-stone-900">
-              ₹{displayPrice.toLocaleString()}
+              ₹{afterPrice.toLocaleString()}
             </div>
-            {displayOriginalPrice > 0 && displayOriginalPrice !== displayPrice && (
+            {beforePrice > afterPrice && (
               <div className="text-[10px] sm:text-xs text-stone-400 line-through">
-                ₹{displayOriginalPrice.toLocaleString()}
+                ₹{beforePrice.toLocaleString()}
               </div>
             )}
           </div>

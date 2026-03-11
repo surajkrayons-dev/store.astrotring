@@ -14,7 +14,7 @@ import { store } from './redux/store.js';
 
 createRoot(document.getElementById('root')).render(
   <>
-    <ToastContainer position="bottom-left" autoClose={2000} />
+    <ToastContainer position="top-right" autoClose={2000} style={{ zIndex: 999999 }} />
     <BrowserRouter>
       <Provider store={store}>
         <App />
