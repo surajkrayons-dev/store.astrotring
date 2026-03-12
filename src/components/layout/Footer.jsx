@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
-import { FaFacebook, FaInstagram, FaTwitter, FaYoutube  } from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import { SlSocialInstagram } from "react-icons/sl";
 import { FaGooglePlay, FaApple } from "react-icons/fa";
 import logo from "../../assets/logo.png";
@@ -18,15 +18,40 @@ const Footer = () => {
       <div className="container mx-auto px-4 lg:px-8">
         {/* ABOUT */}
         <div className="lg:col-span-1">
-            <Link to="/">
-              <img src={logo} alt="Astrotring" className="h-10 mb-4" />
-            </Link>
-            <p className="text-sm text-gray-700 leading-relaxed">
-              AstroTring Store offers a curated collection of authentic
-              astrology and spiritual products designed to enhance positivity
-              and balance in life. Explore a wide range of gemstones, rudraksha,
-              healing bracelets, and vastu items carefully selected by experts.
-            </p>
+          <Link to="/">
+            <img src={logo} alt="Astrotring" className="h-10 mb-4" />
+          </Link>
+          <p className="text-sm text-gray-700 leading-relaxed">
+            AstroTring Store offers a curated collection of authentic astrology
+            and spiritual products designed to enhance positivity and balance in
+            life. Explore a wide range of gemstones, rudraksha, healing
+            bracelets, and vastu items carefully selected by experts.
+          </p>
+        </div>
+        <hr className="text-gray-300 mt-4" />
+        <br />
+        {/* Main Footer Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 pb-8">
+          {/* COLLECTIONS - Dynamic from CATEGORIES */}
+          <div>
+            <h2 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
+              Collections
+            </h2>
+            <ul className="mt-4 space-y-2">
+              {collectionCategories.map((cat) => (
+                <li key={cat.id}>
+                  {/* <Link to={`/collections/${cat.id}`} className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">
+                    {cat.label}
+                  </Link> */}
+                  <Link
+                    to={""}
+                    className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                  >
+                    {cat.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
           </div>
           <hr className="text-gray-300 mt-4"/>
           <br />
@@ -106,11 +131,27 @@ const Footer = () => {
             {/* SOCIAL */}
             <div className="flex gap-2 mt-5">
               {[
-                { Icon: FaFacebook, href: "https://facebook.com", textColor:"text-[#1877F2]" },
-                { Icon: FaInstagram, href: "https://instagram.com",textColor:"text-[#E4405F]" },
-                { Icon: FaTwitter, href: "https://twitter.com",textColor:"text-[#1DA1F2]" },
-                { Icon: FaYoutube , href: "https://youtube.com",textColor:"text-[#FF0000]" },
-              ].map(({ Icon, href,textColor }, i) => (
+                {
+                  Icon: FaFacebook,
+                  href: "https://facebook.com",
+                  textColor: "text-[#1877F2]",
+                },
+                {
+                  Icon: FaInstagram,
+                  href: "https://instagram.com",
+                  textColor: "text-[#E4405F]",
+                },
+                {
+                  Icon: FaTwitter,
+                  href: "https://twitter.com",
+                  textColor: "text-[#1DA1F2]",
+                },
+                {
+                  Icon: FaYoutube,
+                  href: "https://youtube.com",
+                  textColor: "text-[#FF0000]",
+                },
+              ].map(({ Icon, href, textColor }, i) => (
                 <a
                   key={i}
                   href={href}
@@ -122,12 +163,10 @@ const Footer = () => {
                 </a>
               ))}
             </div>
-
-           
           </div>
           {/* APP */}
           <div>
-             {/* DOWNLOAD APP - Astroyogi Style */}
+            {/* DOWNLOAD APP - Astroyogi Style */}
             <h3 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
               Download Our App
             </h3>
@@ -138,7 +177,11 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-black text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-all duration-300 hover:scale-105 shadow-md w-fit"
               >
-                <FaGooglePlay size={18} className="text-[#34A853]" />
+                <img
+                  src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg"
+                  alt="Google Play"
+                  className="w-4 h-4"
+                />
                 <div className="flex flex-col leading-tight text-left">
                   <span className="text-[8px] font-light">GET IT ON</span>
                   <span className="text-xs font-semibold">Google Play</span>
@@ -151,7 +194,7 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-black text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-all duration-300 hover:scale-105 shadow-md w-fit"
               >
-                <FaApple size={18} />
+                <FaApple size={20} />
                 <div className="flex flex-col leading-tight text-left">
                   <span className="text-[8px] font-light">Download on the</span>
                   <span className="text-xs font-semibold">App Store</span>
@@ -164,10 +207,21 @@ const Footer = () => {
         {/* DISCLAIMER */}
         <div className="border-t border-gray-300 py-4">
           <p className="text-xs text-gray-500 leading-relaxed text-center md:text-left">
-            <span className="font-semibold">Disclaimer:</span> Astrology services on{" "}
-            <a href="https://astrotring.com" target="_blank" className="text-amber-600 hover:underline">www.astrotring.com</a>{" "}
-            are provided for guidance and entertainment purposes only. Results may vary. Please read our full{" "}
-            <Link to="/disclaimer" className="text-amber-600 hover:underline"> Disclaimer</Link>{" "}
+            <span className="font-semibold">Disclaimer:</span> Astrology
+            services on{" "}
+            <a
+              href="https://astrotring.com"
+              target="_blank"
+              className="text-amber-600 hover:underline"
+            >
+              www.astrotring.com
+            </a>{" "}
+            are provided for guidance and entertainment purposes only. Results
+            may vary. Please read our full{" "}
+            <Link to="/disclaimer" className="text-amber-600 hover:underline">
+              {" "}
+              Disclaimer
+            </Link>{" "}
             before using the website.
           </p>
         </div>
