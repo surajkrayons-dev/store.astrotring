@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { FaUser, FaShoppingCart, FaSignOutAlt } from "react-icons/fa";
+import { FaUser, FaShoppingCart, FaSignOutAlt, FaUserCircle, FaClipboardList, FaHeart, FaCog, FaHome } from "react-icons/fa";
 import logo from "../../assets/logo.png";
 import { logout } from "../../redux/slices/userAuthSlice";
-import { openLoginModal } from "../../redux/slices/uiSlice"; // 👈 import action
+import { openLoginModal } from "../../redux/slices/uiSlice";
 import { toast } from "react-toastify";
 
 const Navbar = () => {
@@ -65,15 +65,6 @@ const Navbar = () => {
           <img src={logo} alt="Logo" className="h-8 sm:h-10" />
         </Link>
 
-        {/* Search - hidden on mobile */}
-        {/* <div className="hidden md:block flex-1 max-w-[500px]">
-          <input
-            type="text"
-            placeholder="Search products..."
-            className="w-full py-2 px-4 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white focus:border-amber-600 outline-none text-sm"
-          />
-        </div> */}
-
         {/* Right side */}
         <div className="flex items-center gap-2 sm:gap-4">
           {/* Cart */}
@@ -118,22 +109,57 @@ const Navbar = () => {
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-semibold">{user?.name}</p>
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                  {/* User info header */}
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
                     <p className="text-xs text-gray-500">{user?.email}</p>
                   </div>
+
+                  {/* Dropdown links */}
+                  <div className="py-1">
+                    <Link
+                      to="/profile"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors"
+                    >
+                      <FaUserCircle size={16} />
+                      My Profile
+                    </Link>
+                    <Link
+                      to="/orders"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors"
+                    >
+                      <FaClipboardList size={16} />
+                      My Orders
+                    </Link>
+                    <Link
+  to="/"
+  onClick={() => setDropdownOpen(false)}
+  className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors"
+>
+  <FaHome size={16} />
+  Back to Home
+</Link>
+                    
+                  </div>
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-100 my-1"></div>
+
+                  {/* Logout button */}
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2 cursor-pointer"
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 cursor-pointer"
                   >
-                    <FaSignOutAlt size={14} /> Logout
+                    <FaSignOutAlt size={16} />
+                    Logout
                   </button>
                 </div>
               )}
             </div>
           ) : (
-            /* 👇 Login button – directly dispatches openLoginModal */
             <button
               onClick={() => dispatch(openLoginModal())}
               className="flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-1.5 sm:py-2.5 bg-stone-50/90 backdrop-blur-sm border border-stone-200/50 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group"

@@ -16,6 +16,7 @@ import { CATEGORIES } from "../constants/categories";
 import { addToCart } from "../redux/slices/cartSlice";
 import { fetchAllProducts } from '../redux/slices/productSlice';
 import HeroBanner from "../components/features/HeroBanner";
+import Loader from "@/components/common/Loader";
 
 // Helpers
 const getDisplayPrice = (price) => {
@@ -149,7 +150,7 @@ const HomePage = () => {
     setIsSidebarOpen(prev => !prev);
   };
 
-  if (loading) return <div className="text-center py-10">Loading products...</div>;
+  if (loading) return <div className="text-center py-10"><Loader data="Loading products..."/></div>;
   if (error) return <div className="text-center py-10 text-red-500">Error: {error}</div>;
   if (!products.length) return <div className="text-center py-10">No products found</div>;
 
