@@ -1,8 +1,8 @@
 // components/features/FilterSidebar.jsx
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { CATEGORIES } from "../../constants/categories";
 import StarRating from "../common/StarRating";
-import { products } from "../../data/Data";
 
 const FilterSidebar = ({
   selected,
@@ -12,6 +12,8 @@ const FilterSidebar = ({
   onClearFilters,
   className = "",
 }) => {
+  const { items: products } = useSelector((state) => state.product);
+
   const [expandedSections, setExpandedSections] = useState({
     categories: true,
     price: true,
@@ -30,7 +32,7 @@ const FilterSidebar = ({
         expandedSections[section] ? 'mb-2 sm:mb-3' : 'mb-0'
       }`}
     >
-      <span className="text-xs sm:text-sm font-bold text-stone-800 tracking-wide uppercase">
+      <span className="text-xs sm:text-sm font-semibold text-stone-800 tracking-wide uppercase">
         {title}
       </span>
       <svg
@@ -55,12 +57,12 @@ const FilterSidebar = ({
     <div className={`bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-md p-3 sm:p-4 md:p-5 overflow-y-auto ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-3 sm:mb-4 pb-2 sm:pb-3 border-b-2 border-gray-100">
-        <div className="text-sm sm:text-base font-extrabold text-stone-900 tracking-tight">
+        <div className="text-sm sm:text-base font-bold text-stone-900 tracking-tight">
           Filters
         </div>
         <button 
           onClick={onClearFilters} 
-          className="bg-transparent border-none text-amber-600 text-xs font-bold cursor-pointer underline hover:text-amber-700"
+          className="bg-transparent border-none text-amber-600 text-xs sm:text-sm font-medium cursor-pointer underline hover:text-amber-700"
         >
           Clear All
         </button>
@@ -73,23 +75,23 @@ const FilterSidebar = ({
           <div className="space-y-1">
             {CATEGORIES.map((cat) => {
               const active = selected === cat.id;
-              const count =
-                cat.id === "all"
-                  ? products.length
-                  : products.filter((p) => p.category === cat.id).length;
+              const count = cat.id === "all"
+                ? products.length
+                : products.filter((p) => p.category?.slug === cat.id).length;
+
               return (
                 <button
                   key={cat.id}
                   onClick={() => onSelect(cat.id)}
                   className={`w-full flex items-center gap-2 sm:gap-2.5 text-left px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-[9px] border-none cursor-pointer text-xs sm:text-sm transition-all ${
                     active
-                      ? "bg-gradient-to-br from-amber-100 to-amber-200 text-amber-900 font-bold shadow-[inset_0_0_0_1.5px_#fcd34d]"
-                      : "bg-transparent text-stone-600 font-medium hover:bg-stone-50"
+                      ? "bg-gradient-to-br from-amber-100 to-amber-200 text-amber-900 font-semibold shadow-[inset_0_0_0_1.5px_#fcd34d]"
+                      : "bg-transparent text-stone-600 font-normal hover:bg-stone-50"
                   }`}
                 >
                   <span className="text-base sm:text-lg">{cat.icon}</span>
                   <span className="flex-1 truncate">{cat.label}</span>
-                  <span className="text-[10px] sm:text-xs text-stone-400 font-semibold">{count}</span>
+                  <span className="text-[11px] sm:text-xs text-stone-400 font-normal">{count}</span>
                 </button>
               );
             })}
@@ -113,7 +115,7 @@ const FilterSidebar = ({
                   className="w-full px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-lg border border-gray-200 text-xs sm:text-sm outline-none focus:border-amber-600"
                 />
               </div>
-              <span className="text-stone-400 text-xs sm:text-sm font-mono">to</span>
+              <span className="text-stone-400 text-xs sm:text-sm">to</span>
               <div className="w-full sm:flex-1">
                 <input
                   type="number"
@@ -129,8 +131,8 @@ const FilterSidebar = ({
             <div className="flex flex-wrap gap-1.5 mt-1">
               {[
                 { label: "Under ₹1K", min: "", max: "1000" },
-                { label: "₹1K - ₹3K", min: "1000", max: "3000" },
-                { label: "₹3K - ₹5K", min: "3000", max: "5000" },
+                { label: "₹1K – ₹3K", min: "1000", max: "3000" },
+                { label: "₹3K – ₹5K", min: "3000", max: "5000" },
                 { label: "Above ₹5K", min: "5000", max: "" },
               ].map((range, i) => (
                 <button
@@ -142,11 +144,11 @@ const FilterSidebar = ({
                       maxPrice: range.max,
                     }))
                   }
-                  className={`px-2.5 py-1.5 rounded-md border text-[11px] font-semibold cursor-pointer transition-all ${
+                  className={`px-2.5 py-1.5 rounded-md border text-xs font-medium cursor-pointer transition-all ${
                     filters.minPrice === range.min &&
                     filters.maxPrice === range.max
                       ? "border-amber-300 bg-amber-100 text-amber-900"
-                      : "border-gray-200 bg-white text-stone-500 hover:bg-gray-50"
+                      : "border-gray-200 bg-white text-stone-600 hover:bg-gray-50"
                   }`}
                 >
                   {range.label}
@@ -175,7 +177,7 @@ const FilterSidebar = ({
                   className="cursor-pointer w-3 h-3 sm:w-4 sm:h-4"
                 />
                 <StarRating value={rating} size={12} />
-                <span className="text-[10px] sm:text-xs text-stone-500 font-semibold">& Up</span>
+                <span className="text-[11px] sm:text-xs text-stone-500 font-medium">& Up</span>
               </label>
             ))}
             <label className="flex items-center gap-2 sm:gap-2.5 cursor-pointer px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-lg transition-colors hover:bg-stone-50">
@@ -186,7 +188,7 @@ const FilterSidebar = ({
                 onChange={() => setFilters(f => ({ ...f, minRating: "" }))}
                 className="cursor-pointer w-3 h-3 sm:w-4 sm:h-4"
               />
-              <span className="text-[10px] sm:text-xs text-stone-500 font-semibold">All Ratings</span>
+              <span className="text-[11px] sm:text-xs text-stone-500 font-medium">All Ratings</span>
             </label>
           </div>
         )}
@@ -206,7 +208,7 @@ const FilterSidebar = ({
                   type="checkbox" 
                   className="cursor-pointer w-3 h-3 sm:w-4 sm:h-4" 
                 />
-                <span className="text-[10px] sm:text-xs text-stone-500 font-semibold">
+                <span className="text-[11px] sm:text-xs text-stone-600 font-medium">
                   {discount}% or more
                 </span>
               </label>

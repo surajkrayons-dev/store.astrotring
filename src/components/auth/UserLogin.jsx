@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import ForgotPassword from "./ForgotPassword";
 import { fileToBase64 } from "../../hooks/fileToBase64";
 import { Camera, Upload, X } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const UserLogin = () => {   // 👈 trigger prop hata diya
   const dispatch = useDispatch();
@@ -19,6 +20,7 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
   const { isLoginModalOpen } = useSelector((state) => state.ui); // 👈 state from Redux
   const [mode, setMode] = useState("login");
   const [userType, setUserType] = useState("user");
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   const [form, setForm] = useState({
     name: "",
@@ -111,8 +113,13 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
       setErrors({ fields: {}, form: "Passwords do not match" });
       return;
     }
+     if (!termsAccepted) {
+    setErrors({ fields: {}, form: "You must accept the Terms & Conditions to sign up." });
+    return;
+  }
     const { confirmPassword, ...submitData } = form;
     submitData.profile_image = profileImage || null;
+    submitData.terms_accepted = true;
     try {
       await dispatch(userRegister(submitData)).unwrap();
       toast.success("Register successful, please login");
@@ -226,7 +233,7 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
 
             {mode === "signup" && (
               <form onSubmit={handleSignup} className="space-y-3 mt-10">
-                {/* ... signup form ... (same as before) */}
+                {/* ... signup form  */}
                 <input
                   name="name"
                   placeholder="Full Name"
@@ -354,6 +361,36 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-amber-500 focus:border-amber-500"
                 />
+                {/* t&c */}
+
+                <div className="flex items-start gap-2">
+  <input
+    type="checkbox"
+    id="terms"
+    checked={termsAccepted}
+    onChange={(e) => setTermsAccepted(e.target.checked)}
+    className="mt-1 cursor-pointer"
+  />
+  <label htmlFor="terms" className="text-xs text-gray-600">
+    I have read and agree to the{" "}
+    <Link
+      to="/terms-conditions"
+      target="_blank"
+      className="text-amber-600 hover:underline"
+    >
+      Terms & Conditions
+    </Link>{" "}
+    and{" "}
+    <Link
+      to="/privacy-policy"
+      target="_blank"
+      className="text-amber-600 hover:underline"
+    >
+      Privacy Policy
+    </Link>
+    .
+  </label>
+</div>
 
                 <button
                   type="submit"

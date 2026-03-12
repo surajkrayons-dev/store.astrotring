@@ -94,7 +94,7 @@ const ProductDetailsPage = () => {
   }, [selectedImage]);
 
   if (loading)
-    return <div className="text-center py-10">Loading product...</div>;
+    return <div className="text-center py-10"><Loader data="Loading products..."/></div>;
   if (error)
     return <div className="text-center py-10 text-red-500">{error}</div>;
   if (!product)
