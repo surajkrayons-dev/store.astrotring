@@ -54,7 +54,7 @@ const FilterSidebar = ({
   );
 
   return (
-    <div className={`bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-md p-3 sm:p-4 md:p-5 overflow-y-auto ${className}`}>
+    <div className={`bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-md p-3 sm:p-4 md:p-5 overflow-y-auto scrollbar-hide ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-3 sm:mb-4 pb-2 sm:pb-3 border-b-2 border-gray-100">
         <div className="text-sm sm:text-base font-bold text-stone-900 tracking-tight">

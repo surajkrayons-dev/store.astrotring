@@ -176,12 +176,12 @@ const HomePage = () => {
   const isFilterActive = filters.search || filters.minPrice || filters.maxPrice || filters.minRating || filters.sort !== "default";
 
   const homeNavTop = isNavbarVisible ? navbarHeight : 0;
-  const sidebarTop = homeNavTop + 60 + 8 + 10;
+  const sidebarTop = homeNavTop + 60 + 8 + 10; // 60 = approx HomeNav height
 
   return (
     <div className="px-2 sm:px-4">
       <HeroBanner />
-      {/* 👇 Added margin-top to create gap between HeroBanner and HomeNav */}
+      {/* Gap between HeroBanner and HomeNav */}
       <div className="flex gap-3 sm:gap-4 md:gap-6 mt-4">
         <div className="flex-1 min-w-0">
           <div
@@ -207,13 +207,19 @@ const HomePage = () => {
               `}
               style={{ top: sidebarTop }}
             >
-              <FilterSidebar
-                selected={selectedCategory}
-                onSelect={scrollToCategory}
-                filters={filters}
-                setFilters={setFilters}
-                onClearFilters={clearFilters}
-              />
+              {/* 👇 Added min-h-0 to allow shrinking, and scrollbar-hide to hide scrollbar */}
+              <div
+                className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 w-full overflow-y-auto scrollbar-hide min-h-0"
+                style={{ maxHeight: `calc(100vh - ${sidebarTop}px - 2rem)` }}
+              >
+                <FilterSidebar
+                  selected={selectedCategory}
+                  onSelect={scrollToCategory}
+                  filters={filters}
+                  setFilters={setFilters}
+                  onClearFilters={clearFilters}
+                />
+              </div>
             </aside>
 
             <div className="flex-1 min-w-0">
