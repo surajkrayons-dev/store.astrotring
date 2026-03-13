@@ -1,6 +1,6 @@
 
 
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { lazy, Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { userProfile } from "./redux/slices/userAuthSlice";
@@ -19,6 +19,7 @@ const ShippingPolicyPage = lazy(() => import("./pages/legal/ShippingPolicyPage")
 const TermsAndConditionsPage = lazy(() => import("./pages/legal/TermsAndConditionsPage"));
 
 function App() {
+  const path = useLocation().pathname;
   const dispatch = useDispatch();
   const { token, user } = useSelector((state) => state.userAuth);
 
@@ -31,7 +32,7 @@ function App() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+  }, [path]);
 
   return (
     <Suspense fallback={<Loader data="Loading..." />}>

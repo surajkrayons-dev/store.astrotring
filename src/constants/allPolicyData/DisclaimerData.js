@@ -171,22 +171,6 @@ export const disclaimerData = {
         }
       ]
     },
-    {
-      heading: "WEBSITE FOOTER NOTICE",
-      body: [
-        {
-          type: "paragraph",
-          text: "The following short-form notice is to be displayed in the footer of every page of www.astrotring.com:"
-        },
-        {
-          type: "paragraph",
-          text: "*Astrology services on www.astrotring.com are provided for guidance and knowledge  purposes only. Results may vary. Please read our full Disclaimer, Terms and Conditions, and Privacy Policy before using this website.*"
-        },
-        {
-          type: "paragraph",
-          text: "© 2026 Veltex Services Private Limited. All rights reserved."
-        }
-      ]
-    }
+   
   ]
 };

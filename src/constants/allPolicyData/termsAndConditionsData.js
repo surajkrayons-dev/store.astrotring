@@ -195,7 +195,7 @@ export const termsAndConditionsData = {
             },
             {
               type: "paragraph",
-              text: "Any user found engaging in such conduct will have their account permanently deleted with immediate effect and the matter will be reported to the appropriate law enforcement authorities. Any such behaviour must be reported immediately to support@astrotring.com."
+              text: "Any user found engaging in such conduct will have their account permanently deleted with immediate effect and the matter will be reported to the appropriate law enforcement authorities. Any such behaviour must be reported immediately to store@astrotring.com."
             }
           ]
         },
@@ -208,7 +208,7 @@ export const termsAndConditionsData = {
             },
             {
               type: "paragraph",
-              text: "Any such activity must be reported immediately to support@astrotring.com."
+              text: "Any such activity must be reported immediately to store@astrotring.com."
             }
           ]
         },
@@ -614,7 +614,7 @@ export const termsAndConditionsData = {
         },
         {
           type: "paragraph",
-          text: "Email: support@astrotring.com"
+          text: "Email: store@astrotring.com"
         },
         {
           type: "paragraph",

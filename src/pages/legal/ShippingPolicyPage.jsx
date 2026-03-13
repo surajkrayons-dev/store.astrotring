@@ -88,12 +88,12 @@ const ShippingPolicyPage = () => {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-semibold text-stone-900 mb-2">
+          {/* <h1 className="text-3xl font-semibold text-stone-900 mb-2">
             {name}
           </h1>
           <p className="text-stone-400 text-xs mb-4">
             <Link to="https://astrotring.com/">{website}</Link>
-          </p>
+          </p> */}
           <h2 className="text-2xl font-semibold text-stone-900 mb-2">
             {title}
           </h2>
@@ -119,11 +119,11 @@ const ShippingPolicyPage = () => {
                 </div>
 
                 {/* Footer */}
-                <div className="mt-12 pt-8 border-t border-stone-100 text-center">
+                {/* <div className="mt-12 pt-8 border-t border-stone-100 text-center">
                     <p className="text-xs text-stone-400 tracking-wide">
                         © 2026 Veltex Services Private Limited. All rights reserved.
                     </p>
-                </div>
+                </div> */}
       </div>
     </div>
   );

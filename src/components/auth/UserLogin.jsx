@@ -119,7 +119,7 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
   }
     const { confirmPassword, ...submitData } = form;
     submitData.profile_image = profileImage || null;
-    submitData.terms_accepted = true;
+    submitData.terms_accepted = termsAccepted ? 1 : 0;
     try {
       await dispatch(userRegister(submitData)).unwrap();
       toast.success("Register successful, please login");
@@ -143,7 +143,7 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
       {/* Modal container */}
       <div className="absolute inset-0 flex items-center justify-center p-4">
         <div
-          className="relative bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto"
+          className="relative bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto scrollbar-hide"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="p-6">
@@ -157,7 +157,7 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
               </h2>
               <button
                 onClick={() => dispatch(closeLoginModal())}
-                className="text-gray-500 hover:text-gray-700 bg-gray-100 rounded-full p-1.5"
+                className="text-gray-500 hover:text-gray-700 bg-gray-100 rounded-full p-1.5 cursor-pointer"
               >
                 <X size={18} />
               </button>
@@ -203,7 +203,7 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
                       setMode("forgot");
                       setUserType("user");
                     }}
-                    className="text-sm text-amber-600 hover:underline"
+                    className="text-sm text-amber-600 hover:underline cursor-pointer"
                   >
                     Forgot Password?
                   </button>
@@ -211,7 +211,7 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-2 px-4 rounded-md hover:from-yellow-600 hover:to-yellow-700 disabled:opacity-50"
+                  className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-2 px-4 rounded-md hover:from-yellow-600 hover:to-yellow-700 disabled:opacity-50 cursor-pointer"
                 >
                   {loading ? "Logging in..." : "Login"}
                 </button>
@@ -223,7 +223,7 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
                       setMode("signup");
                       setErrors({ fields: {}, form: "" });
                     }}
-                    className="text-amber-600 hover:underline"
+                    className="text-amber-600 hover:underline cursor-pointer"
                   >
                     Sign Up
                   </button>
@@ -233,7 +233,6 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
 
             {mode === "signup" && (
               <form onSubmit={handleSignup} className="space-y-3 mt-10">
-                {/* ... signup form  */}
                 <input
                   name="name"
                   placeholder="Full Name"
@@ -330,7 +329,7 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
                             e.stopPropagation();
                             removeImage();
                           }}
-                          className="text-red-500 hover:text-red-700 p-0.5"
+                          className="text-red-500 hover:text-red-700 p-0.5 cursor-pointer"
                         >
                           <X className="w-3.5 h-3.5" />
                         </button>
@@ -361,41 +360,40 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
                   onChange={handleChange}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-amber-500 focus:border-amber-500"
                 />
-                {/* t&c */}
 
                 <div className="flex items-start gap-2">
-  <input
-    type="checkbox"
-    id="terms"
-    checked={termsAccepted}
-    onChange={(e) => setTermsAccepted(e.target.checked)}
-    className="mt-1 cursor-pointer"
-  />
-  <label htmlFor="terms" className="text-xs text-gray-600">
-    I have read and agree to the{" "}
-    <Link
-      to="/terms-conditions"
-      target="_blank"
-      className="text-amber-600 hover:underline"
-    >
-      Terms & Conditions
-    </Link>{" "}
-    and{" "}
-    <Link
-      to="/privacy-policy"
-      target="_blank"
-      className="text-amber-600 hover:underline"
-    >
-      Privacy Policy
-    </Link>
-    .
-  </label>
-</div>
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    checked={termsAccepted}
+                    onChange={(e) => setTermsAccepted(e.target.checked)}
+                    className="mt-1 cursor-pointer"
+                  />
+                  <label htmlFor="terms" className="text-xs text-gray-600">
+                    I have read and agree to the{" "}
+                    <Link
+                      to="/terms-conditions"
+                      target="_blank"
+                      className="text-amber-600 hover:underline"
+                    >
+                      Terms & Conditions
+                    </Link>{" "}
+                    and{" "}
+                    <Link
+                      to="/privacy-policy"
+                      target="_blank"
+                      className="text-amber-600 hover:underline"
+                    >
+                      Privacy Policy
+                    </Link>
+                    .
+                  </label>
+                </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-2 px-4 rounded-md hover:from-yellow-600 hover:to-yellow-700 disabled:opacity-50"
+                  className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-2 px-4 rounded-md hover:from-yellow-600 hover:to-yellow-700 disabled:opacity-50 cursor-pointer"
                 >
                   {loading ? "Creating..." : "Sign Up"}
                 </button>
@@ -407,7 +405,7 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
                       setMode("login");
                       setErrors({ fields: {}, form: "" });
                     }}
-                    className="text-amber-600 hover:underline"
+                    className="text-amber-600 hover:underline cursor-pointer"
                   >
                     Login
                   </button>

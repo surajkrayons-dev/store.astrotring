@@ -209,7 +209,7 @@ const HomePage = () => {
             >
               {/* 👇 Added min-h-0 to allow shrinking, and scrollbar-hide to hide scrollbar */}
               <div
-                className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4 w-full overflow-y-auto scrollbar-hide min-h-0"
+                className="bg-white rounded-2xl border border-gray-200  w-full overflow-y-auto scrollbar-hide min-h-0"
                 style={{ maxHeight: `calc(100vh - ${sidebarTop}px - 2rem)` }}
               >
                 <FilterSidebar

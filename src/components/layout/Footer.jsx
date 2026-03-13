@@ -96,11 +96,11 @@ const Footer = () => {
 
             <div className="mt-4">
               <a
-                href="mailto:mail@astrotring.com"
+                href="mailto:store@astrotring.com"
                 className="flex items-center gap-3 text-sm text-gray-700 hover:text-amber-600 transition group flex-wrap"
               >
                 <Mail className="size-8 text-[#EA4335] border border-gray-600 p-1.5 rounded-full group-hover:bg-amber-600 group-hover:border-amber-600 group-hover:text-white transition" />
-                <span className="underline-offset-2 hover:underline">mail@astrotring.com</span>
+                <span className="underline-offset-2 hover:underline">store@astrotring.com</span>
               </a>
             </div>
 
