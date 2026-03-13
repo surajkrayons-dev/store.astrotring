@@ -1,113 +1,106 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ArrowRight, Circle } from 'lucide-react';
 
-// स्लाइड्स का डेटा - इसे आप बाद में API से भी ला सकते हैं
 const promoSlides = [
   {
     id: 1,
-    text: "🚚 फ्री शिपिंग सभी ऑर्डर पर ₹999 से ऊपर",
-    bgColor: "bg-amber-600",
+    text: "For Every Woman Who Deserves More",
+    path: "/",
   },
   {
     id: 2,
-    text: "🎉 नए ग्राहकों के लिए 10% अतिरिक्त छूट",
-    bgColor: "bg-stone-700",
+    text: "Special Introductory Deals to Begin Your Astro Journey",
+    path: "/",
   },
   {
     id: 3,
-    text: "✨ प्रीमियम रत्नों पर 20% तक की छूट",
-    bgColor: "bg-amber-700",
+    text: "Begin Your Astro Journey with Exclusive Introductory Offers",
+    path: "/",
   },
 ];
 
 const TopPromoSlider = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [isVisible, setIsVisible] = useState(true); // स्लाइडर को बंद करने के लिए
   const intervalRef = useRef(null);
 
-  // ऑटो-स्लाइड के लिए इंटरवल
   useEffect(() => {
-    if (!isPaused && isVisible) {
+    if (!isPaused) {
       intervalRef.current = setInterval(() => {
-        setCurrentIndex((prevIndex) => (prevIndex + 1) % promoSlides.length);
-      }, 4000); // हर 4 सेकंड में बदलें
+        setCurrentIndex((prev) => (prev + 1) % promoSlides.length);
+      }, 4000);
     }
     return () => clearInterval(intervalRef.current);
-  }, [isPaused, isVisible]);
+  }, [isPaused]);
 
   const goToNext = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % promoSlides.length);
+    setCurrentIndex((prev) => (prev + 1) % promoSlides.length);
   };
 
   const goToPrev = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + promoSlides.length) % promoSlides.length);
+    setCurrentIndex((prev) => (prev - 1 + promoSlides.length) % promoSlides.length);
   };
-
-  const goToSlide = (index) => {
-    setCurrentIndex(index);
-  };
-
-  const closeSlider = () => {
-    setIsVisible(false);
-  };
-
-  if (!isVisible) return null;
-
-  const currentSlide = promoSlides[currentIndex];
 
   return (
-    <div className={`w-full ${currentSlide.bgColor} text-white transition-all duration-500`}>
-      <div className="container mx-auto px-4 py-2 flex items-center justify-between">
-        {/* बायाँ तीर */}
-        <button
-          onClick={goToPrev}
-          className="p-1 hover:bg-white/20 rounded-full transition"
-          aria-label="पिछला प्रोमो"
-        >
-          <ChevronLeft size={18} />
-        </button>
+    <div className="w-full bg-amber-900  text-white">
+      <div className=" mx-auto px-4 py-3">
+        <div className="flex items-center justify-between gap-4">
+          {/* left arrow */}
+          <button
+            onClick={goToPrev}
+            className="p-1.5 hover:bg-white/20 rounded-full transition-colors flex-shrink-0"
+            aria-label="Previous slide"
+          >
+            <ChevronLeft size={18} />
+          </button>
 
-        {/* स्लाइड कंटेंट - यहाँ होवर करने पर ऑटो-स्लाइड रुक जाएगा */}
-        <div
-          className="flex-1 text-center font-medium text-sm md:text-base px-2"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
-          {currentSlide.text}
-        </div>
+          {/* slide content with sliding animation */}
+          <div
+            className="flex-1 overflow-hidden"
+            onMouseEnter={() => setIsPaused(true)}
+            onMouseLeave={() => setIsPaused(false)}
+          >
+            <div
+              className="flex transition-transform duration-500 ease-in-out"
+              style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+            >
+              {promoSlides.map((slide, idx) => (
+                <div
+                  key={idx}
+                  className="w-full flex-shrink-0 flex items-center justify-center gap-2"
+                >
+                  {/* Text */}
+                  <a 
+                   href={slide.path}
+                  className="font-medium text-xs tracking-wide text-center relative inline-block
+             after:content-[''] after:absolute after:left-0 after:bottom-[-0px] after:w-0 after:h-[1px] after:bg-amber-200
+             hover:after:w-full after:transition-all after:duration-700 ease-in-out hover:text-amber-200">
+                    {slide.text}
+                  </a>
+                  {/* Dot */}
+                  <Circle className="w-1 h-1 fill-amber-400 text-amber-400 flex-shrink-0 animate-pulse" />
+                  {/* Shop Now Button */}
+                  <a
+                    href={slide.path}
+                    className="group flex items-center gap-1 text-yellow-400 py-1.5 text-xs font-semibold transition-all duration-300 flex-shrink-0 cursor-pointer"
+                  >
+                    <span>Shop Now</span>
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform rotate-315" />
+                  </a>
+                </div>
+              ))}
+            </div>
+          </div>
 
-        {/* दायाँ तीर और बंद करने का बटन */}
-        <div className="flex items-center gap-2">
+          {/* right arrow */}
           <button
             onClick={goToNext}
-            className="p-1 hover:bg-white/20 rounded-full transition"
-            aria-label="अगला प्रोमो"
+            className="p-1.5 hover:bg-white/20 rounded-full transition-colors flex-shrink-0"
+            aria-label="Next slide"
           >
             <ChevronRight size={18} />
           </button>
-          <button
-            onClick={closeSlider}
-            className="p-1 hover:bg-white/20 rounded-full transition"
-            aria-label="प्रोमो बार बंद करें"
-          >
-            <X size={18} />
-          </button>
         </div>
-      </div>
-
-      {/* डॉट्स नेविगेशन (वैकल्पिक) */}
-      <div className="flex justify-center gap-1 pb-1">
-        {promoSlides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            className={`h-1.5 rounded-full transition-all ${
-              index === currentIndex ? 'w-4 bg-white' : 'w-1.5 bg-white/50'
-            }`}
-            aria-label={`स्लाइड ${index + 1} पर जाएँ`}
-          />
-        ))}
       </div>
     </div>
   );
