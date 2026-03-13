@@ -104,7 +104,7 @@ const Footer = () => {
               </a>
             </div>
 
-            {/* SOCIAL */}
+            {/* social icons */}
             <div className="flex gap-2 mt-5">
               {[
                 { Icon: FaFacebook, href: "https://facebook.com", textColor:"text-[#1877F2]" },
