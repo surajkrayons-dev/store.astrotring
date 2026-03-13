@@ -58,12 +58,54 @@ const Footer = () => {
             </h2>
 
             <ul className="mt-4 space-y-2">
-              <li><Link to="/" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Astrology Blogs</Link></li>
-              <li><Link to="/" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Zodiac Signs</Link></li>
-              <li><Link to="/" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Numerology</Link></li>
-              <li><Link to="/" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Vastu Shastra</Link></li>
-              <li><Link to="/t" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Tarot</Link></li>
-              <li><Link to="/" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Love Calculator</Link></li>
+              <li>
+                <Link
+                  to="/"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
+                  Astrology Blogs
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
+                  Zodiac Signs
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
+                  Numerology
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
+                  Vastu Shastra
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/t"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
+                  Tarot
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
+                  Love Calculator
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -75,12 +117,51 @@ const Footer = () => {
 
             <ul className="mt-4 space-y-2">
               {/* <li><Link to="/" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">About Us</Link></li> */}
-              <li><Link to="/privacy-policy" target="_blank" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Privacy Policy</Link></li>
-              <li><Link to="/terms-conditions" target="_blank" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Terms & Conditions</Link></li>
-              <li><Link to="/refund-policy" target="_blank" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Refund & Cancellation</Link></li>
-              <li><Link to="/shipping-policy" target="_blank" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">
-              Shipping Policy</Link></li>
-              <li><Link to="/disclaimer" target="_blank" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Disclaimer</Link></li>
+              <li>
+                <Link
+                  to="/privacy-policy"
+                  target="_blank"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/terms-conditions"
+                  target="_blank"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
+                  Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/refund-policy"
+                  target="_blank"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
+                  Refund & Cancellation
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/shipping-policy"
+                  target="_blank"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
+                  Shipping Policy
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/disclaimer"
+                  target="_blank"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
+                  Disclaimer
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -100,27 +181,45 @@ const Footer = () => {
                 className="flex items-center gap-3 text-sm text-gray-700 hover:text-amber-600 transition group flex-wrap"
               >
                 <Mail className="size-8 text-[#EA4335] border border-gray-600 p-1.5 rounded-full group-hover:bg-amber-600 group-hover:border-amber-600 group-hover:text-white transition" />
-                <span className="underline-offset-2 hover:underline">store@astrotring.com</span>
+                <span className="underline-offset-2 hover:underline">
+                  store@astrotring.com
+                </span>
               </a>
             </div>
 
             {/* social icons */}
-            
+
             <div className="flex gap-2 mt-5">
               {[
-                { Icon: FaFacebook, href: "https://facebook.com" },
-                { Icon: FaInstagram, href: "https://instagram.com" },
-                { Icon: FaTwitter, href: "https://twitter.com" },
-                { Icon: FaYoutube, href: "https://youtube.com" },
-              ].map(({ Icon, href }, i) => (
+                {
+                  Icon: FaFacebook,
+                  href: "https://facebook.com",
+                  textColor: "text-[#1877F2]",
+                },
+                {
+                  Icon: FaInstagram,
+                  href: "https://instagram.com",
+                  textColor: "text-[#E4405F]",
+                },
+                {
+                  Icon: FaTwitter,
+                  href: "https://twitter.com",
+                  textColor: "text-[#1DA1F2]",
+                },
+                {
+                  Icon: FaYoutube,
+                  href: "https://youtube.com",
+                  textColor: "text-[#FF0000]",
+                },
+              ].map(({ Icon, href, textColor }, i) => (
                 <a
                   key={i}
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="border border-gray-600 rounded-full h-8 w-8 grid place-items-center hover:bg-amber-600 hover:text-white"
+                  className="border border-gray-600 rounded-full h-8 w-8 grid place-items-center text-gray-700 hover:bg-amber-600 hover:border-amber-600 hover:text-white transition"
                 >
-                  <Icon className="size-4" />
+                  <Icon className={`size-5 ${textColor}`} />
                 </a>
               ))}
             </div>
@@ -161,10 +260,25 @@ const Footer = () => {
         {/* DISCLAIMER */}
         <div className="border-t border-gray-300 py-4">
           <p className="text-xs text-gray-500 leading-relaxed text-center md:text-left">
-            <span className="font-semibold">Disclaimer:</span> Astrology services on{" "}
-            <a href="https://astrotring.com" target="_blank" className="text-amber-600 hover:underline">www.astrotring.com</a>{" "}
-            are provided for guidance and knowledge purposes only. Results may vary. Please read our full{" "}
-            <Link to="/disclaimer" target="_blank" className="text-amber-600 hover:underline"> Disclaimer</Link>{" "}
+            <span className="font-semibold">Disclaimer:</span> Astrology
+            services on{" "}
+            <a
+              href="https://astrotring.com"
+              target="_blank"
+              className="text-amber-600 hover:underline"
+            >
+              www.astrotring.com
+            </a>{" "}
+            are provided for guidance and knowledge purposes only. Results may
+            vary. Please read our full{" "}
+            <Link
+              to="/disclaimer"
+              target="_blank"
+              className="text-amber-600 hover:underline"
+            >
+              {" "}
+              Disclaimer
+            </Link>{" "}
             before using the website.
           </p>
         </div>
