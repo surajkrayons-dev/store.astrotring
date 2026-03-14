@@ -20,6 +20,7 @@ import {
   fetchProductById,
   clearSelectedProduct,
 } from "../redux/slices/productSlice";
+import Loader from "@/components/common/Loader";
 
 // Fallback image (inline SVG)
 const fallbackImage =

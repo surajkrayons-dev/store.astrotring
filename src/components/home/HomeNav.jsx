@@ -15,11 +15,11 @@ const HomeNav = ({
       {/* Filter Button */}
       <button
         onClick={onToggleSidebar}
-        className="flex items-center gap-1.5 px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg text-stone-600 hover:bg-stone-100 hover:text-amber-600 transition-all duration-200 cursor-pointer group"
+        className="flex items-center gap-1.5 px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg text-gray-900 hover:text-amber-600 transition-all duration-200 cursor-pointer group border  border-gray-200"
         aria-label="Toggle filters"
       >
-        <Filter className="w-5 h-5 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />
-        <span className="text-xs sm:text-sm font-medium text-stone-700 group-hover:text-amber-600">
+        <Filter className="w-5 h-5 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform " />
+        <span className="text-xs sm:text-sm font-medium group-hover:text-amber-600">
           {buttonText}
         </span>
       </button>
