@@ -35,14 +35,12 @@ const Footer = () => {
             <h2 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
               Collections
             </h2>
+
             <ul className="mt-4 space-y-2">
               {collectionCategories.map((cat) => (
                 <li key={cat.id}>
-                  {/* <Link to={`/collections/${cat.id}`} className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">
-                    {cat.label}
-                  </Link> */}
                   <Link
-                    to={""}
+                    to={`/#category-${cat.id}`} // 👈 hash link
                     className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
                   >
                     {cat.label}
@@ -57,10 +55,11 @@ const Footer = () => {
             <h2 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
               Resources
             </h2>
+
             <ul className="mt-4 space-y-2">
               <li>
                 <Link
-                  to="/blogs"
+                  to="/"
                   className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
                 >
                   Astrology Blogs
@@ -68,7 +67,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/zodiac-signs"
+                  to="/"
                   className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
                 >
                   Zodiac Signs
@@ -76,7 +75,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/numerology"
+                  to="/"
                   className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
                 >
                   Numerology
@@ -84,7 +83,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/vastu-shastra"
+                  to="/"
                   className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
                 >
                   Vastu Shastra
@@ -92,7 +91,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/tarot"
+                  to="/t"
                   className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
                 >
                   Tarot
@@ -100,7 +99,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/love-calculator"
+                  to="/"
                   className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
                 >
                   Love Calculator
@@ -114,18 +113,13 @@ const Footer = () => {
             <h2 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
               Corporate Info
             </h2>
+
             <ul className="mt-4 space-y-2">
-              <li>
-                <Link
-                  to="/about-us"
-                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
-                >
-                  About Us
-                </Link>
-              </li>
+              {/* <li><Link to="/" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">About Us</Link></li> */}
               <li>
                 <Link
                   to="/privacy-policy"
+                  target="_blank"
                   className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
                 >
                   Privacy Policy
@@ -134,6 +128,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/terms-conditions"
+                  target="_blank"
                   className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
                 >
                   Terms & Conditions
@@ -142,6 +137,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/refund-policy"
+                  target="_blank"
                   className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
                 >
                   Refund & Cancellation
@@ -149,15 +145,17 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  to="/pricing-policy"
+                  to="/shipping-policy"
+                  target="_blank"
                   className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
                 >
-                  Pricing Policy
+                  Shipping Policy
                 </Link>
               </li>
               <li>
                 <Link
                   to="/disclaimer"
+                  target="_blank"
                   className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
                 >
                   Disclaimer
@@ -166,28 +164,49 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* CONTACT  */}
+          {/* CONTACT */}
           <div>
             <h2 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
               Contact us
             </h2>
-            <p className="text-sm text-gray-700 leading-relaxed mt-4">
+
+            <p className="text-sm text-gray-700 mt-4">
               We are available 24x7 on chat support, click to start chat
             </p>
 
             <div className="mt-4">
               <a
-                href="mailto:mail@astrotring.com"
+                href="mailto:store@astrotring.com"
                 className="flex items-center gap-3 text-sm text-gray-700 hover:text-amber-600 transition group flex-wrap"
               >
                 <Mail className="size-8 text-[#EA4335] border border-gray-600 p-1.5 rounded-full group-hover:bg-amber-600 group-hover:border-amber-600 group-hover:text-white transition" />
                 <span className="underline-offset-2 hover:underline">
-                  mail@astrotring.com
+                  store@astrotring.com
                 </span>
               </a>
             </div>
 
-            {/* SOCIAL */}
+            {/* social icons */}
+
+            {/* <div className="flex gap-2 mt-5">
+              {[
+                { Icon: FaFacebook, href: "https://facebook.com", textColor:"text-[#1877F2]" },
+                { Icon: FaInstagram, href: "https://instagram.com",textColor:"text-[#E4405F]" },
+                { Icon: FaTwitter, href: "https://twitter.com",textColor:"text-[#1DA1F2]" },
+                { Icon: FaYoutube , href: "https://youtube.com",textColor:"text-[#FF0000]" },
+              ].map(({ Icon, href,textColor }, i) => (
+                <a
+                  key={i}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border border-gray-600 rounded-full h-8 w-8 grid place-items-center text-gray-700 hover:bg-amber-600 hover:border-amber-600 hover:text-white transition"
+                >
+                  <Icon className={`size-5 ${textColor}`} />
+                </a>
+              ))}
+            </div> */}
+
             <div className="flex gap-2 mt-5">
               {[
                 {
@@ -223,37 +242,35 @@ const Footer = () => {
               ))}
             </div>
           </div>
+
           {/* APP */}
           <div>
-            {/* DOWNLOAD APP - Astroyogi Style */}
             <h3 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
               Download Our App
             </h3>
             <div className="flex flex-col gap-3 mt-4">
+              {/* Google Play Button – original icon, proper size */}
               <a
                 href="#"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 bg-black text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-all duration-300 hover:scale-105 shadow-md w-fit"
+                className="flex items-center gap-2 bg-black text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-all duration-300 hover:scale-105 shadow-md w-fit min-w-[160px]"
               >
-                <img
-                  src="https://upload.wikimedia.org/wikipedia/commons/d/d0/Google_Play_Arrow_logo.svg"
-                  alt="Google Play"
-                  className="w-4 h-4"
-                />
+                <FaGooglePlay size={20} className="text-white" />
                 <div className="flex flex-col leading-tight text-left">
                   <span className="text-[8px] font-light">GET IT ON</span>
                   <span className="text-xs font-semibold">Google Play</span>
                 </div>
               </a>
 
+              {/* App Store Button – same size and style */}
               <a
                 href="#"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 bg-black text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-all duration-300 hover:scale-105 shadow-md w-fit"
+                className="flex items-center gap-2 bg-black text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-all duration-300 hover:scale-105 shadow-md w-fit min-w-[160px]"
               >
-                <FaApple size={20} />
+                <FaApple size={20} className="text-white" />
                 <div className="flex flex-col leading-tight text-left">
                   <span className="text-[8px] font-light">Download on the</span>
                   <span className="text-xs font-semibold">App Store</span>
@@ -275,9 +292,13 @@ const Footer = () => {
             >
               www.astrotring.com
             </a>{" "}
-            are provided for guidance and entertainment purposes only. Results
-            may vary. Please read our full{" "}
-            <Link to="/disclaimer" className="text-amber-600 hover:underline">
+            are provided for guidance and knowledge purposes only. Results may
+            vary. Please read our full{" "}
+            <Link
+              to="/disclaimer"
+              target="_blank"
+              className="text-amber-600 hover:underline"
+            >
               {" "}
               Disclaimer
             </Link>{" "}

@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { FaUser, FaShoppingCart, FaSignOutAlt } from "react-icons/fa";
+import { FaUser, FaShoppingCart, FaSignOutAlt, FaUserCircle, FaClipboardList, FaHeart, FaCog, FaHome } from "react-icons/fa";
 import logo from "../../assets/logo.png";
 import { logout } from "../../redux/slices/userAuthSlice";
-import UserLogin from "../auth/UserLogin";
+import { openLoginModal } from "../../redux/slices/uiSlice";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [isNavHidden, setIsNavHidden] = useState(false); // 👈 Naya state
-  const lastScrollY = useRef(0); // 👈 Ref for last scroll position
+  const [isNavHidden, setIsNavHidden] = useState(false);
+  const lastScrollY = useRef(0);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -21,20 +22,15 @@ const Navbar = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      const threshold = 10; // थ्रेशोल्ड ताकि बार-बार टॉगल न हो
+      const threshold = 10;
 
-      // Scroll direction detection
       if (currentScrollY > lastScrollY.current + threshold) {
-        // Scrolling down → navbar hide
         setIsNavHidden(true);
       } else if (currentScrollY < lastScrollY.current - threshold) {
-        // Scrolling up → navbar show
         setIsNavHidden(false);
       }
 
-      // Shadow on scroll (original functionality)
       setScrolled(currentScrollY > 20);
-
       lastScrollY.current = currentScrollY;
     };
 
@@ -42,7 +38,6 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const closeDropdown = (e) => {
       if (!e.target.closest(".user-menu")) setDropdownOpen(false);
@@ -54,6 +49,7 @@ const Navbar = () => {
   const handleLogout = () => {
     dispatch(logout());
     setDropdownOpen(false);
+    toast.success("Logged out!!");
     navigate("/");
   };
 
@@ -61,26 +57,17 @@ const Navbar = () => {
     <nav
       className={`w-full sticky top-0 z-[100] bg-white transition-all duration-500 ${
         scrolled ? "shadow-md" : ""
-      } ${isNavHidden ? '-translate-y-full' : 'translate-y-0'}`} // 👈 Animation classes
+      } ${isNavHidden ? '-translate-y-full' : 'translate-y-0'}`}
     >
       <div className="w-full px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-6">
-        {/* Logo - smaller on mobile */}
+        {/* Logo */}
         <Link to="/" className="flex-shrink-0">
           <img src={logo} alt="Logo" className="h-8 sm:h-10" />
         </Link>
 
-        {/* Search - hidden on mobile, visible on md+ */}
-        <div className="hidden md:block flex-1 max-w-[500px]">
-          <input
-            type="text"
-            placeholder="Search products..."
-            className="w-full py-2 px-4 rounded-lg border border-gray-200 bg-gray-50 focus:bg-white focus:border-amber-600 outline-none text-sm"
-          />
-        </div>
-
         {/* Right side */}
         <div className="flex items-center gap-2 sm:gap-4">
-          {/* Cart - responsive padding */}
+          {/* Cart */}
           <div
             onClick={() => navigate("/cart")}
             className="relative flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-1.5 sm:py-2.5 bg-stone-50/90 backdrop-blur-sm border border-stone-200/50 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group"
@@ -106,54 +93,87 @@ const Navbar = () => {
             <div className="relative user-menu">
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
-                className="focus:outline-none"
+                className="focus:outline-none cursor-pointer"
               >
                 {user?.profile_image ? (
                   <img
                     src={user.profile_image}
-                    alt={user.name}
-                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-amber-200 object-cover"
+                    alt={user?.name?.charAt(0).toUpperCase()}
+                    className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 border-amber-200 object-cover cursor-pointer"
                   />
                 ) : (
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-sm sm:text-lg">
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-amber-600 text-white flex items-center justify-center font-medium text-sm sm:text-lg cursor-pointer">
                     {user?.name?.charAt(0).toUpperCase()}
                   </div>
                 )}
               </button>
 
               {dropdownOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                  <div className="px-4 py-2 border-b border-gray-100">
-                    <p className="text-sm font-semibold">{user?.name}</p>
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-2 z-50">
+                  {/* User info header */}
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-semibold text-gray-900">{user?.name}</p>
                     <p className="text-xs text-gray-500">{user?.email}</p>
                   </div>
+
+                  {/* Dropdown links */}
+                  <div className="py-1">
+                    <Link
+                      to="/"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors"
+                    >
+                      <FaUserCircle size={16} />
+                      My Profile
+                    </Link>
+                    <Link
+                      to="/"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors"
+                    >
+                      <FaClipboardList size={16} />
+                      My Orders
+                    </Link>
+                    <Link
+  to="/"
+  onClick={() => setDropdownOpen(false)}
+  className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors"
+>
+  <FaHome size={16} />
+  Back to Home
+</Link>
+                    
+                  </div>
+
+                  {/* Divider */}
+                  <div className="border-t border-gray-100 my-1"></div>
+
+                  {/* Logout button */}
                   <button
                     onClick={handleLogout}
-                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 flex items-center gap-2"
+                    className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-3 cursor-pointer"
                   >
-                    <FaSignOutAlt size={14} /> Logout
+                    <FaSignOutAlt size={16} />
+                    Logout
                   </button>
                 </div>
               )}
             </div>
           ) : (
-            <UserLogin
-              trigger={
-                <div
-                  className="flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-1.5 sm:py-2.5 bg-stone-50/90 backdrop-blur-sm border border-stone-200/50 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group"
-                  style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.05)' }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/30 to-amber-500/30 rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <FaUser className="text-amber-600 relative z-10" size={16} />
-                  <span
-                    className="font-medium text-stone-700 relative z-10 hidden sm:block xs:inline text-sm sm:text-base"
-                    style={{ fontFamily: 'Montserrat, sans-serif' }}
-                  >
-                    Login
-                  </span>
-                </div>
-              }
-            />
+            <button
+              onClick={() => dispatch(openLoginModal())}
+              className="flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-1.5 sm:py-2.5 bg-stone-50/90 backdrop-blur-sm border border-stone-200/50 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group"
+              style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.05)' }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-400/30 to-amber-500/30 rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <FaUser className="text-amber-600 relative z-10" size={16} />
+              <span
+                className="font-medium text-stone-700 relative z-10 hidden sm:block xs:inline text-sm sm:text-base"
+                style={{ fontFamily: 'Montserrat, sans-serif' }}
+              >
+                Login
+              </span>
+            </button>
           )}
         </div>
       </div>

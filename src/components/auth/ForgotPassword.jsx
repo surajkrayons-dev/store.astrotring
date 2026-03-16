@@ -8,7 +8,7 @@ import {
 import { toast } from "react-toastify";
 
 const ForgotPassword = ({ onSuccess, onCancel, userType }) => {
-  const [step, setStep] = useState(1); // 1: email, 2: otp, 3: new password
+  const [step, setStep]= useState(1); // 1: email, 2: otp, 3: new password
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [password, setPassword] = useState("");
@@ -121,7 +121,7 @@ const ForgotPassword = ({ onSuccess, onCancel, userType }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-2 px-4 rounded-md hover:from-yellow-600 hover:to-yellow-700 disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-2 px-4 rounded-md hover:from-yellow-600 hover:to-yellow-700 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
             {loading ? "Sending OTP..." : "Send OTP"}
           </button>
@@ -144,7 +144,7 @@ const ForgotPassword = ({ onSuccess, onCancel, userType }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-2 px-4 rounded-md hover:from-yellow-600 hover:to-yellow-700 disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-2 px-4 rounded-md hover:from-yellow-600 hover:to-yellow-700 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
             {loading ? "Verifying..." : "Verify OTP"}
           </button>
@@ -180,7 +180,7 @@ const ForgotPassword = ({ onSuccess, onCancel, userType }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-2 px-4 rounded-md hover:from-yellow-600 hover:to-yellow-700 disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-yellow-500 to-yellow-600 text-white py-2 px-4 rounded-md hover:from-yellow-600 hover:to-yellow-700 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed"
           >
             {loading ? "Resetting..." : "Reset Password"}
           </button>
