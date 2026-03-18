@@ -922,4 +922,4 @@ const ProductDetailsPage = () => {
     );
 };
 
-export default ProductDetailsPage;change productdetails page
+export default ProductDetailsPage;
