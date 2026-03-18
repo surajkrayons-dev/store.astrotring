@@ -167,7 +167,7 @@ const Footer = () => {
         </div>
 
         {/* DISCLAIMER */}
-        <div className="border-t border-gray-300 py-4">
+        {/* <div className="border-t border-gray-300 py-4">
           <p className="text-xs text-gray-500 leading-relaxed text-center md:text-left">
             <span className="font-semibold">Disclaimer:</span> Astrology services on{" "}
             <a href="https://astrotring.com" target="_blank" className="text-amber-600 hover:underline">www.astrotring.com</a>{" "}
@@ -175,7 +175,7 @@ const Footer = () => {
             <Link to="/disclaimer" target="_blank" className="text-amber-600 hover:underline"> Disclaimer</Link>{" "}
             before using the website.
           </p>
-        </div>
+        </div> */}
       </div>
 
       {/* COPYRIGHT */}
