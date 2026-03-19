@@ -55,7 +55,7 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`w-full sticky top-0 z-[100] bg-white transition-all duration-500 ${
+      className={`w-full px-16 mb-4 sticky top-0 z-[100] bg-white transition-all duration-500 ${
         scrolled ? "shadow-md" : ""
       } ${isNavHidden ? '-translate-y-full' : 'translate-y-0'}`}
     >

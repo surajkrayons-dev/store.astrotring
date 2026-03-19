@@ -17,6 +17,7 @@ import { addToCart } from "../redux/slices/cartSlice";
 import { fetchAllProducts } from '../redux/slices/productSlice';
 import HeroBanner from "../components/features/HeroBanner";
 import Loader from "@/components/common/Loader";
+import { div } from "framer-motion/client";
 
 // Helpers
 const getDisplayPrice = (price) => {
@@ -232,6 +233,7 @@ const HomePage = () => {
               </div>
 
               {isFilterActive ? (
+                
                 <FilteredProductsView
                   products={filteredProducts}
                   onAddToCart={handleAddToCart}
