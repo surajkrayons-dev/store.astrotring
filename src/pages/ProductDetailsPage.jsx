@@ -351,10 +351,10 @@ const suggestedProducts = useMemo(() => {
           <ol className="flex items-center flex-wrap gap-1">
             <li><a href="/" className="hover:text-amber-600 transition cursor-pointer">Home</a></li>
             <li className="mx-1">/</li>
-            <li><a href="/products" className="hover:text-amber-600 transition cursor-pointer">Products</a></li>
-            <li className="mx-1">/</li>
-            <li><a href={`/category/${product?.category?.slug}`} className="hover:text-amber-600 transition cursor-pointer">Gemstones</a></li>
-            <li className="mx-1">/</li>
+            {/* <li><a href="/products" className="hover:text-amber-600 transition cursor-pointer">Products</a></li>
+            <li className="mx-1">/</li> */}
+            {/* <li><a href={`/category/${product?.category?.slug}`} className="hover:text-amber-600 transition cursor-pointer">Gemstones</a></li>
+            <li className="mx-1">/</li> */}
             <li className="text-amber-700 font-medium truncate max-w-[200px]">{product?.name}</li>
           </ol>
         </nav>
