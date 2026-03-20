@@ -6,6 +6,7 @@ import logo from "../../assets/logo.png";
 import { logout } from "../../redux/slices/userAuthSlice";
 import { openLoginModal } from "../../redux/slices/uiSlice";
 import { toast } from "react-toastify";
+import { fetchCart } from "@/redux/slices/cartSlice";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -17,7 +18,16 @@ const Navbar = () => {
 
   const { user, isLoggedIn } = useSelector((state) => state.userAuth);
   const cartItems = useSelector((state) => state.cart.items);
-  const cartCount = cartItems.reduce((sum, item) => sum + item.qty, 0);
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  // console.log("cart",cartItems)
+
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchCart());
+    }
+  }, [dispatch, isLoggedIn]);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,21 +65,26 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`w-full px-16 mb-4 sticky top-0 z-[100] bg-white transition-all duration-500 ${
-        scrolled ? "shadow-md" : ""
-      } ${isNavHidden ? '-translate-y-full' : 'translate-y-0'}`}
+      className={`w-full  mb-4 sticky top-0 z-[100] bg-white transition-all duration-500 ${scrolled ? "shadow-md" : ""
+        } ${isNavHidden ? '-translate-y-full' : 'translate-y-0'}`}
     >
-      <div className="w-full px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-6">
+      <div className="container mx-auto px-4 sm:px-8  py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-6">
         {/* Logo */}
         <Link to="/" className="flex-shrink-0">
-          <img src={logo} alt="Logo" className="h-8 sm:h-10" />
+          <img src={logo} alt="Logo" className="h-6 sm:h-10" />
         </Link>
 
         {/* Right side */}
         <div className="flex items-center gap-2 sm:gap-4">
           {/* Cart */}
           <div
-            onClick={() => navigate("/cart")}
+            onClick={() => {
+              if (!isLoggedIn) {
+                toast.warning("Please login to view your cart");
+              } else {
+                navigate("/cart");
+              }
+            }}
             className="relative flex items-center gap-2 sm:gap-3 px-3 sm:px-5 py-1.5 sm:py-2.5 bg-stone-50/90 backdrop-blur-sm border border-stone-200/50 rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer group"
             style={{ boxShadow: '0 8px 32px rgba(0,0,0,0.05)' }}
           >
@@ -135,14 +150,14 @@ const Navbar = () => {
                       My Orders
                     </Link>
                     <Link
-  to="/"
-  onClick={() => setDropdownOpen(false)}
-  className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors"
->
-  <FaHome size={16} />
-  Back to Home
-</Link>
-                    
+                      to="/"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors"
+                    >
+                      <FaHome size={16} />
+                      Back to Home
+                    </Link>
+
                   </div>
 
                   {/* Divider */}

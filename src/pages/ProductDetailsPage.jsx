@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import {  useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { fetchCart } from '../redux/slices/cartSlice'; // add import
 import {
   Settings,
   ShoppingCart,
@@ -54,6 +55,7 @@ import {
   fallbackYouMayAlsoLike,
   fallbackCertificates
 } from "../constants/productStaticData";
+import { openLoginModal } from "@/redux/slices/uiSlice";
 
 // ---------- Helper Functions ----------
 const getStockStatus = (status, qty) => {
@@ -168,6 +170,7 @@ const ProductDetailsPage = () => {
   // Redux state
 
   const { selectedProduct: product, items: allProducts, loading, error } = useSelector((state) => state.product);
+  const { isLoggedIn } = useSelector((state) => state.userAuth);
 
   useEffect(() => {
     if (!allProducts.length) {
@@ -277,7 +280,7 @@ const suggestedProducts = useMemo(() => {
     ? product.lab_certificates.map((cert, idx) => ({
       id: idx,
       image: cert.image || cert,
-      name: cert.name || (idx === 0 ? "IGI Certified" : "GTL Certified")
+     
     }))
     : fallbackCertificates;
 
@@ -310,16 +313,34 @@ const suggestedProducts = useMemo(() => {
     setQuantity((prev) => Math.max(1, prev + delta));
   };
 
-  const handleAddToCart = () => {
-    dispatch(addToCart({
-      ...product,
-      qty: quantity,
-      selectedRatti,
-      price: displayAfterPrice,
-      selectedRattiPrice: selectedRattiObj?.ratti_afterPrice
-    }));
-    toast.success(`${product?.name} (${selectedRatti} Ratti) added to cart!`);
-  };
+  // const handleAddToCart = () => {
+  //   dispatch(addToCart({
+  //     ...product,
+  //     qty: quantity,
+  //     selectedRatti,
+  //     price: displayAfterPrice,
+  //     selectedRattiPrice: selectedRattiObj?.ratti_afterPrice
+  //   }));
+  //   toast.success(`${product?.name} (${selectedRatti} Ratti) added to cart!`);
+  // };
+
+
+ 
+
+const handleAddToCart = async () => {
+  if (!isLoggedIn) {
+    toast.warning("Please login to add items to cart");
+    dispatch(openLoginModal());
+    return;
+  }
+  try {
+    await dispatch(addToCart({ product_id: product.id, quantity })).unwrap();
+    toast.success(`${product?.name} added to cart!`);
+    dispatch(fetchCart()); // 👈 cart refresh
+  } catch (err) {
+    toast.error(err || 'Failed to add to cart');
+  }
+};
 
   const handleImageError = (e) => {
     e.target.src = fallbackImage;
@@ -527,7 +548,7 @@ const suggestedProducts = useMemo(() => {
                 {productSpecs.map((spec, idx) => (
                   <div key={idx} className="grid grid-cols-[160px_10px_1fr] py-2 text-sm items-center">
                     <span className="text-gray-700 font-semibold">{spec.label}</span>
-                    <span className="text-center">:</span>
+                    <span className="text-center text-gray-700">:</span>
                     <span className="text-gray-900 text-xs font-medium">{spec.value}</span>
                   </div>
                 ))}
@@ -598,7 +619,7 @@ const suggestedProducts = useMemo(() => {
               <Award className="w-6 h-6 text-amber-500" /> Our Certificates
             </h1>
             <p className="text-sm text-gray-500 text-center mb-8 max-w-2xl mx-auto">
-              Every gemstone comes with authentic lab certificates to guarantee purity and origin.
+              Every product comes with authentic lab certificates to guarantee purity and origin.
             </p>
             <div className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-6 px-4">
               {certificates.map((cert) => (

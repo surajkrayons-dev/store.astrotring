@@ -18,20 +18,33 @@ import { fetchAllProducts } from '../redux/slices/productSlice';
 import HeroBanner from "../components/features/HeroBanner";
 import Loader from "@/components/common/Loader";
 import { div } from "framer-motion/client";
+import { fetchCart } from '../redux/slices/cartSlice'; // add at top with other imports
 
 // Helpers
-const getDisplayPrice = (price) => {
-  if (typeof price === 'number') return price;
-  if (price && typeof price === 'object') {
-    return parseFloat(price.after) || parseFloat(price.before) || 0;
-  }
-  return 0;
-};
+// const getDisplayPrice = (price) => {
+//   if (typeof price === 'number') return price;
+//   if (price && typeof price === 'object') {
+//     return parseFloat(price.after) || parseFloat(price.before) || 0;
+//   }
+//   return 0;
+// };
 
-const getRatingValue = (rating) => {
-  if (typeof rating === 'number') return rating;
-  if (rating && typeof rating === 'object') {
-    return parseFloat(rating.avg) || 0;
+// const getRatingValue = (rating) => {
+//   if (typeof rating === 'number') return rating;
+//   if (rating && typeof rating === 'object') {
+//     return parseFloat(rating.avg) || 0;
+//   }
+//   return 0;
+// };
+
+// Updated helpers for new API structure
+const getProductPrice = (product) => Number(product?.after_price) || 0;
+const getProductRating = (product) => Number(product?.rating_avg) || 0;
+const getDiscountPercent = (product) => {
+  const before = Number(product?.before_price) || 0;
+  const after = Number(product?.after_price) || 0;
+  if (before > after && after > 0) {
+    return Math.round(((before - after) / before) * 100);
   }
   return 0;
 };
@@ -43,7 +56,16 @@ const HomePage = () => {
   const location = useLocation();
   const { items: products, loading, error } = useSelector((state) => state.product);
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [filters, setFilters] = useState({ search: "", minPrice: "", maxPrice: "", minRating: "", sort: "default" });
+  // const [filters, setFilters] = useState({ search: "", minPrice: "", maxPrice: "", minRating: "", sort: "default" });
+
+  const [filters, setFilters] = useState({ 
+  search: "", 
+  minPrice: "", 
+  maxPrice: "", 
+  minRating: "", 
+  minDiscount: "",   
+  sort: "default" 
+});
   const [isSidebarOpen, setIsSidebarOpen] = useState(() => {
     if (typeof window !== 'undefined') {
       return window.innerWidth >= 768;
@@ -116,36 +138,47 @@ const HomePage = () => {
     return () => observers.forEach(o => o.disconnect());
   }, [products]);
 
-  const filteredProducts = useMemo(() => {
-    let list = selectedCategory === "all"
-      ? [...products]
-      : products.filter(p => p.category?.slug === selectedCategory);
+const filteredProducts = useMemo(() => {
+  let list = selectedCategory === "all"
+    ? [...products]
+    : products.filter(p => p.category?.slug === selectedCategory);
 
-    if (filters.search) {
-      list = list.filter(p => p.name.toLowerCase().includes(filters.search.toLowerCase()));
-    }
-    if (filters.minPrice) {
-      list = list.filter(p => getDisplayPrice(p.price) >= Number(filters.minPrice));
-    }
-    if (filters.maxPrice) {
-      list = list.filter(p => getDisplayPrice(p.price) <= Number(filters.maxPrice));
-    }
-    if (filters.minRating) {
-      list = list.filter(p => getRatingValue(p.rating) >= Number(filters.minRating));
-    }
+  // Search filter
+  if (filters.search) {
+    list = list.filter(p => p.name.toLowerCase().includes(filters.search.toLowerCase()));
+  }
 
-    if (filters.sort === "price-asc") {
-      list.sort((a, b) => getDisplayPrice(a.price) - getDisplayPrice(b.price));
-    } else if (filters.sort === "price-desc") {
-      list.sort((a, b) => getDisplayPrice(b.price) - getDisplayPrice(a.price));
-    } else if (filters.sort === "rating") {
-      list.sort((a, b) => getRatingValue(b.rating) - getRatingValue(a.rating));
-    } else if (filters.sort === "name") {
-      list.sort((a, b) => a.name.localeCompare(b.name));
-    }
+  // Price range filters
+  if (filters.minPrice) {
+    list = list.filter(p => getProductPrice(p) >= Number(filters.minPrice));
+  }
+  if (filters.maxPrice) {
+    list = list.filter(p => getProductPrice(p) <= Number(filters.maxPrice));
+  }
 
-    return list;
-  }, [selectedCategory, filters, products]);
+  // Rating filter
+  if (filters.minRating) {
+    list = list.filter(p => getProductRating(p) >= Number(filters.minRating));
+  }
+
+  // Discount filter
+  if (filters.minDiscount) {
+    list = list.filter(p => getDiscountPercent(p) >= Number(filters.minDiscount));
+  }
+
+  // Sorting
+  if (filters.sort === "price-asc") {
+    list.sort((a, b) => getProductPrice(a) - getProductPrice(b));
+  } else if (filters.sort === "price-desc") {
+    list.sort((a, b) => getProductPrice(b) - getProductPrice(a));
+  } else if (filters.sort === "rating") {
+    list.sort((a, b) => getProductRating(b) - getProductRating(a));
+  } else if (filters.sort === "name") {
+    list.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  return list;
+}, [selectedCategory, filters, products]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(prev => !prev);
@@ -155,10 +188,17 @@ const HomePage = () => {
   if (error) return <div className="text-center py-10 text-red-500">Error: {error}</div>;
   if (!products.length) return <div className="text-center py-10">No products found</div>;
 
-  const handleAddToCart = (product) => {
-    dispatch(addToCart(product));
-    toast.success(`${product.name} added to cart!`);
-  };
+  
+
+const handleAddToCart = async ({ product_id, quantity, name }) => {
+  try {
+    await dispatch(addToCart({ product_id, quantity })).unwrap();
+    toast.success(`${name} added to cart!`);
+    dispatch(fetchCart()); // 👈 cart refresh
+  } catch (err) {
+    toast.error(err || 'Failed to add to cart');
+  }
+};
 
   const scrollToCategory = (catId) => {
     setSelectedCategory(catId);
@@ -169,10 +209,17 @@ const HomePage = () => {
     }
   };
 
-  const clearFilters = () => {
-    setFilters({ search: "", minPrice: "", maxPrice: "", minRating: "", sort: "default" });
-    setSelectedCategory("all");
-  };
+ const clearFilters = () => {
+  setFilters({ 
+    search: "", 
+    minPrice: "", 
+    maxPrice: "", 
+    minRating: "", 
+    minDiscount: "",   // 👈 add
+    sort: "default" 
+  });
+  setSelectedCategory("all");
+};
 
   const isFilterActive = filters.search || filters.minPrice || filters.maxPrice || filters.minRating || filters.sort !== "default";
 
