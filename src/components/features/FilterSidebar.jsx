@@ -195,27 +195,43 @@ const FilterSidebar = ({
       </div>
 
       {/* Discount Section */}
-      <div className="mb-2 sm:mb-5">
-        <SectionHeader title="Discount" section="discount" />
-        {expandedSections.discount && (
-          <div className="space-y-1.5 sm:space-y-2">
-            {["50", "40", "30", "20", "10"].map(discount => (
-              <label 
-                key={discount} 
-                className="flex items-center gap-2 sm:gap-2.5 cursor-pointer px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-lg transition-colors hover:bg-stone-50"
-              >
-                <input 
-                  type="checkbox" 
-                  className="cursor-pointer w-3 h-3 sm:w-4 sm:h-4" 
-                />
-                <span className="text-[11px] sm:text-xs text-stone-600 font-medium">
-                  {discount}% or more
-                </span>
-              </label>
-            ))}
-          </div>
-        )}
-      </div>
+      
+<div className="mb-2 sm:mb-5">
+  <SectionHeader title="Discount" section="discount" />
+  {expandedSections.discount && (
+    <div className="space-y-1.5 sm:space-y-2">
+      {["50", "40", "30", "20", "10"].map(discount => (
+        <label 
+          key={discount} 
+          className="flex items-center gap-2 sm:gap-2.5 cursor-pointer px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-lg transition-colors hover:bg-stone-50"
+        >
+          <input 
+            type="radio"   // 👈 radio button (single select)
+            name="discount"
+            value={discount}
+            checked={filters.minDiscount === discount}
+            onChange={() => setFilters(f => ({ ...f, minDiscount: discount }))}
+            className="cursor-pointer w-3 h-3 sm:w-4 sm:h-4" 
+          />
+          <span className="text-[11px] sm:text-xs text-stone-600 font-medium">
+            {discount}% or more
+          </span>
+        </label>
+      ))}
+      {/* All Discounts option */}
+      <label className="flex items-center gap-2 sm:gap-2.5 cursor-pointer px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-lg transition-colors hover:bg-stone-50">
+        <input 
+          type="radio"
+          name="discount"
+          checked={filters.minDiscount === ""}
+          onChange={() => setFilters(f => ({ ...f, minDiscount: "" }))}
+          className="cursor-pointer w-3 h-3 sm:w-4 sm:h-4"
+        />
+        <span className="text-[11px] sm:text-xs text-stone-600 font-medium">All Discounts</span>
+      </label>
+    </div>
+  )}
+</div>
     </div>
   );
 };

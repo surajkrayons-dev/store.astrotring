@@ -33,7 +33,7 @@ const HeroBanner = () => {
   if (!banners.length) return null;
 
   return (
-    <div className="w-full h-full mx-auto overflow-hidden border-8 border-white rounded-[18px]">
+    <div className="w-full h-full mx-auto overflow-hidden border border-white rounded-[18px]">
       {sortedBanners.length > 0 && (
         <div
           className="flex h-full transition-transform duration-700 ease-in-out"

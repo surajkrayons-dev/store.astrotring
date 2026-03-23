@@ -230,8 +230,8 @@ const ProductCard = ({ product, addToCart, compact = false }) => {
 
   // Conditional classes (unchanged)
   const cardClass = compact
-    ? "bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-250 flex flex-col cursor-pointer w-full"
-    : "bg-white rounded-xl overflow-hidden border border-gray-100 transition-all duration-250 flex flex-col cursor-pointer hover:shadow-xl hover:-translate-y-0.5 shadow-md w-full";
+    ? "bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all duration-250 flex flex-col  w-full"
+    : "bg-white rounded-xl overflow-hidden border border-gray-100 transition-all duration-250 flex flex-col  hover:shadow-xl hover:-translate-y-0.5 shadow-md w-full cursor-pointer";
 
   const badgeSize = compact ? "text-[8px] px-1.5 py-0.5" : "text-[10px] px-2 py-0.5";
   const overlayButtonClass = compact
@@ -266,7 +266,13 @@ const ProductCard = ({ product, addToCart, compact = false }) => {
       className={cardClass}
     >
       {/* Image container */}
-      <div className="relative bg-stone-50 overflow-hidden aspect-square">
+      <div 
+      className="relative bg-stone-50 overflow-hidden aspect-square cursor-pointer"
+      onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/product/${product?.id}`);
+              }}
+      >
         <img
           src={imageUrl}
           alt={product?.name}
@@ -316,13 +322,13 @@ const ProductCard = ({ product, addToCart, compact = false }) => {
             >
               View
             </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                addToCart(product);
-              }}
-              className={overlayCartClass}
-            >
+           <button
+  onClick={(e) => {
+    e.stopPropagation();
+    addToCart({ product_id: product?.id, quantity: 1,name: product?.name });  // ✅ sirf id aur quantity
+  }}
+  className={overlayCartClass}
+>
               <svg
                 width={compact ? 10 : 12}
                 height={compact ? 10 : 12}
@@ -365,9 +371,9 @@ const ProductCard = ({ product, addToCart, compact = false }) => {
           {/* Quick add button */}
           <button
             onClick={(e) => {
-              e.stopPropagation();
-              addToCart(product);
-            }}
+    e.stopPropagation();
+    addToCart({ product_id: product?.id, quantity: 1,name: product?.name });  // ✅ same fix
+  }}
             className={`bg-amber-100 border border-amber-300 text-amber-900 rounded-lg cursor-pointer flex items-center justify-center transition-colors hover:bg-amber-200 ${quickAddSize}`}
             aria-label="Add to cart"
           >
