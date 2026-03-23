@@ -1,8 +1,14 @@
 import React from "react";
 import { Tag } from "lucide-react";
+import { toast } from 'react-toastify';
 
 const ProductOffers = ({ offers }) => {
   if (!offers?.length) return null;
+
+  const handleCopyCoupon = (code) => {
+  navigator.clipboard.writeText(code);
+  toast.success(`Coupon ${code} copied!`);
+};
 
   return (
     <div>
@@ -26,12 +32,15 @@ const ProductOffers = ({ offers }) => {
                 </div>
                 <div className="border-t border-dashed bg-amber-50 px-5 py-3 flex justify-between items-center">
                   <span className="font-semibold text-stone-800 text-sm">
-                    Get it for{" "}
+                   
                     <span className="text-amber-600 font-bold text-base">{offer.price}</span>
                   </span>
-                  <button className="text-amber-600 font-semibold text-sm flex items-center gap-1 hover:underline cursor-pointer">
-                    {offer.code} ⧉
-                  </button>
+                  <button 
+  onClick={() => handleCopyCoupon(offer.code)}
+  className="text-amber-600 font-semibold text-sm flex items-center gap-1 hover:underline cursor-pointer"
+>
+  {offer.code} ⧉
+</button>
                 </div>
               </div>
             );

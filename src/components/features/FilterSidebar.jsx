@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useSelector } from "react-redux";
 import { CATEGORIES } from "../../constants/categories";
 import StarRating from "../common/StarRating";
+import { useNavigate } from "react-router-dom";
 
 const FilterSidebar = ({
   selected,
@@ -13,6 +14,8 @@ const FilterSidebar = ({
   className = "",
 }) => {
   const { items: products } = useSelector((state) => state.product);
+  const navigate = useNavigate();
+
 
   const [expandedSections, setExpandedSections] = useState({
     categories: true,
@@ -28,9 +31,8 @@ const FilterSidebar = ({
   const SectionHeader = ({ title, section }) => (
     <div
       onClick={() => toggleSection(section)}
-      className={`flex items-center justify-between py-2 sm:py-2.5 cursor-pointer select-none border-b border-gray-100 ${
-        expandedSections[section] ? 'mb-2 sm:mb-3' : 'mb-0'
-      }`}
+      className={`flex items-center justify-between py-2 sm:py-2.5 cursor-pointer select-none border-b border-gray-100 ${expandedSections[section] ? 'mb-2 sm:mb-3' : 'mb-0'
+        }`}
     >
       <span className="text-xs sm:text-sm font-semibold text-stone-800 tracking-wide uppercase">
         {title}
@@ -44,9 +46,8 @@ const FilterSidebar = ({
         strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"
-        className={`transition-transform duration-200 w-3 h-3 sm:w-4 sm:h-4 ${
-          expandedSections[section] ? 'rotate-180' : 'rotate-0'
-        }`}
+        className={`transition-transform duration-200 w-3 h-3 sm:w-4 sm:h-4 ${expandedSections[section] ? 'rotate-180' : 'rotate-0'
+          }`}
       >
         <polyline points="6 9 12 15 18 9" />
       </svg>
@@ -60,8 +61,8 @@ const FilterSidebar = ({
         <div className="text-sm sm:text-base font-bold text-stone-900 tracking-tight">
           Filters
         </div>
-        <button 
-          onClick={onClearFilters} 
+        <button
+          onClick={onClearFilters}
           className="bg-transparent border-none text-amber-600 text-xs sm:text-sm font-medium cursor-pointer underline hover:text-amber-700"
         >
           Clear All
@@ -82,12 +83,18 @@ const FilterSidebar = ({
               return (
                 <button
                   key={cat.id}
-                  onClick={() => onSelect(cat.id)}
-                  className={`w-full flex items-center gap-2 sm:gap-2.5 text-left px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-[9px] border-none cursor-pointer text-xs sm:text-sm transition-all ${
-                    active
+                  onClick={() => {
+                    onSelect(cat.id)
+                    if (cat.id === "all") {
+                      navigate("/");
+                    } else {
+                      navigate(`/category/${cat.slug}`);
+                    }
+                  }}
+                  className={`w-full flex items-center gap-2 sm:gap-2.5 text-left px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-[9px] border-none cursor-pointer text-xs sm:text-sm transition-all ${active
                       ? "bg-gradient-to-br from-amber-100 to-amber-200 text-amber-900 font-semibold shadow-[inset_0_0_0_1.5px_#fcd34d]"
                       : "bg-transparent text-stone-600 font-normal hover:bg-stone-50"
-                  }`}
+                    }`}
                 >
                   <span className="text-base sm:text-lg">{cat.icon}</span>
                   <span className="flex-1 truncate">{cat.label}</span>
@@ -144,12 +151,11 @@ const FilterSidebar = ({
                       maxPrice: range.max,
                     }))
                   }
-                  className={`px-2.5 py-1.5 rounded-md border text-xs font-medium cursor-pointer transition-all ${
-                    filters.minPrice === range.min &&
-                    filters.maxPrice === range.max
+                  className={`px-2.5 py-1.5 rounded-md border text-xs font-medium cursor-pointer transition-all ${filters.minPrice === range.min &&
+                      filters.maxPrice === range.max
                       ? "border-amber-300 bg-amber-100 text-amber-900"
                       : "border-gray-200 bg-white text-stone-600 hover:bg-gray-50"
-                  }`}
+                    }`}
                 >
                   {range.label}
                 </button>
@@ -165,8 +171,8 @@ const FilterSidebar = ({
         {expandedSections.rating && (
           <div className="space-y-1.5 sm:space-y-2">
             {[4, 3, 2, 1].map(rating => (
-              <label 
-                key={rating} 
+              <label
+                key={rating}
                 className="flex items-center gap-2 sm:gap-2.5 cursor-pointer px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-lg transition-colors hover:bg-stone-50"
               >
                 <input
@@ -195,43 +201,43 @@ const FilterSidebar = ({
       </div>
 
       {/* Discount Section */}
-      
-<div className="mb-2 sm:mb-5">
-  <SectionHeader title="Discount" section="discount" />
-  {expandedSections.discount && (
-    <div className="space-y-1.5 sm:space-y-2">
-      {["50", "40", "30", "20", "10"].map(discount => (
-        <label 
-          key={discount} 
-          className="flex items-center gap-2 sm:gap-2.5 cursor-pointer px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-lg transition-colors hover:bg-stone-50"
-        >
-          <input 
-            type="radio"   // 👈 radio button (single select)
-            name="discount"
-            value={discount}
-            checked={filters.minDiscount === discount}
-            onChange={() => setFilters(f => ({ ...f, minDiscount: discount }))}
-            className="cursor-pointer w-3 h-3 sm:w-4 sm:h-4" 
-          />
-          <span className="text-[11px] sm:text-xs text-stone-600 font-medium">
-            {discount}% or more
-          </span>
-        </label>
-      ))}
-      {/* All Discounts option */}
-      <label className="flex items-center gap-2 sm:gap-2.5 cursor-pointer px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-lg transition-colors hover:bg-stone-50">
-        <input 
-          type="radio"
-          name="discount"
-          checked={filters.minDiscount === ""}
-          onChange={() => setFilters(f => ({ ...f, minDiscount: "" }))}
-          className="cursor-pointer w-3 h-3 sm:w-4 sm:h-4"
-        />
-        <span className="text-[11px] sm:text-xs text-stone-600 font-medium">All Discounts</span>
-      </label>
-    </div>
-  )}
-</div>
+
+      <div className="mb-2 sm:mb-5">
+        <SectionHeader title="Discount" section="discount" />
+        {expandedSections.discount && (
+          <div className="space-y-1.5 sm:space-y-2">
+            {["50", "40", "30", "20", "10"].map(discount => (
+              <label
+                key={discount}
+                className="flex items-center gap-2 sm:gap-2.5 cursor-pointer px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-lg transition-colors hover:bg-stone-50"
+              >
+                <input
+                  type="radio"   // 👈 radio button (single select)
+                  name="discount"
+                  value={discount}
+                  checked={filters.minDiscount === discount}
+                  onChange={() => setFilters(f => ({ ...f, minDiscount: discount }))}
+                  className="cursor-pointer w-3 h-3 sm:w-4 sm:h-4"
+                />
+                <span className="text-[11px] sm:text-xs text-stone-600 font-medium">
+                  {discount}% or more
+                </span>
+              </label>
+            ))}
+            {/* All Discounts option */}
+            <label className="flex items-center gap-2 sm:gap-2.5 cursor-pointer px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-lg transition-colors hover:bg-stone-50">
+              <input
+                type="radio"
+                name="discount"
+                checked={filters.minDiscount === ""}
+                onChange={() => setFilters(f => ({ ...f, minDiscount: "" }))}
+                className="cursor-pointer w-3 h-3 sm:w-4 sm:h-4"
+              />
+              <span className="text-[11px] sm:text-xs text-stone-600 font-medium">All Discounts</span>
+            </label>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

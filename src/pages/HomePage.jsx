@@ -258,7 +258,7 @@ const HomePage = () => {
               <div className="space-y-6 sm:space-y-8">
                 {groupedCategories.map(cat => {
                   const catProducts = categoryFilteredProducts[cat.id] || [];
-                  if (catProducts.length === 0) return null;   // hide empty categories
+                  // if (catProducts.length === 0) return null;   // hide empty categories
                   return (
                     <CategorySection
                       key={cat.id}

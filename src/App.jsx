@@ -7,6 +7,9 @@ import { userProfile } from "./redux/slices/userAuthSlice";
 import Loader from "./components/common/Loader"; // 👈 loader import
 import Layout from "./components/layout/Layout";
 import HomePage from "./pages/HomePage";
+import CategoryPage from "./pages/CategoryPage";
+import ProfilePage from "./pages/ProfilePage";
+import OrdersPage from "./pages/OrdersPage";
 
 // Lazy load all pages
 
@@ -30,10 +33,10 @@ function App() {
   }, [token, user, dispatch]);
 
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
+   useEffect(() => {
+  
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [path]);
-
   return (
     <Suspense fallback={<Loader data="Loading..." />}>
       <Routes>
@@ -48,7 +51,13 @@ function App() {
           <Route path="/refund-policy" element={<RefundPolicyPage />} />
           <Route path="/shipping-policy" element={<ShippingPolicyPage />} />
           <Route path="/terms-conditions" element={<TermsAndConditionsPage />} />
+{/* product catogaries page */}
+          <Route path="/category/:slug" element={<CategoryPage />} />
         </Route>
+
+        {/* user details */}
+        <Route path="/profile" element={<ProfilePage />} />
+<Route path="/orders" element={<OrdersPage />} />
       </Routes>
     </Suspense>
   );
