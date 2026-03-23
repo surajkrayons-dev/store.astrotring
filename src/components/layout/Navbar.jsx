@@ -134,7 +134,7 @@ const Navbar = () => {
                   {/* Dropdown links */}
                   <div className="py-1">
                     <Link
-                      to="/"
+                      to="/profile"
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors"
                     >
@@ -142,7 +142,7 @@ const Navbar = () => {
                       My Profile
                     </Link>
                     <Link
-                      to="/"
+                      to="/orders"
                       onClick={() => setDropdownOpen(false)}
                       className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors"
                     >

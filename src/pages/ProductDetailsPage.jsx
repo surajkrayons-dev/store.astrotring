@@ -32,6 +32,8 @@ import ProductYouMayAlsoLike from "@/components/product/ProductYouMayAlsoLike";
 import ProductOffers from "@/components/product/ProductOffers";
 import AccordionSection from "@/components/common/AccordionSection";
 import ProductAccordionSections from "@/components/product/ProductAccordionSections";
+import { fallbackOffers } from "../constants/productStaticData";
+import { fetchCoupons } from "@/redux/slices/couponSlice";
 
 // ---------- Helper Functions ----------
 const getStockStatus = (status, qty) => {
@@ -62,6 +64,23 @@ const ProductDetailsPage = () => {
     (state) => state.product
   );
   const { isLoggedIn } = useSelector((state) => state.userAuth);
+  const { list: coupons, loading: couponsLoading } = useSelector((state) => state.coupon);
+
+
+    const offers = useMemo(() => {
+  if (coupons.length > 0) {
+    return coupons.map(coupon => ({
+      title: coupon.label,
+      description: `Min order ₹${parseFloat(coupon.min_amount).toLocaleString()}`,
+      price: coupon.discount_type === 'percentage' 
+        ? `${coupon.discount_value}% OFF` 
+        : `₹${parseFloat(coupon.discount_value).toLocaleString()} OFF`,
+      code: coupon.code,
+      type: 'discount',
+    }));
+  }
+  return fallbackOffers;
+}, [coupons]);
 
   useEffect(() => {
     if (!allProducts.length) {
@@ -82,6 +101,12 @@ const ProductDetailsPage = () => {
       setSelectedRatti("5"); // fallback only for ratti (UI control)
     }
   }, [product]);
+// fetch coopans
+  useEffect(() => {
+  if (!coupons.length && !couponsLoading) {
+    dispatch(fetchCoupons());
+  }
+}, [dispatch, coupons.length, couponsLoading]);
 
   // Related products (only from API, no fallback)
   const suggestedProducts = useMemo(() => {
@@ -169,7 +194,12 @@ const ProductDetailsPage = () => {
       : [];
 
   // --- Offers – only if provided (assuming product.offers is an array) ---
-  const offers = product?.offers && Array.isArray(product.offers) ? product.offers : [];
+  // const offers = product?.offers && Array.isArray(product.offers) ? product.offers : [];
+
+
+
+
+
 
   // Payment methods (static, can stay)
   const paymentMethods = [
