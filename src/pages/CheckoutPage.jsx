@@ -2,22 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { api } from '../redux/baseApi';
 import { fetchAddresses } from '../redux/slices/addressSlice';
-import { clearCart, fetchCart } from '../redux/slices/cartSlice';
+import { clearCart } from '../redux/slices/cartSlice';
 import { openLoginModal } from '../redux/slices/uiSlice';
 import Loader from '@/components/common/Loader';
+import { placeOrder } from '../redux/slices/orderSlice';
+import { initiatePayment, verifyPayment } from '../redux/slices/paymentSlice'; // 👈 new
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Redux state
   const { isLoggedIn } = useSelector((state) => state.userAuth);
   const { items: cartItems, loading: cartLoading } = useSelector((state) => state.cart);
   const { addresses, loading: addressesLoading } = useSelector((state) => state.address);
 
-  // Local state
   const [selectedAddressId, setSelectedAddressId] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -36,7 +35,6 @@ const CheckoutPage = () => {
     }
   }, [isLoggedIn, dispatch, navigate]);
 
-  // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
   const shipping = subtotal > 10000 ? 0 : 199;
   const grandTotal = subtotal + shipping;
@@ -68,7 +66,7 @@ const CheckoutPage = () => {
     setLoading(true);
     try {
       // 1. Place order
-      const orderRes = await api.post('/user/order/place', {
+      const order = await dispatch(placeOrder({
         items: cartItems.map(item => ({
           product_id: item.product_id,
           quantity: item.quantity,
@@ -77,15 +75,13 @@ const CheckoutPage = () => {
         total: grandTotal,
         payment_method: 'online',
         address_id: selectedAddressId,
-      });
-      const order = orderRes.data;
+      })).unwrap();
 
-      // 2. Initiate online payment
-      const paymentRes = await api.post('/user/payment/initiate', {
+      // 2. Initiate payment
+      const paymentData = await dispatch(initiatePayment({
         order_id: order.id,
         payment_method: 'online',
-      });
-      const paymentData = paymentRes.data;
+      })).unwrap();
 
       // 3. Open Razorpay checkout
       const options = {
@@ -97,18 +93,15 @@ const CheckoutPage = () => {
         order_id: paymentData.razorpay_order_id,
         handler: async (response) => {
           // 4. Verify payment
-          const verifyRes = await api.post('/user/payment/verify', {
+          await dispatch(verifyPayment({
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_signature: response.razorpay_signature,
-          });
-          if (verifyRes.data.success) {
-            toast.success('Payment successful! Order placed.');
-            dispatch(clearCart());
-            navigate('/order-success', { state: { orderId: order.id } });
-          } else {
-            toast.error('Payment verification failed. Please contact support.');
-          }
+          })).unwrap();
+
+          toast.success('Payment successful! Order placed.');
+          dispatch(clearCart());
+          navigate('/order-success', { state: { orderId: order.id } });
         },
         modal: {
           ondismiss: () => {
@@ -120,13 +113,13 @@ const CheckoutPage = () => {
       razorpay.open();
     } catch (error) {
       console.error('Order error:', error);
-      toast.error(error.response?.data?.message || 'Failed to place order');
+      toast.error(error || 'Failed to place order');
     } finally {
       setLoading(false);
     }
   };
 
-  if (!isLoggedIn) return null; // will redirect
+  if (!isLoggedIn) return null;
   if (cartLoading || addressesLoading) return <Loader data="Loading..." />;
   if (cartItems.length === 0) {
     return (

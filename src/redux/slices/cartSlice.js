@@ -69,7 +69,9 @@ export const updateCartItem = createAsyncThunk(
     }
     try {
       const response = await api.post('/user/cart/update', { item_id, quantity }); // 👈 changed
-      console.log("cart qty" ,quantity)
+      // console.log("cart qty" ,quantity)
+      // console.log("cart update res" ,response)
+
       return { success: true };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update cart');

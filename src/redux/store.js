@@ -9,6 +9,7 @@ import addressReducer from './slices/addressSlice';
 import walletReducer from './slices/walletSlice';
 import reviewReducer from './slices/reviewSlice';
 import wishlistReducer from './slices/wishlistSlice';
+import paymentReducer from './slices/paymentSlice';
 
 // import cartApiReducer from './slices/cartSlice';
 import uiReducer from './slices/uiSlice';
@@ -27,5 +28,6 @@ export const store = configureStore({
      wallet: walletReducer,
      review: reviewReducer,
      wishlist: wishlistReducer,
+     payment: paymentReducer,
   },
 });
