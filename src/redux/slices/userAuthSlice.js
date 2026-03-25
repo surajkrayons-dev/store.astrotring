@@ -76,6 +76,7 @@ export const userProfile = createAsyncThunk(
     async (data, thunkApi) => {
         try {
             const res = await api.get("/user/profile");
+            console.log("user address",res.data.user)
             return res.data.user;
         } catch (error) {
 

@@ -5,6 +5,11 @@ import bannerReducer from "./slices/bannerSlice";
 import productReducer from "./slices/productSlice";
 import orderReducer from './slices/orderSlice';
 import couponReducer from './slices/couponSlice';
+import addressReducer from './slices/addressSlice';
+import walletReducer from './slices/walletSlice';
+import reviewReducer from './slices/reviewSlice';
+import wishlistReducer from './slices/wishlistSlice';
+
 // import cartApiReducer from './slices/cartSlice';
 import uiReducer from './slices/uiSlice';
 
@@ -18,5 +23,9 @@ export const store = configureStore({
     order: orderReducer,
      ui: uiReducer,
      coupon: couponReducer,
+     address: addressReducer,
+     wallet: walletReducer,
+     review: reviewReducer,
+     wishlist: wishlistReducer,
   },
 });

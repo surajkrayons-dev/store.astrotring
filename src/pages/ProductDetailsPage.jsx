@@ -15,6 +15,7 @@ import {
   ChevronDown,
   MapPin,
   Gift,
+  Play,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { addToCart } from "../redux/slices/cartSlice";
@@ -34,6 +35,7 @@ import AccordionSection from "@/components/common/AccordionSection";
 import ProductAccordionSections from "@/components/product/ProductAccordionSections";
 import { fallbackOffers } from "../constants/productStaticData";
 import { fetchCoupons } from "@/redux/slices/couponSlice";
+import ProductReviews from "@/components/product/ProductReviews";
 
 // ---------- Helper Functions ----------
 const getStockStatus = (status, qty) => {
@@ -52,12 +54,13 @@ const ProductDetailsPage = () => {
   const dispatch = useDispatch();
 
   // Local state
-  const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedRatti, setSelectedRatti] = useState("");
   const [openFaq, setOpenFaq] = useState(null);
   const [pincode, setPincode] = useState("");
+  
 
   // Redux state
   const { selectedProduct: product, items: allProducts, loading, error } = useSelector(
@@ -66,34 +69,36 @@ const ProductDetailsPage = () => {
   const { isLoggedIn } = useSelector((state) => state.userAuth);
   const { list: coupons, loading: couponsLoading } = useSelector((state) => state.coupon);
 
+  // --- Coupons (static fallback if no coupons) ---
+  const offers = useMemo(() => {
+    if (coupons.length > 0) {
+      return coupons.map(coupon => ({
+        title: coupon.label,
+        description: `Min order ₹${parseFloat(coupon.min_amount).toLocaleString()}`,
+        price: coupon.discount_type === 'percentage'
+          ? `${coupon.discount_value}% OFF`
+          : `₹${parseFloat(coupon.discount_value).toLocaleString()} OFF`,
+        code: coupon.code,
+        type: 'discount',
+      }));
+    }
+    return fallbackOffers;
+  }, [coupons]);
 
-    const offers = useMemo(() => {
-  if (coupons.length > 0) {
-    return coupons.map(coupon => ({
-      title: coupon.label,
-      description: `Min order ₹${parseFloat(coupon.min_amount).toLocaleString()}`,
-      price: coupon.discount_type === 'percentage' 
-        ? `${coupon.discount_value}% OFF` 
-        : `₹${parseFloat(coupon.discount_value).toLocaleString()} OFF`,
-      code: coupon.code,
-      type: 'discount',
-    }));
-  }
-  return fallbackOffers;
-}, [coupons]);
-
+  // --- Fetch all products (for "You May Also Like") ---
   useEffect(() => {
     if (!allProducts.length) {
       dispatch(fetchAllProducts());
     }
   }, [dispatch, allProducts.length]);
 
+  // --- Fetch current product ---
   useEffect(() => {
     if (id) dispatch(fetchProductById(id));
     return () => dispatch(clearSelectedProduct());
   }, [dispatch, id]);
 
-  // Set default Ratti when product loads
+  // --- Set default Ratti when product loads ---
   useEffect(() => {
     if (product?.ratti_options?.length > 0) {
       setSelectedRatti(product.ratti_options[0].ratti.toString());
@@ -101,14 +106,15 @@ const ProductDetailsPage = () => {
       setSelectedRatti("5"); // fallback only for ratti (UI control)
     }
   }, [product]);
-// fetch coopans
-  useEffect(() => {
-  if (!coupons.length && !couponsLoading) {
-    dispatch(fetchCoupons());
-  }
-}, [dispatch, coupons.length, couponsLoading]);
 
-  // Related products (only from API, no fallback)
+  // --- Fetch coupons ---
+  useEffect(() => {
+    if (!coupons.length && !couponsLoading) {
+      dispatch(fetchCoupons());
+    }
+  }, [dispatch, coupons.length, couponsLoading]);
+
+  // --- Related products (only from API, no fallback) ---
   const suggestedProducts = useMemo(() => {
     if (!allProducts.length || !product) return [];
     const currentCategory = product?.category?.slug;
@@ -121,7 +127,7 @@ const ProductDetailsPage = () => {
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
   if (!product) return <div className="text-center py-10">Product not found</div>;
 
-  // ----- Data Extraction from API (only what is provided) -----
+  // ----- Data Extraction from API -----
   const baseAfterPrice = Number(product?.after_price) || 0;
   const baseBeforePrice = Number(product?.before_price) || 0;
 
@@ -146,12 +152,26 @@ const ProductDetailsPage = () => {
   const ratingValue = parseFloat(product?.rating_avg) || 0;
   const reviewsCount = product?.rating_count || 0;
 
-  let images = [];
+  // --- Media: objects with url, type, and thumbnail ---
+  let mediaItems = [];
   if (product?.images?.length) {
-    images = product.images.map((img) => img.image);
+    product.images.forEach(item => {
+      const url = item.image;
+      const isVideo = url?.endsWith('.mp4') || url?.endsWith('.webm') || item.media_type === 'video';
+      // Try to get a thumbnail: if the API provides a thumbnail field, use it; else replace .mp4 with .jpg
+      const thumbnail = item.thumbnail || (isVideo ? url.replace(/\.mp4$/, '.jpg') : null);
+      mediaItems.push({
+        url,
+        type: isVideo ? 'video' : 'image',
+        thumbnail,
+      });
+    });
   } else if (product?.image) {
-    images = [product.image];
+    mediaItems.push({ url: product.image, type: 'image', thumbnail: null });
   }
+
+  const mediaList = mediaItems.map(m => m.url);
+  const totalMedia = mediaList.length;
 
   const stockStatus = getStockStatus(product?.stock_status, product?.stock_qty);
 
@@ -189,19 +209,10 @@ const ProductDetailsPage = () => {
       ? product.lab_certificates.map((cert, idx) => ({
           id: idx,
           image: cert.image || cert,
-          
         }))
       : [];
 
-  // --- Offers – only if provided (assuming product.offers is an array) ---
-  // const offers = product?.offers && Array.isArray(product.offers) ? product.offers : [];
-
-
-
-
-
-
-  // Payment methods (static, can stay)
+  // Payment methods (static)
   const paymentMethods = [
     { src: "/payments/upi.png", name: "UPI" },
     { src: "/payments/gpay.png", name: "Google Pay" },
@@ -212,16 +223,18 @@ const ProductDetailsPage = () => {
     { src: "/payments/rupay.png", name: "RuPay" },
   ];
 
-  // Handlers (unchanged)
-  const handlePrevImage = () => {
-    setSelectedImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  // Handlers
+  const handlePrevMedia = () => {
+    setSelectedMediaIndex((prev) => (prev === 0 ? totalMedia - 1 : prev - 1));
   };
-  const handleNextImage = () => {
-    setSelectedImage((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  const handleNextMedia = () => {
+    setSelectedMediaIndex((prev) => (prev === totalMedia - 1 ? 0 : prev + 1));
   };
+
   const handleQuantityChange = (delta) => {
     setQuantity((prev) => Math.max(1, prev + delta));
   };
+
   const handleAddToCart = async () => {
     if (!isLoggedIn) {
       toast.warning("Please login to add items to cart");
@@ -229,19 +242,26 @@ const ProductDetailsPage = () => {
       return;
     }
     try {
-      await dispatch(addToCart({ product_id: product.id, quantity })).unwrap();
+      await dispatch(addToCart({
+        product_id: product.id,
+        quantity,
+        ratti: selectedRatti,
+      })).unwrap();
       toast.success(`${product?.name} added to cart!`);
       dispatch(fetchCart());
     } catch (err) {
       toast.error(err || "Failed to add to cart");
     }
   };
+
   const handleImageError = (e) => {
     e.target.src = fallbackImage;
   };
+
   const toggleFaq = (index) => {
     setOpenFaq(openFaq === index ? null : index);
   };
+
   const checkPincode = () => {
     if (pincode.length === 6) {
       toast.success("Delivery available in 5-7 days");
@@ -270,26 +290,42 @@ const ProductDetailsPage = () => {
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-start">
-          {/* LEFT COLUMN: IMAGES - sticky */}
+          {/* LEFT COLUMN: MEDIA GALLERY */}
           <div className="space-y-4 lg:sticky lg:top-8 lg:self-start">
-            {/* Main image */}
+            {/* Main Media */}
             <div className="relative aspect-square bg-white rounded-2xl overflow-hidden border border-gray-200 shadow-lg group">
-              <img
-                src={images[selectedImage] || fallbackImage}
-                alt={product?.name}
-                className="w-full h-full object-cover"
-                onError={handleImageError}
-              />
-              {images.length > 1 && (
+              {mediaItems[selectedMediaIndex]?.type === 'video' ? (
+                <video
+                  src={mediaItems[selectedMediaIndex].url}
+                  poster={mediaItems[selectedMediaIndex].thumbnail || undefined}
+                  controls
+                  autoPlay
+                  muted
+                  loop
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    // Fallback: hide video and maybe show image placeholder
+                    e.target.style.display = 'none';
+                  }}
+                />
+              ) : (
+                <img
+                  src={mediaItems[selectedMediaIndex]?.url || fallbackImage}
+                  alt={product?.name}
+                  className="w-full h-full object-cover"
+                  onError={handleImageError}
+                />
+              )}
+              {totalMedia > 1 && (
                 <>
                   <button
-                    onClick={handlePrevImage}
+                    onClick={handlePrevMedia}
                     className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                   >
                     <ChevronLeft className="w-5 h-5" />
                   </button>
                   <button
-                    onClick={handleNextImage}
+                    onClick={handleNextMedia}
                     className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/90 hover:bg-white text-gray-800 p-2 rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
                   >
                     <ChevronRight className="w-5 h-5" />
@@ -304,26 +340,41 @@ const ProductDetailsPage = () => {
             </div>
 
             {/* Thumbnails */}
-            {images.length > 1 && (
+            {totalMedia > 1 && (
               <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                {images.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImage(idx)}
-                    className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 overflow-hidden transition-all cursor-pointer ${
-                      selectedImage === idx
-                        ? "border-amber-600 shadow-md"
-                        : "border-gray-200 hover:border-gray-300"
-                    }`}
-                  >
-                    <img
-                      src={img}
-                      alt={`thumb-${idx}`}
-                      className="w-full h-full object-cover"
-                      onError={handleImageError}
-                    />
-                  </button>
-                ))}
+                {mediaItems.map((item, idx) => {
+                  const isVideo = item.type === 'video';
+                  const thumbUrl = isVideo ? (item.thumbnail || item.url) : item.url;
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedMediaIndex(idx)}
+                      className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 overflow-hidden transition-all cursor-pointer ${
+                        selectedMediaIndex === idx
+                          ? "border-amber-600 shadow-md"
+                          : "border-gray-200 hover:border-gray-300"
+                      }`}
+                    >
+                      {isVideo ?  (
+            <video
+              src={item.url}
+              className="w-full h-full object-cover"
+              autoPlay
+              muted
+              loop
+              playsInline
+            />
+          ) : (
+                        <img
+                          src={thumbUrl}
+                          alt={`thumb-${idx}`}
+                          className="w-full h-full object-cover"
+                          onError={handleImageError}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
@@ -418,7 +469,7 @@ const ProductDetailsPage = () => {
               </div>
             )}
 
-            {/* Offers Section – only if offers exist */}
+            {/* Offers Section */}
             {offers.length > 0 && <ProductOffers offers={offers} />}
 
             {/* Quantity & Add to Cart */}
@@ -449,12 +500,14 @@ const ProductDetailsPage = () => {
                 className="px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-400 transition cursor-pointer"
               >
                 <Heart
-                  className={`w-5 h-5 ${isWishlisted ? "fill-red-500 text-red-500" : "text-gray-600"}`}
+                  className={`w-5 h-5 ${
+                    isWishlisted ? "fill-red-500 text-red-500" : "text-gray-600"
+                  }`}
                 />
               </button>
             </div>
 
-            {/* Shipping Info Summary (always shown) */}
+            {/* Shipping Info Summary */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 border-t border-gray-200 pt-4">
               <div className="flex items-center gap-2">
                 <Truck className="w-5 h-5 text-gray-500" />
@@ -479,7 +532,7 @@ const ProductDetailsPage = () => {
               </div>
             </div>
 
-            {/* Product Specifications – only if specs exist */}
+            {/* Product Specifications */}
             {productSpecs.length > 0 && (
               <AccordionSection title="Product Specifications" icon={Settings} defaultOpen={true}>
                 <div className="divide-y text-gray-200">
@@ -497,7 +550,7 @@ const ProductDetailsPage = () => {
               </AccordionSection>
             )}
 
-            {/* Shipping Details (always shown, but uses product.shipping_info if present) */}
+            {/* Shipping Details */}
             <section className="bg-[#efe3d3] rounded-xl p-4 sm:p-5">
               <p className="text-sm text-gray-600">Prepaid orders are delivered on priority.</p>
               <p className="text-sm font-semibold text-gray-900 mb-3">
@@ -539,20 +592,20 @@ const ProductDetailsPage = () => {
               </div>
             </section>
 
-            {/* Accordion Sections – Product details (only if any content) */}
+            {/* Accordion Sections – Product details */}
             {(benefitsParagraphs.length > 0 || howToUseSteps.length > 0) && (
               <ProductAccordionSections
-  description={product?.description}
-  benefitsParagraphs={benefitsParagraphs}
-  howToUseSteps={howToUseSteps}
-/>
+                description={product?.description}
+                benefitsParagraphs={benefitsParagraphs}
+                howToUseSteps={howToUseSteps}
+              />
             )}
           </div>
         </div>
 
-        {/* ---------- FULL WIDTH SECTIONS (only if data exists) ---------- */}
+        {/* ---------- FULL WIDTH SECTIONS ---------- */}
         <div className="mt-12 space-y-10">
-          {/* Certificates Section – only if certificates exist */}
+          {/* Certificates Section */}
           {certificates.length > 0 && (
             <section className="bg-white py-6 rounded-xl border border-gray-100">
               <h1 className="text-3xl text-center font-semibold text-gray-800 mb-4 flex items-center justify-center gap-2">
@@ -572,14 +625,13 @@ const ProductDetailsPage = () => {
                         onError={handleImageError}
                       />
                     </div>
-                    
                   </div>
                 ))}
               </div>
             </section>
           )}
 
-          {/* FAQ's – only if faqs exist */}
+          {/* FAQ's */}
           {faqs.length > 0 && (
             <section className="bg-white py-6 rounded-xl border border-gray-100">
               <h1 className="text-3xl text-center font-semibold text-gray-800 mb-6">FAQs</h1>
@@ -614,9 +666,12 @@ const ProductDetailsPage = () => {
             </section>
           )}
 
-          {/* You May Also Like – only if suggestedProducts exist */}
+          {/* You May Also Like */}
           {suggestedProducts.length > 0 && <ProductYouMayAlsoLike products={suggestedProducts} />}
+{/* product reviews */}
+           <ProductReviews productId={product.id} />
         </div>
+       
       </div>
     </div>
   );

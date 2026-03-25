@@ -24,27 +24,58 @@ const CategoryPage = () => {
   }, [dispatch, items.length]);
 
   const products = useMemo(() => {
-    if (!items.length) return [];
-    if (slug === "all") return items;
-    return items.filter((p) => p.category?.slug === slug);
-  }, [items, slug]);
+  if (!items.length) return [];
+  let filtered = slug === "all" ? items : items.filter((p) => p.category?.slug === slug);
+  return [...filtered].sort((a, b) => {
+    // Extract numeric prefix from name (if any)
+    const aNum = parseInt(a.name, 10);
+    const bNum = parseInt(b.name, 10);
+    // If both have a numeric prefix, sort numerically
+    if (!isNaN(aNum) && !isNaN(bNum)) {
+      if (aNum !== bNum) return aNum - bNum;
+      // If numbers equal, sort by the rest of the string
+      const aRest = a.name.replace(/^\d+/, '');
+      const bRest = b.name.replace(/^\d+/, '');
+      return aRest.localeCompare(bRest);
+    }
+    // Otherwise, fallback to normal string comparison
+    return a.name.localeCompare(b.name);
+  });
+}, [items, slug]);
 
   const data = categoryStaticData[slug] || categoryStaticData.default;
 
-  const handleAddToCart = async ({ product_id, quantity, name }) => {
-    if (!isLoggedIn) {
-      toast.warning("Login required");
-      dispatch(openLoginModal());
-      return;
-    }
-    try {
-      await dispatch(addToCart({ product_id, quantity })).unwrap();
-      toast.success(`${name} added`);
-      dispatch(fetchCart());
-    } catch {
-      toast.error("Failed to add");
-    }
-  };
+  // const handleAddToCart = async ({ product_id, quantity, name }) => {
+  //   if (!isLoggedIn) {
+  //     toast.warning("Login required");
+  //     dispatch(openLoginModal());
+  //     return;
+  //   }
+  //   try {
+  //     await dispatch(addToCart({ product_id, quantity })).unwrap();
+  //     toast.success(`${name} added`);
+  //     dispatch(fetchCart());
+  //   } catch {
+  //     toast.error("Failed to add");
+  //   }
+  // };
+
+
+  const handleAddToCart = async ({ product_id, quantity, name, ratti }) => {
+  if (!isLoggedIn) {
+    toast.warning("Login required");
+    dispatch(openLoginModal());
+    return;
+  }
+  try {
+    await dispatch(addToCart({ product_id, quantity, ratti })).unwrap();
+    toast.success(`${name} added`);
+    dispatch(fetchCart());
+  } catch {
+    toast.error("Failed to add");
+  }
+};
+
 
   if (loading) return <Loader data="Loading..." />;
   if (error) return <p className="text-center text-red-500">{error}</p>;

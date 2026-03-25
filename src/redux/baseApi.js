@@ -1,4 +1,3 @@
-
 import axios from "axios";
 
 export const api = axios.create({
@@ -10,7 +9,10 @@ api.interceptors.request.use((config) => {
 
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-    config.headers["Content-Type"] = "multipart/form-data";
+    // Only set Content-Type if not already defined
+    if (!config.headers["Content-Type"]) {
+      config.headers["Content-Type"] = "multipart/form-data";
+    }
   }
 
   return config;

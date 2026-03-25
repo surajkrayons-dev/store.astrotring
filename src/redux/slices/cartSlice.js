@@ -12,6 +12,7 @@ export const fetchCart = createAsyncThunk(
     try {
       const response = await api.get('/user/cart');
       // API returns { status: true, data: { items: [...], grand_total } }
+      console.log("fetchcart",response.data.data)
       return response.data.data.items; // extract the items array
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch cart');
@@ -19,24 +20,46 @@ export const fetchCart = createAsyncThunk(
   }
 );
 
+// export const addToCart = createAsyncThunk(
+//   'cart/addToCart',
+//   async ({ product_id, quantity = 1 }, { rejectWithValue, getState }) => {
+//     const { userAuth } = getState();
+//     if (!userAuth.isLoggedIn) {
+//       return rejectWithValue('Please login to add items to cart');
+//     }
+//     try {
+//       const response = await api.post('/user/cart/add', { product_id, quantity });
+//       console.log("addtocart",response.data)
+//       console.log("addtocart id",product_id)
+//       console.log("addtocart qty",quantity)
+//       // response is { status: true, message: 'Product added to cart' }
+//       // No cart data returned, so we just return success indicator
+//       return { success: true };
+//     } catch (error) {
+//       return rejectWithValue(error.response?.data?.message || 'Failed to add to cart');
+//     }
+//   }
+// );
+
+
+
 export const addToCart = createAsyncThunk(
   'cart/addToCart',
-  async ({ product_id, quantity = 1 }, { rejectWithValue, getState }) => {
+  async ({ product_id, quantity = 1, ratti = null }, { rejectWithValue, getState }) => {
     const { userAuth } = getState();
     if (!userAuth.isLoggedIn) {
       return rejectWithValue('Please login to add items to cart');
     }
     try {
-      const response = await api.post('/user/cart/add', { product_id, quantity });
-      // response is { status: true, message: 'Product added to cart' }
-      // No cart data returned, so we just return success indicator
+      const payload = { product_id, quantity };
+      if (ratti) payload.ratti = ratti; // send selected ratti to backend
+      const response = await api.post('/user/cart/add', payload);
       return { success: true };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to add to cart');
     }
   }
 );
-
 export const updateCartItem = createAsyncThunk(
   'cart/updateCartItem',
   async ({ item_id, quantity }, { rejectWithValue, getState }) => {   // 👈 changed
@@ -46,6 +69,7 @@ export const updateCartItem = createAsyncThunk(
     }
     try {
       const response = await api.post('/user/cart/update', { item_id, quantity }); // 👈 changed
+      console.log("cart qty" ,quantity)
       return { success: true };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to update cart');
@@ -86,6 +110,9 @@ const cartSlice = createSlice({
       state.error = null;
     },
     resetCart: () => initialState,
+    clearCart: (state) => {
+    state.items = [];
+  },
   },
   extraReducers: (builder) => {
     builder
@@ -148,5 +175,5 @@ const cartSlice = createSlice({
   },
 });
 
-export const { clearCartError, resetCart } = cartSlice.actions;
+export const { clearCartError, resetCart,clearCart } = cartSlice.actions;
 export default cartSlice.reducer;

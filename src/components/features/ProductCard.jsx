@@ -219,6 +219,9 @@ const ProductCard = ({ product, addToCart, compact = false }) => {
   const beforePrice = parseFloat(product?.before_price) || 0;
   const ratingValue = parseFloat(product?.rating_avg) || 0;
 
+
+  // default ratti
+  const defaultRatti = product?.ratti_options?.length ? product.ratti_options[0].ratti : null;
   // Discount percentage
   const savings =
     beforePrice > afterPrice && afterPrice > 0
@@ -266,19 +269,18 @@ const ProductCard = ({ product, addToCart, compact = false }) => {
       className={cardClass}
     >
       {/* Image container */}
-      <div 
-      className="relative bg-stone-50 overflow-hidden aspect-square cursor-pointer"
-      onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/product/${product?.id}`);
-              }}
+      <div
+        className="relative bg-stone-50 overflow-hidden aspect-square cursor-pointer"
+        onClick={(e) => {
+          e.stopPropagation();
+          navigate(`/product/${product?.id}`);
+        }}
       >
         <img
           src={imageUrl}
           alt={product?.name}
-          className={`w-full h-full object-cover transition-transform duration-350 ${
-            hovered ? "scale-105" : "scale-100"
-          }`}
+          className={`w-full h-full object-cover transition-transform duration-350 ${hovered ? "scale-105" : "scale-100"
+            }`}
           loading="lazy"
           onError={(e) => {
             e.target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%23f0f0f0'/%3E%3Ctext x='50' y='115' font-family='Arial' font-size='16' fill='%23999'%3ENo image%3C/text%3E%3C/svg%3E";
@@ -308,9 +310,8 @@ const ProductCard = ({ product, addToCart, compact = false }) => {
 
         {/* Hover overlay */}
         <div
-          className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-stone-900/70 to-transparent px-2 py-2 pt-6 transition-opacity duration-250 ${
-            hovered ? "opacity-100" : "opacity-0"
-          }`}
+          className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-stone-900/70 to-transparent px-2 py-2 pt-6 transition-opacity duration-250 ${hovered ? "opacity-100" : "opacity-0"
+            }`}
         >
           <div className="flex gap-1.5">
             <button
@@ -322,10 +323,15 @@ const ProductCard = ({ product, addToCart, compact = false }) => {
             >
               View
             </button>
-           <button
+            <button
   onClick={(e) => {
     e.stopPropagation();
-    addToCart({ product_id: product?.id, quantity: 1,name: product?.name });  // ✅ sirf id aur quantity
+    addToCart({ 
+      product_id: product?.id, 
+      quantity: 1, 
+      name: product?.name,
+      ratti: defaultRatti
+    });
   }}
   className={overlayCartClass}
 >
@@ -370,9 +376,14 @@ const ProductCard = ({ product, addToCart, compact = false }) => {
 
           {/* Quick add button */}
           <button
-            onClick={(e) => {
+             onClick={(e) => {
     e.stopPropagation();
-    addToCart({ product_id: product?.id, quantity: 1,name: product?.name });  // ✅ same fix
+    addToCart({ 
+      product_id: product?.id, 
+      quantity: 1, 
+      name: product?.name,
+      ratti: defaultRatti
+    });
   }}
             className={`bg-amber-100 border border-amber-300 text-amber-900 rounded-lg cursor-pointer flex items-center justify-center transition-colors hover:bg-amber-200 ${quickAddSize}`}
             aria-label="Add to cart"

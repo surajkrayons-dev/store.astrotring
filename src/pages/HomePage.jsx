@@ -159,15 +159,25 @@ const HomePage = () => {
   }, [categoryFilteredProducts]);
 
   // ----- Handlers -----
-  const handleAddToCart = async ({ product_id, quantity, name }) => {
-    try {
-      await dispatch(addToCart({ product_id, quantity })).unwrap();
-      toast.success(`${name} added to cart!`);
-      dispatch(fetchCart());
-    } catch (err) {
-      toast.error(err || 'Failed to add to cart');
-    }
-  };
+  // const handleAddToCart = async ({ product_id, quantity, name }) => {
+  //   try {
+  //     await dispatch(addToCart({ product_id, quantity })).unwrap();
+  //     toast.success(`${name} added to cart!`);
+  //     dispatch(fetchCart());
+  //   } catch (err) {
+  //     toast.error(err || 'Failed to add to cart');
+  //   }
+  // };
+
+  const handleAddToCart = async ({ product_id, quantity, name, ratti }) => {
+  try {
+    await dispatch(addToCart({ product_id, quantity, ratti })).unwrap();
+    toast.success(`${name} added to cart!`);
+    dispatch(fetchCart());
+  } catch (err) {
+    toast.error(err || 'Failed to add to cart');
+  }
+};
 
   const scrollToCategory = (catId) => {
   setFilterCategory(catId);

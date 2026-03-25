@@ -152,10 +152,12 @@ const CartPage = () => {
 
   const proceedToCheckout = () => {
     setIsCheckingOut(true);
-    setTimeout(() => {
-      setIsCheckingOut(false);
-      toast.success('Order placed successfully!');
-    }, 2000);
+    // setTimeout(() => {
+    //   setIsCheckingOut(false);
+    //   toast.success('Order placed successfully!');
+    // }, 2000);
+
+    navigate("/checkout")
   };
 
   const handleCheckout = () => {
