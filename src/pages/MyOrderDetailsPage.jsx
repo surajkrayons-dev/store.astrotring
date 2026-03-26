@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import Loader from '@/components/common/Loader';
 import { ArrowLeft, Calendar, Package, Truck, MapPin, CreditCard, CheckCircle, Clock } from 'lucide-react';
 
-const OrderDetailsPage = () => {
+const MyOrderDetailsPage = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -140,4 +140,4 @@ const OrderDetailsPage = () => {
   );
 };
 
-export default OrderDetailsPage;
+export default MyOrderDetailsPage;

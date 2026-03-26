@@ -37,7 +37,9 @@ const Slider = ({ children, slideCount }) => {
           disableOnInteraction: false,   // autoplay continues after user interaction
           pauseOnMouseEnter: true,
         }}
-        mousewheel={true}
+        mousewheel={{
+          forceToAxis: true, // only horizontal wheel movements scroll the slider
+        }}
         breakpoints={{
           0: { slidesPerView: 1 },
           640: { slidesPerView: 2 },

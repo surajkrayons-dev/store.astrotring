@@ -9,12 +9,14 @@ import Layout from "./components/layout/Layout";
 import HomePage from "./pages/HomePage";
 import CategoryPage from "./pages/CategoryPage";
 import ProfilePage from "./pages/ProfilePage";
-import OrdersPage from "./pages/OrdersPage";
+
 import AddressesPage from "./pages/AddressesPage";
+
 import CheckoutPage from "./pages/CheckoutPage";
-import OrderSuccessPage from "./pages/OrderSuccessPage";
-import OrderDetailsPage from "./pages/OrderDetailsPage";
+import MyOrderDetailsPage from "./pages/MyOrderDetailsPage";
+import MyOrdersPage from "./pages/MyOrdersPage";
 import WalletPage from "./pages/WalletPage";
+import OrderSuccessPage from "./pages/OrderSuccessPage";
 import WishlistPage from "./pages/WishlistPage";
 
 // Lazy load all pages
@@ -64,7 +66,7 @@ function App() {
         {/* user details */}
         <Route path="/profile" element={<ProfilePage />} />
 
-        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/orders" element={<MyOrdersPage />} />
         {/* address */}
         <Route path="addresses" element={<AddressesPage />} />
         {/* checkout  */}
@@ -72,7 +74,7 @@ function App() {
         {/* ordersuccess */}
       <Route path="order-success" element={<OrderSuccessPage />} />
       {/* order details page */}
-      <Route path="/orders/:id" element={<OrderDetailsPage />} />
+      <Route path="/orders/:id" element={<MyOrderDetailsPage />} />
       {/* user wallet */}
       <Route path="/wallet" element={<WalletPage />} />
       {/* wishlist */}

@@ -119,7 +119,7 @@ const statusColors = {
   cancelled: "bg-red-100 text-red-800",
 };
 
-const OrdersPage = () => {
+const MyOrdersPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { orders, loading, error } = useSelector((state) => state.order);
@@ -228,4 +228,4 @@ const OrdersPage = () => {
   );
 };
 
-export default OrdersPage;
+export default MyOrdersPage;
