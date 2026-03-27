@@ -12,6 +12,8 @@ export const placeOrder = createAsyncThunk(
       }
       
       const response = await api.post('/user/order/place', orderData);
+
+      console.log("order details",response.data.data)
       return response.data.data; // placed order details
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to place order');
@@ -29,6 +31,7 @@ export const fetchMyOrders = createAsyncThunk(
       }
       
       const response = await api.get('/user/orders');
+      console.log("myorders",response.data.data)
       return response.data.data; // array of orders
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch orders');
@@ -46,6 +49,8 @@ export const fetchOrderDetails = createAsyncThunk(
       }
       
       const response = await api.get(`/user/orders/${orderId}`);
+
+      console.log("myorderdetails",response.data.data)
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch order details');

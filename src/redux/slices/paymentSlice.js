@@ -5,9 +5,12 @@ import { api } from '../baseApi';
 export const initiatePayment = createAsyncThunk(
   'payment/initiate',
   async ({ order_id, method = 'online' }, { rejectWithValue }) => {
-    console.log("method",method)
+    console.log("initiate payment order_id ",order_id)     
+      console.log("initiate payment method ",method) 
     try {
       const response = await api.post('/user/payment/initiate', { order_id, method });
+
+          
       
       return response.data.data; // expects { key_id, amount, currency, razorpay_order_id, ... }
     } catch (error) {

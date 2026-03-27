@@ -42,8 +42,8 @@ const couponSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchCoupons.fulfilled, (state, action) => {
-        state.loading = false;
         state.list = action.payload;
+        state.loading = false;
       })
       .addCase(fetchCoupons.rejected, (state, action) => {
         state.loading = false;

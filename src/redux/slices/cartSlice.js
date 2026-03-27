@@ -101,6 +101,8 @@ const initialState = {
   loading: false,
   error: null,
   syncStatus: 'idle',
+  appliedCoupon: null,     
+  couponDiscount: 0,
 };
 
 // ---------- SLICE ----------
@@ -108,14 +110,22 @@ const cartSlice = createSlice({
   name: 'cart',
   initialState,
   reducers: {
-    clearCartError: (state) => {
-      state.error = null;
-    },
-    resetCart: () => initialState,
-    clearCart: (state) => {
+  clearCartError: (state) => {
+    state.error = null;
+  },
+  resetCart: () => initialState,
+  clearCart: (state) => {
     state.items = [];
   },
+  setAppliedCoupon: (state, action) => {
+    state.appliedCoupon = action.payload.coupon;
+    state.couponDiscount = action.payload.discount;
   },
+  clearAppliedCoupon: (state) => {
+    state.appliedCoupon = null;
+    state.couponDiscount = 0;
+  },
+},
   extraReducers: (builder) => {
     builder
       // fetchCart
@@ -177,5 +187,5 @@ const cartSlice = createSlice({
   },
 });
 
-export const { clearCartError, resetCart,clearCart } = cartSlice.actions;
+export const { clearCartError, resetCart,clearCart,setAppliedCoupon, clearAppliedCoupon } = cartSlice.actions;
 export default cartSlice.reducer;

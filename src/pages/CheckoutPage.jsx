@@ -7,7 +7,7 @@
 // import { openLoginModal } from '../redux/slices/uiSlice';
 // import Loader from '@/components/common/Loader';
 // import { placeOrder } from '../redux/slices/orderSlice';
-// import { initiatePayment, verifyPayment } from '../redux/slices/paymentSlice'; // 👈 new
+// import { initiatePayment, verifyPayment } from '../redux/slices/paymentSlice';
 
 // const CheckoutPage = () => {
 //   const dispatch = useDispatch();
@@ -16,18 +16,17 @@
 //   const { isLoggedIn } = useSelector((state) => state.userAuth);
 //   const { items: cartItems, loading: cartLoading } = useSelector((state) => state.cart);
 //   const { addresses, loading: addressesLoading } = useSelector((state) => state.address);
+//   const { appliedCoupon, couponDiscount } = useSelector((state) => state.cart);
 
 //   const [selectedAddressId, setSelectedAddressId] = useState('');
 //   const [loading, setLoading] = useState(false);
 
-//   // Fetch addresses if logged in
 //   useEffect(() => {
 //     if (isLoggedIn && addresses.length === 0) {
 //       dispatch(fetchAddresses());
 //     }
 //   }, [dispatch, isLoggedIn, addresses.length]);
 
-//   // Redirect to login if not logged in
 //   useEffect(() => {
 //     if (!isLoggedIn) {
 //       dispatch(openLoginModal());
@@ -36,8 +35,8 @@
 //   }, [isLoggedIn, dispatch, navigate]);
 
 //   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-//   const shipping = subtotal > 10000 ? 0 : 199;
-//   const grandTotal = subtotal + shipping;
+//   const shipping = subtotal > 599 ? 0 : 199;
+//   const grandTotal = subtotal + shipping - couponDiscount;
 
 //   // Load Razorpay script once
 //   useEffect(() => {
@@ -65,7 +64,7 @@
 
 //     setLoading(true);
 //     try {
-//       // 1. Place order
+//       // 1. Place order using orderSlice
 //       const order = await dispatch(placeOrder({
 //         items: cartItems.map(item => ({
 //           product_id: item.product_id,
@@ -77,10 +76,10 @@
 //         address_id: selectedAddressId,
 //       })).unwrap();
 
-//       // 2. Initiate payment
+//       // 2. Initiate payment using paymentSlice
 //       const paymentData = await dispatch(initiatePayment({
-//         order_id: order.id,
-//         payment_method: 'online',
+//         order_id: order.order_id,
+//         method: 'online',
 //       })).unwrap();
 
 //       // 3. Open Razorpay checkout
@@ -88,11 +87,11 @@
 //         key: paymentData.key_id,
 //         amount: paymentData.amount,
 //         currency: paymentData.currency,
-//         name: 'AstroStore',
+//         name: 'AstroTring',
 //         description: `Order #${order.id}`,
 //         order_id: paymentData.razorpay_order_id,
 //         handler: async (response) => {
-//           // 4. Verify payment
+//           // 4. Verify payment using paymentSlice
 //           await dispatch(verifyPayment({
 //             razorpay_order_id: response.razorpay_order_id,
 //             razorpay_payment_id: response.razorpay_payment_id,
@@ -140,10 +139,7 @@
 //           {addresses.length === 0 ? (
 //             <div className="bg-white p-4 rounded shadow">
 //               <p className="text-gray-600">No saved addresses.</p>
-//               <button
-//                 onClick={() => navigate('/addresses')}
-//                 className="mt-2 text-amber-600 hover:underline"
-//               >
+//               <button onClick={() => navigate('/addresses')} className="mt-2 text-amber-600 hover:underline">
 //                 Add a new address
 //               </button>
 //             </div>
@@ -167,10 +163,7 @@
 //                   </div>
 //                 </label>
 //               ))}
-//               <button
-//                 onClick={() => navigate('/addresses')}
-//                 className="text-amber-600 text-sm hover:underline"
-//               >
+//               <button onClick={() => navigate('/addresses')} className="text-amber-600 text-sm hover:underline">
 //                 + Add new address
 //               </button>
 //             </div>
@@ -195,6 +188,12 @@
 //               <span>Shipping</span>
 //               <span>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
 //             </div>
+//             {appliedCoupon && (
+//               <div className="flex justify-between py-2 text-green-600 font-semibold">
+//                 <span>Coupon ({appliedCoupon.code})</span>
+//                 <span>-₹{couponDiscount.toLocaleString()}</span>
+//               </div>
+//             )}
 //             <div className="flex justify-between py-2 text-lg font-bold">
 //               <span>Total</span>
 //               <span>₹{grandTotal.toLocaleString()}</span>
@@ -219,12 +218,6 @@
 
 
 
-
-
-
-
-
-
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -234,6 +227,9 @@ import { fetchAddresses } from '../redux/slices/addressSlice';
 import { clearCart } from '../redux/slices/cartSlice';
 import { openLoginModal } from '../redux/slices/uiSlice';
 import Loader from '@/components/common/Loader';
+import { placeOrder } from '../redux/slices/orderSlice';
+
+const RAZORPAY_KEY = 'rzp_test_SUyXgXcUvcqmCn'; // Replace with your actual test key
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
@@ -242,18 +238,17 @@ const CheckoutPage = () => {
   const { isLoggedIn } = useSelector((state) => state.userAuth);
   const { items: cartItems, loading: cartLoading } = useSelector((state) => state.cart);
   const { addresses, loading: addressesLoading } = useSelector((state) => state.address);
+  const { appliedCoupon, couponDiscount } = useSelector((state) => state.cart);
 
   const [selectedAddressId, setSelectedAddressId] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Fetch addresses if logged in
   useEffect(() => {
     if (isLoggedIn && addresses.length === 0) {
       dispatch(fetchAddresses());
     }
   }, [dispatch, isLoggedIn, addresses.length]);
 
-  // Redirect to login if not logged in
   useEffect(() => {
     if (!isLoggedIn) {
       dispatch(openLoginModal());
@@ -262,8 +257,8 @@ const CheckoutPage = () => {
   }, [isLoggedIn, dispatch, navigate]);
 
   const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shipping = subtotal > 10000 ? 0 : 199;
-  const grandTotal = subtotal + shipping;
+  const shipping = subtotal > 599 ? 0 : 199;
+  const grandTotal = subtotal + shipping - couponDiscount;
 
   // Load Razorpay script once
   useEffect(() => {
@@ -283,102 +278,52 @@ const CheckoutPage = () => {
     loadRazorpayScript();
   }, []);
 
-//   const handlePlaceOrder = async () => {
-//     if (!selectedAddressId) {
-//       toast.error('Please select a delivery address');
-//       return;
-//     }
-
-//     setLoading(true);
-//     try {
-//       // 1. Mock order (since real order placement is broken)
-//       const order = { id: Math.floor(Math.random() * 100000) };
-//       toast.info('🔧 Using mock order – real order creation skipped');
-
-//       // 2. Initiate payment with real amount (in rupees)
-//       const paymentResponse = await api.post('/razorpay/create-order', { amount: grandTotal });
-//       const paymentData = paymentResponse.data; // expects { key_id, amount, currency, razorpay_order_id }
-//       console.log("paymentResponse",paymentData)
-// const RAZORPAY_KEY = 'rzp_test_xxxxxxxxxx';
-//       // 3. Open Razorpay checkout
-//       const options = {
-//         key: RAZORPAY_KEY,
-//         amount: paymentData.amount,
-//         currency: paymentData.currency,
-//         name: 'AstroStore',
-//         description: `Order #${order.id}`,
-//         order_id: paymentData.order_id,
-//         handler: async (response) => {
-//           // 4. Verify payment
-//           const verifyResponse = await api.post('/razorpay/verify', {
-//             razorpay_order_id: response.razorpay_order_id,
-//             razorpay_payment_id: response.razorpay_payment_id,
-//             razorpay_signature: response.razorpay_signature,
-//             amount: grandTotal,
-//           });
-//           if (verifyResponse.data.success) {
-//             toast.success('Payment successful! Order placed.');
-//             dispatch(clearCart());
-//             navigate('/order-success', { state: { orderId: order.id } });
-//           } else {
-//             toast.error('Payment verification failed. Please contact support.');
-//           }
-//         },
-//         modal: {
-//           ondismiss: () => {
-//             toast.info('Payment cancelled');
-//           },
-//         },
-//       };
-//       const razorpay = new window.Razorpay(options);
-//       razorpay.open();
-//     } catch (error) {
-//       console.error('Order error:', error);
-//       toast.error(error.response?.data?.message || 'Failed to place order');
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-const RAZORPAY_KEY = 'rzp_test_SUyXgXcUvcqmCn'; // 👈 replace with your key
-
-const handlePlaceOrder = async () => {
-  if (!selectedAddressId) {
-    toast.error('Please select a delivery address');
-    return;
-  }
-
-  setLoading(true);
-  try {
-    // Mock order
-    const order = { id: Math.floor(Math.random() * 100000) };
-    toast.info('🔧 Using mock order – real order creation skipped');
-
-    // Initiate payment
-    const paymentResponse = await api.post('/razorpay/create-order', { amount: grandTotal });
-    const paymentData = paymentResponse.data;
-
-    if (!paymentData.status) {
-      throw new Error(paymentData.message || 'Failed to create order');
+  const handlePlaceOrder = async () => {
+    if (!selectedAddressId) {
+      toast.error('Please select a delivery address');
+      return;
     }
 
-    const razorpayOrderId = paymentData.order_id;
-    const amountInPaise = Math.round(grandTotal * 100);
+    setLoading(true);
+    try {
+      // 1. Place real order using Redux thunk
+      const order = await dispatch(placeOrder({
+        items: cartItems.map(item => ({
+          product_id: item.product_id,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        total: grandTotal,
+        payment_method: 'online', // still needed for order record
+        address_id: selectedAddressId,
+      })).unwrap();
 
-    const options = {
-      key: RAZORPAY_KEY,
-      amount: amountInPaise,
-      currency: 'INR',
-      name: 'AstroTring',
-      description: `Order #${order.id}`,
-      order_id: razorpayOrderId,
-      handler: async (response) => {
-        try {
+      // 2. Create Razorpay order using the working endpoint
+      const paymentResponse = await api.post('/razorpay/create-order', { amount: grandTotal });
+      const paymentData = paymentResponse.data;
+
+      if (!paymentData.status) {
+        throw new Error(paymentData.message || 'Failed to create Razorpay order');
+      }
+
+      const razorpayOrderId = paymentData.order_id; // the backend returns order_id
+      const amountInPaise = Math.round(grandTotal * 100);
+
+      // 3. Open Razorpay checkout
+      const options = {
+        key: RAZORPAY_KEY,
+        amount: amountInPaise,
+        currency: 'INR',
+        name: 'AstroTring',
+        description: `Order #${order.id}`,
+        order_id: razorpayOrderId,
+        handler: async (response) => {
+          // 4. Verify payment using the working endpoint
           const verifyResponse = await api.post('/razorpay/verify', {
             razorpay_order_id: response.razorpay_order_id,
             razorpay_payment_id: response.razorpay_payment_id,
             razorpay_signature: response.razorpay_signature,
-            amount: grandTotal,
+            amount: grandTotal, // the backend may need the amount for verification
           });
           if (verifyResponse.data.status) {
             toast.success('Payment successful! Order placed.');
@@ -387,26 +332,22 @@ const handlePlaceOrder = async () => {
           } else {
             toast.error('Payment verification failed. Please contact support.');
           }
-        } catch (err) {
-          toast.error('Payment verification error');
-          console.error(err);
-        }
-      },
-      modal: {
-        ondismiss: () => {
-          toast.info('Payment cancelled');
         },
-      },
-    };
-    const razorpay = new window.Razorpay(options);
-    razorpay.open();
-  } catch (error) {
-    console.error('Order error:', error);
-    toast.error(error.response?.data?.message || 'Failed to place order');
-  } finally {
-    setLoading(false);
-  }
-};
+        modal: {
+          ondismiss: () => {
+            toast.info('Payment cancelled');
+          },
+        },
+      };
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      console.error('Order error:', error);
+      toast.error(error || 'Failed to place order');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!isLoggedIn) return null;
   if (cartLoading || addressesLoading) return <Loader data="Loading..." />;
@@ -429,10 +370,7 @@ const handlePlaceOrder = async () => {
           {addresses.length === 0 ? (
             <div className="bg-white p-4 rounded shadow">
               <p className="text-gray-600">No saved addresses.</p>
-              <button
-                onClick={() => navigate('/addresses')}
-                className="mt-2 text-amber-600 hover:underline"
-              >
+              <button onClick={() => navigate('/addresses')} className="mt-2 text-amber-600 hover:underline">
                 Add a new address
               </button>
             </div>
@@ -456,10 +394,7 @@ const handlePlaceOrder = async () => {
                   </div>
                 </label>
               ))}
-              <button
-                onClick={() => navigate('/addresses')}
-                className="text-amber-600 text-sm hover:underline"
-              >
+              <button onClick={() => navigate('/addresses')} className="text-amber-600 text-sm hover:underline">
                 + Add new address
               </button>
             </div>
@@ -484,6 +419,12 @@ const handlePlaceOrder = async () => {
               <span>Shipping</span>
               <span>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
             </div>
+            {appliedCoupon && (
+              <div className="flex justify-between py-2 text-green-600 font-semibold">
+                <span>Coupon ({appliedCoupon.code})</span>
+                <span>-₹{couponDiscount.toLocaleString()}</span>
+              </div>
+            )}
             <div className="flex justify-between py-2 text-lg font-bold">
               <span>Total</span>
               <span>₹{grandTotal.toLocaleString()}</span>

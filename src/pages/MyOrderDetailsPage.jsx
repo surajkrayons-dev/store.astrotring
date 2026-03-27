@@ -45,6 +45,12 @@ const MyOrderDetailsPage = () => {
 
   const order = currentOrder;
 
+  // Compute subtotal if not provided
+  const subtotal = order.subtotal || order.items?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || 0;
+  const shipping = order.shipping_cost || 0;
+  const discount = order.discount || 0;
+  const total = order.total || subtotal + shipping - discount;
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
@@ -59,7 +65,7 @@ const MyOrderDetailsPage = () => {
           {/* Header */}
           <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-wrap justify-between items-center">
             <div>
-              <p className="text-sm text-gray-500">Order #{order.id}</p>
+              <p className="text-sm text-gray-500">Order Number: #{order.order_number}</p>
               <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
                 <Calendar className="w-3 h-3" /> {new Date(order.created_at).toLocaleString()}
               </p>
@@ -68,7 +74,7 @@ const MyOrderDetailsPage = () => {
               <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                 order.status === 'delivered' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
               }`}>
-                {order.status?.toUpperCase()}
+                {order.status?.toUpperCase() || 'PENDING'}
               </span>
             </div>
           </div>
@@ -88,6 +94,7 @@ const MyOrderDetailsPage = () => {
                     <div className="flex-1">
                       <h3 className="font-medium text-gray-800">{item.name}</h3>
                       <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                      {item.ratti && <p className="text-sm text-gray-500">Ratti: {item.ratti}</p>}
                       <p className="text-sm text-gray-600">₹{item.price} each</p>
                     </div>
                     <div className="text-right">
@@ -102,10 +109,10 @@ const MyOrderDetailsPage = () => {
 
             {/* Order Summary */}
             <div className="mt-6 pt-4 border-t border-gray-200 text-right">
-              {order.subtotal && <p className="text-sm text-gray-500">Subtotal: ₹{order.subtotal}</p>}
-              {order.shipping_cost > 0 && <p className="text-sm text-gray-500">Shipping: ₹{order.shipping_cost}</p>}
-              {order.discount > 0 && <p className="text-sm text-green-600">Discount: -₹{order.discount}</p>}
-              <p className="text-lg font-bold text-gray-900 mt-1">Total: ₹{order.total}</p>
+              <p className="text-sm text-gray-500">Subtotal: ₹{subtotal.toLocaleString()}</p>
+              {shipping > 0 && <p className="text-sm text-gray-500">Shipping: ₹{shipping.toLocaleString()}</p>}
+              {discount > 0 && <p className="text-sm text-green-600">Discount: -₹{discount.toLocaleString()}</p>}
+              <p className="text-lg font-bold text-gray-900 mt-1">Total: ₹{total.toLocaleString()}</p>
             </div>
           </div>
 

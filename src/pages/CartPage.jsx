@@ -11,22 +11,23 @@ import {
   updateCartItem,
   removeFromCart,
   addToCart,
-  clearCartError
+  clearCartError,
+  setAppliedCoupon,       // 👈 new import
+  clearAppliedCoupon,     // 👈 new import
 } from '../redux/slices/cartSlice';
-import { validateCoupon } from '../redux/slices/couponSlice'; // 👈 import
+import { validateCoupon } from '../redux/slices/couponSlice';
 import { toast } from 'react-toastify';
 import { openLoginModal } from '../redux/slices/uiSlice';
 
 const CartPage = () => {
   const navigate = useNavigate();
-  const { items: cartItems, loading, error } = useSelector((state) => state.cart);
+  const { items: cartItems, loading, error, appliedCoupon, couponDiscount } = useSelector((state) => state.cart);
   const { isLoggedIn } = useSelector((state) => state.userAuth);
   const dispatch = useDispatch();
 
   const [couponCode, setCouponCode] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponStatus, setCouponStatus] = useState(null);
-  const [couponValidating, setCouponValidating] = useState(false); // 👈 new
+  const [couponValidating, setCouponValidating] = useState(false);
   const [removingId, setRemovingId] = useState(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
 
@@ -102,18 +103,34 @@ const CartPage = () => {
         return;
       }
 
-      setAppliedCoupon({
-        code: coupon.code,
-        discount_type: coupon.discount_type,
-        discount_value: parseFloat(coupon.discount_value),
-        max_discount: coupon.max_discount ? parseFloat(coupon.max_discount) : null,
-        min_amount: minAmount,
-        label: coupon.label,
-      });
+      // Compute discount
+      let discount = 0;
+      if (coupon.discount_type === 'flat') {
+        discount = Math.min(parseFloat(coupon.discount_value), subtotal);
+      } else {
+        discount = (subtotal * parseFloat(coupon.discount_value)) / 100;
+        if (coupon.max_discount) {
+          discount = Math.min(discount, parseFloat(coupon.max_discount));
+        }
+      }
+
+      // Store coupon in Redux
+      dispatch(setAppliedCoupon({
+        coupon: {
+          code: coupon.code,
+          discount_type: coupon.discount_type,
+          discount_value: parseFloat(coupon.discount_value),
+          max_discount: coupon.max_discount ? parseFloat(coupon.max_discount) : null,
+          min_amount: minAmount,
+          label: coupon.label,
+        },
+        discount: discount,
+      }));
+
       setCouponStatus('success');
       setTimeout(() => setCouponStatus(null), 3000);
     } catch (err) {
-      setAppliedCoupon(null);
+      dispatch(clearAppliedCoupon());
       setCouponStatus('error');
       toast.error(err || 'Invalid coupon');
       setTimeout(() => setCouponStatus(null), 3000);
@@ -123,41 +140,27 @@ const CartPage = () => {
   };
 
   const removeCoupon = () => {
-    setAppliedCoupon(null);
+    dispatch(clearAppliedCoupon());
     setCouponCode('');
   };
 
-  // Calculate totals using cartItems from API (each item has price and quantity)
+  // Calculate totals
   const subtotal = cartItems.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
-  const originalTotal = subtotal; // if no original price, use same
+  const originalTotal = subtotal;
   const productSavings = originalTotal - subtotal;
-  const shippingFee = subtotal > 10000 ? 0 : 199;
-  const freeShippingRemaining = Math.max(0, 10000 - subtotal);
+  const shippingFee = subtotal > 599 ? 0 : 199;
+  const freeShippingRemaining = Math.max(0, 599 - subtotal);
 
-  let couponDiscount = 0;
-  if (appliedCoupon) {
-    if (appliedCoupon.discount_type === 'flat') {
-      couponDiscount = Math.min(appliedCoupon.discount_value, subtotal);
-    } else { // percentage
-      let discount = (subtotal * appliedCoupon.discount_value) / 100;
-      if (appliedCoupon.max_discount) {
-        discount = Math.min(discount, appliedCoupon.max_discount);
-      }
-      couponDiscount = discount;
-    }
-  }
+  // couponDiscount is already in Redux, but we recalc if needed? Actually we already have it from state.
+  // But we need to ensure it's consistent with the coupon logic. The discount is stored when applied.
+  // The couponDiscount variable from Redux is used.
 
-  const totalSavings = productSavings + couponDiscount + (shippingFee === 0 && subtotal > 10000 ? 199 : 0);
+  const totalSavings = productSavings + couponDiscount + (shippingFee === 0 && subtotal > 599 ? 199 : 0);
   const grandTotal = subtotal + shippingFee - couponDiscount;
 
   const proceedToCheckout = () => {
     setIsCheckingOut(true);
-    // setTimeout(() => {
-    //   setIsCheckingOut(false);
-    //   toast.success('Order placed successfully!');
-    // }, 2000);
-
-    navigate("/checkout")
+    navigate("/checkout");
   };
 
   const handleCheckout = () => {
@@ -178,6 +181,7 @@ const CartPage = () => {
 
   return (
     <div className="min-h-screen bg-stone-50 p-4 pb-10">
+      {/* Header */}
       <div className="max-w-6xl mx-auto mb-6 flex items-center gap-3">
         <button
           className="w-10 h-10 rounded-lg bg-white border border-stone-200 flex items-center justify-center shadow-sm hover:bg-amber-600 hover:text-white hover:border-amber-600 transition-colors cursor-pointer"
@@ -186,7 +190,6 @@ const CartPage = () => {
         >
           <ArrowLeft size={18} strokeWidth={2.5} />
         </button>
-
         <div className="flex items-center gap-2">
           <ShoppingCart size={22} strokeWidth={2} className="text-amber-600" />
           <h1 className="text-xl font-bold text-stone-900">My Cart</h1>
@@ -197,6 +200,7 @@ const CartPage = () => {
       </div>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Cart Items */}
         <div className="lg:col-span-2">
           <div className="bg-white rounded-xl border border-stone-200 shadow-md overflow-hidden">
             <div className="flex justify-between items-center p-4 border-b border-stone-200">
@@ -276,9 +280,11 @@ const CartPage = () => {
           </div>
         </div>
 
+        {/* Sidebar */}
         <div className="lg:col-span-1 space-y-4">
           {cartItems.length > 0 && (
             <>
+              {/* Delivery info */}
               <div className="bg-white rounded-xl border border-stone-200 shadow-md overflow-hidden">
                 <div className="p-4 border-b border-stone-200 flex items-center gap-2">
                   <Truck size={16} className="text-amber-600" />
@@ -297,7 +303,7 @@ const CartPage = () => {
                       <div className="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-gradient-to-r from-amber-600 to-amber-500 transition-all"
-                          style={{ width: `${Math.min(100, (subtotal / 10000) * 100)}%` }}
+                          style={{ width: `${Math.min(100, (subtotal / 599) * 100)}%` }}
                         />
                       </div>
                     </>
@@ -305,6 +311,7 @@ const CartPage = () => {
                 </div>
               </div>
 
+              {/* Coupon */}
               <div className="bg-white rounded-xl border border-stone-200 shadow-md overflow-hidden">
                 <div className="p-4 border-b border-stone-200 flex items-center gap-2">
                   <Tag size={16} className="text-amber-600" />
@@ -358,6 +365,7 @@ const CartPage = () => {
                 </div>
               </div>
 
+              {/* Order Summary */}
               <div className="bg-white rounded-xl border border-stone-200 shadow-md overflow-hidden sticky top-4">
                 <div className="p-4 border-b border-stone-200 flex items-center gap-2">
                   <Package size={16} className="text-amber-600" />

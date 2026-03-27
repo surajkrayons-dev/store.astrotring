@@ -36,6 +36,12 @@ import ProductAccordionSections from "@/components/product/ProductAccordionSecti
 import { fallbackOffers } from "../constants/productStaticData";
 import { fetchCoupons } from "@/redux/slices/couponSlice";
 import ProductReviews from "@/components/product/ProductReviews";
+// wishlists
+import {
+  fetchWishlist,
+  addToWishlist,
+  removeFromWishlist,
+} from '../redux/slices/wishlistSlice';
 
 // ---------- Helper Functions ----------
 const getStockStatus = (status, qty) => {
@@ -56,7 +62,6 @@ const ProductDetailsPage = () => {
   // Local state
   const [selectedMediaIndex, setSelectedMediaIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [selectedRatti, setSelectedRatti] = useState("");
   const [openFaq, setOpenFaq] = useState(null);
   const [pincode, setPincode] = useState("");
@@ -68,6 +73,7 @@ const ProductDetailsPage = () => {
   );
   const { isLoggedIn } = useSelector((state) => state.userAuth);
   const { list: coupons, loading: couponsLoading } = useSelector((state) => state.coupon);
+  const wishlistItems = useSelector((state) => state.wishlist.items);
 
   // --- Coupons (static fallback if no coupons) ---
   const offers = useMemo(() => {
@@ -97,6 +103,12 @@ const ProductDetailsPage = () => {
     if (id) dispatch(fetchProductById(id));
     return () => dispatch(clearSelectedProduct());
   }, [dispatch, id]);
+// wishlist
+  useEffect(() => {
+  if (isLoggedIn) {
+    dispatch(fetchWishlist());
+  }
+}, [dispatch, isLoggedIn]);
 
   // --- Set default Ratti when product loads ---
   useEffect(() => {
@@ -112,7 +124,10 @@ const ProductDetailsPage = () => {
     if (!coupons.length && !couponsLoading) {
       dispatch(fetchCoupons());
     }
-  }, [dispatch, coupons.length, couponsLoading]);
+  }, [dispatch]);
+
+
+
 
   // --- Related products (only from API, no fallback) ---
   const suggestedProducts = useMemo(() => {
@@ -122,6 +137,13 @@ const ProductDetailsPage = () => {
       (p) => p.category?.slug === currentCategory && p.id !== product?.id
     );
   }, [allProducts, product]);
+    const isInWishlist = useMemo(() => {
+  return wishlistItems.some(item => item.id === product?.id);
+}, [wishlistItems, product?.id]);
+
+  console.log('Wishlist items:', wishlistItems);
+console.log('Current product id:', product?.id);
+console.log('Is in wishlist?', isInWishlist);
 
   if (loading) return <Loader data="Loading product..." />;
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
@@ -269,6 +291,27 @@ const ProductDetailsPage = () => {
       toast.error("Please enter a valid 6-digit pincode");
     }
   };
+
+const handleWishlistToggle = async () => {
+  if (!isLoggedIn) {
+    toast.warning("Please login to add to wishlist");
+    dispatch(openLoginModal());
+    return;
+  }
+  try {
+    if (isInWishlist) {
+      await dispatch(removeFromWishlist({ product_id: product.id })).unwrap();
+      toast.info("Removed from wishlist");
+    } else {
+      await dispatch(addToWishlist({ product_id: product.id })).unwrap();
+      toast.success("Added to wishlist");
+    }
+    // Refetch to keep UI in sync (optimistic update would be better but simpler)
+    dispatch(fetchWishlist());
+  } catch (err) {
+    toast.error(err || "Failed to update wishlist");
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -496,12 +539,12 @@ const ProductDetailsPage = () => {
                 <ShoppingCart className="w-5 h-5" /> Add to Cart
               </button>
               <button
-                onClick={() => setIsWishlisted(!isWishlisted)}
+                onClick={handleWishlistToggle}
                 className="px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-400 transition cursor-pointer"
               >
                 <Heart
                   className={`w-5 h-5 ${
-                    isWishlisted ? "fill-red-500 text-red-500" : "text-gray-600"
+                    isInWishlist  ? "fill-red-500 text-red-500" : "text-gray-600"
                   }`}
                 />
               </button>

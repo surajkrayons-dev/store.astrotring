@@ -61,6 +61,8 @@ function App() {
           <Route path="/terms-conditions" element={<TermsAndConditionsPage />} />
           {/* product catogaries page */}
           <Route path="/category/:slug" element={<CategoryPage />} />
+        
+        
         </Route>
 
         {/* user details */}
@@ -72,15 +74,15 @@ function App() {
         {/* checkout  */}
         <Route path="checkout" element={<CheckoutPage />} />
         {/* ordersuccess */}
-      <Route path="order-success" element={<OrderSuccessPage />} />
-      {/* order details page */}
-      <Route path="/orders/:id" element={<MyOrderDetailsPage />} />
-      {/* user wallet */}
-      <Route path="/wallet" element={<WalletPage />} />
-      {/* wishlist */}
-      <Route path="/wishlist" element={<WishlistPage />} />
+        <Route path="order-success" element={<OrderSuccessPage />} />
+        {/* order details page */}
+        <Route path="/orders/:id" element={<MyOrderDetailsPage />} />
+        {/* user wallet */}
+        <Route path="/wallet" element={<WalletPage />} />
+        {/* wishlist */}
+        <Route path="/wishlist" element={<WishlistPage />} />
       </Routes>
-      
+
     </Suspense>
   );
 }
