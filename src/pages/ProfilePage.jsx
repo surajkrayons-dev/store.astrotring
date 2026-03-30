@@ -13,10 +13,13 @@ import {
   FaTimes,
   FaCamera,
 } from "react-icons/fa";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
   const { user, loading, error } = useSelector((state) => state.userAuth);
+  const navigate = useNavigate()
 
   console.log(user)
 
@@ -327,6 +330,13 @@ const ProfilePage = () => {
             )}
           </div>
         </div>
+      </div>
+
+      <div
+        onClick={() => navigate('/')}
+        className="flex items-center justify-center gap-2 text-amber-600  mt-4 hover:underline mb-6 text-center cursor-pointer"
+      >
+        <ArrowLeft className="w-4 h-4 text-center" /> Back to Home
       </div>
     </div>
   );
