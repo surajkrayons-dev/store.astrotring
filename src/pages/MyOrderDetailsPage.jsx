@@ -41,7 +41,7 @@ const handleCancelOrder = async () => {
     toast.success('Order cancelled successfully');
     
   } catch (err) {
-    toast.error(err || 'Failed to cancel order');
+    // toast.error(err || 'Failed to cancel order');
   }
 };
   if (!isLoggedIn) {

@@ -7,7 +7,7 @@ import { logout } from "../../redux/slices/userAuthSlice";
 import { openLoginModal } from "../../redux/slices/uiSlice";
 import { toast } from "react-toastify";
 import { fetchCart } from "@/redux/slices/cartSlice";
-import { WalletIcon } from "lucide-react";
+import { MapPin, WalletIcon } from "lucide-react";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -166,6 +166,15 @@ const Navbar = () => {
                     >
                       <FaHeart size={16} />
                       My Wishlist
+                    </Link>
+                    <Link
+                      to="/addresses"
+                      onClick={() => setDropdownOpen(false)}
+                      className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-amber-50 hover:text-amber-600 transition-colors"
+                    >
+                      <MapPin size={16}/>
+                    
+                      My Address
                     </Link>
                     <Link
                       to="/"
