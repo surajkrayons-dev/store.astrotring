@@ -35,14 +35,14 @@ const CategorySection = forwardRef(({ category, products, onAddToCart }, ref) =>
             className="p-1.5 rounded-full border border-gray-300 hover:bg-amber-600 hover:text-white transition"
             aria-label="Scroll left"
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft size={18} className='hidden sm:block' />
           </button>
           <button
             onClick={() => scroll('right')}
             className="p-1.5 rounded-full border border-gray-300 hover:bg-amber-600 hover:text-white transition"
             aria-label="Scroll right"
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={18} className='hidden sm:block' />
           </button>
         </div>
       </div>

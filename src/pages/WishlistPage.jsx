@@ -38,23 +38,23 @@ const WishlistCard = ({ product, onRemove }) => {
             </div>
           )}
         </div>
-        <div className="p-3">
-          <h3 className="text-xs sm:text-sm font-bold text-stone-800 leading-snug line-clamp-2 mb-1.5">
+        <div className="p-2">
+          <h3 className="text-xs  font-bold text-stone-800 leading-snug line-clamp-2 mb-1">
             {product.name}
           </h3>
           <div className="flex items-center gap-1 mb-1">
-            <StarRating value={ratingValue} size={12} />
-            <span className="text-[10px] sm:text-xs text-stone-500 font-semibold">
+            <StarRating value={ratingValue} size={10} />
+            <span className="text-[10px]  text-stone-500 font-semibold">
               {ratingValue.toFixed(1)}
             </span>
           </div>
           <div className="flex items-end justify-between mt-auto">
             <div>
-              <div className="text-base sm:text-lg font-extrabold text-stone-900">
+              <div className="text-sm  font-extrabold text-stone-900">
                 ₹{afterPrice.toLocaleString()}
               </div>
               {beforePrice > afterPrice && (
-                <div className="text-[10px] sm:text-xs text-stone-400 line-through">
+                <div className="text-[10px]  text-stone-400 line-through">
                   ₹{beforePrice.toLocaleString()}
                 </div>
               )}
@@ -65,9 +65,9 @@ const WishlistCard = ({ product, onRemove }) => {
       <div className="px-3 pb-3">
         <button
           onClick={() => onRemove(product.id, product.name)}
-          className="w-full flex items-center justify-center gap-2 text-red-600 border border-red-200 rounded-lg py-2 hover:bg-red-50 transition cursor-pointer"
+          className="w-full flex items-center justify-center gap-2 text-red-600 border border-red-200 rounded-lg py-1 hover:bg-red-50 transition cursor-pointer text-xs"
         >
-          <FaTrash size={14} /> Remove
+          <FaTrash size={12}  /> Remove
         </button>
       </div>
     </div>

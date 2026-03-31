@@ -41,8 +41,8 @@ const Slider = ({ children, slideCount }) => {
           forceToAxis: true, // only horizontal wheel movements scroll the slider
         }}
         breakpoints={{
-          0: { slidesPerView: 1 },
-          640: { slidesPerView: 2 },
+          0: { slidesPerView: 2 },
+          640: { slidesPerView: 3 },
           1024: { slidesPerView: slideCount || 4 },
         }}
         navigation={{
