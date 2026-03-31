@@ -303,7 +303,7 @@ const CheckoutPage = () => {
         amount: grandTotal,                       // original total
         coupon_code: appliedCoupon?.code || null,
         delivery_charge: shipping,
-        wallet_amount: 100,
+        // wallet_amount: 100,
       });
       const paymentData = paymentResponse.data;
 
@@ -332,7 +332,7 @@ const CheckoutPage = () => {
             razorpay_signature: response.razorpay_signature,
             coupon_code: appliedCoupon?.code || null,
             delivery_charge: shipping,
-            wallet_amount: 100,
+            // wallet_amount: 100,
 
             amount: grandTotal, // the backend may need the amount for verification
           });
