@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Select from 'react-select';
 import {
   fetchAddresses,
   addAddress,
@@ -9,6 +10,7 @@ import {
 } from '../../redux/slices/addressSlice';
 import { toast } from 'react-toastify';
 import { MapPin, Home, Phone, Mail, Plus, Edit, Trash2, Star, X } from 'lucide-react';
+import { useCountryCodes } from '../../hooks/useCountryCodes'; // adjust path
 
 const AddressManager = () => {
   const dispatch = useDispatch();
@@ -16,13 +18,22 @@ const AddressManager = () => {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    country_code: '+91',
+    country_code: '+91',   // default India
     mobile: '',
     alternative_mobile: '',
     address: '',
     pincode: '',
     is_default: false,
   });
+
+  // Fetch country codes
+  const { countryCodes, loading: loadingCodes, error: codesError } = useCountryCodes();
+
+  // Convert countryCodes to react-select options
+  const countryOptions = countryCodes.map(code => ({
+    value: code.value,
+    label: code.label,
+  }));
 
   useEffect(() => {
     dispatch(fetchAddresses());
@@ -34,6 +45,12 @@ const AddressManager = () => {
       dispatch(clearAddressError());
     }
   }, [error, dispatch]);
+
+  useEffect(() => {
+    if (codesError) {
+      toast.error('Could not load country codes. Using default.');
+    }
+  }, [codesError]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -141,17 +158,66 @@ const AddressManager = () => {
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:border-amber-500"
               />
             </div>
-            {/* Country Code - made smaller with fixed width */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Country Code *</label>
-              <input
-                type="text"
-                name="country_code"
-                value={formData.country_code}
-                onChange={handleChange}
-                placeholder="+91"
-                className="w-24 border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:border-amber-500"
-              />
+
+            {/* Country Code - Dynamic Select */}
+
+
+
+
+
+            {/* Country Code - react-select */}
+            <div className="w-full sm:w-32">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Country Code *
+              </label>
+              {loadingCodes ? (
+                <div className="border border-gray-300 rounded-md px-3 py-2 bg-gray-50 text-gray-500">
+                  Loading codes...
+                </div>
+              ) : (
+                <Select
+                  name="country_code"
+                  options={countryOptions}
+                  value={countryOptions.find(opt => opt.value === formData.country_code)}
+                  onChange={(selected) => setFormData({
+                    ...formData,
+                    country_code: selected ? selected.value : ''
+                  })}
+                  placeholder="Select country code"
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                  isClearable={false}
+                  isSearchable={true}
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      borderColor: state.isFocused ? '#f59e0b' : '#d1d5db',
+                      boxShadow: state.isFocused ? '0 0 0 1px #f59e0b' : 'none',
+                      '&:hover': {
+                        borderColor: '#f59e0b',
+                      },
+                      borderRadius: '0.375rem',
+                      minHeight: '2.5rem',
+                    }),
+                    menu: (base) => ({
+                      ...base,
+                      zIndex: 9999,
+                    }),
+                    option: (base, state) => ({
+                      ...base,
+                      backgroundColor: state.isSelected ? '#f59e0b' : state.isFocused ? '#fef3c7' : 'white',
+                      color: state.isSelected ? 'white' : '#374151',
+                      '&:active': {
+                        backgroundColor: '#f59e0b',
+                      },
+                    }),
+                    placeholder: (base) => ({
+                      ...base,
+                      color: '#9ca3af',
+                    }),
+                  }}
+                />
+              )}
             </div>
 
             {/* Mobile */}
@@ -166,6 +232,7 @@ const AddressManager = () => {
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:border-amber-500"
               />
             </div>
+
             {/* Alternative Mobile */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Alternative Mobile (optional)</label>
@@ -179,7 +246,7 @@ const AddressManager = () => {
               />
             </div>
 
-            {/* Full Address (span full width) */}
+            {/* Full Address */}
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
               <input
@@ -240,7 +307,7 @@ const AddressManager = () => {
         </form>
       </div>
 
-      {/* Address List (unchanged) */}
+      {/* Address List - unchanged */}
       {loading ? (
         <div className="text-center py-10">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-amber-600 border-t-transparent"></div>
@@ -262,9 +329,8 @@ const AddressManager = () => {
               {addresses.map((addr) => (
                 <div
                   key={addr.id}
-                  className={`border rounded-lg p-4 transition-all hover:shadow-md ${
-                    addr.is_default ? 'border-amber-200 bg-amber-50' : 'border-gray-200 bg-white'
-                  }`}
+                  className={`border rounded-lg p-4 transition-all hover:shadow-md ${addr.is_default ? 'border-amber-200 bg-amber-50' : 'border-gray-200 bg-white'
+                    }`}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">

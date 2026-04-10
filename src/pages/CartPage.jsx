@@ -219,7 +219,8 @@ const CartPage = () => {
               cartItems.map(item => {
                 const price = parseFloat(item.price);
                 const quantity = item.quantity;
-                const total = price * quantity;
+                const total = item.total ? item.total : price * quantity;
+                const ratti =item.ratti ? item.ratti :null
 
                 return (
                   <div
@@ -240,6 +241,8 @@ const CartPage = () => {
 
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-semibold text-stone-900 truncate mb-1">{item.name}</h4>
+
+                      {ratti  &&<h4 className="text-sm font-semibold text-stone-900 truncate mb-1">{`Ratti : ${item.ratti || ratti}`}</h4>}
 
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-base font-bold text-stone-900">

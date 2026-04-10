@@ -4,7 +4,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { lazy, Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { userProfile } from "./redux/slices/userAuthSlice";
-import Loader from "./components/common/Loader"; // 👈 loader import
+import Loader from "./components/common/Loader"; 
 import Layout from "./components/layout/Layout";
 import HomePage from "./pages/HomePage";
 import CategoryPage from "./pages/CategoryPage";
@@ -18,6 +18,8 @@ import MyOrdersPage from "./pages/MyOrdersPage";
 import WalletPage from "./pages/WalletPage";
 import OrderSuccessPage from "./pages/OrderSuccessPage";
 import WishlistPage from "./pages/WishlistPage";
+import Gemstonesinfo from "./pages/product info/GemstonesInfo";
+import GemstoneDetails from "./pages/product info/GemstoneDetails";
 
 // Lazy load all pages
 
@@ -63,6 +65,10 @@ function App() {
           <Route path="/category/:slug" element={<CategoryPage />} />
         
         
+           {/* product info */}
+         <Route path="/gemstones" element={<Gemstonesinfo />} />
+      <Route path="/gemstones/:name" element={<GemstoneDetails />} />
+        
         </Route>
 
         {/* user details */}
@@ -81,6 +87,11 @@ function App() {
         <Route path="/wallet" element={<WalletPage />} />
         {/* wishlist */}
         <Route path="/wishlist" element={<WishlistPage />} />
+
+     
+      
+
+
       </Routes>
 
     </Suspense>

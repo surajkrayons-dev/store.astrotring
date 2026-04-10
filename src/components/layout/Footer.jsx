@@ -53,11 +53,11 @@ const Footer = () => {
           {/* RESOURCES */}
           <div>
             <h2 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
-              Resources
+              More Info
             </h2>
 
             <ul className="mt-4 space-y-2">
-              <li><Link to="/" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Astrology Blogs</Link></li>
+              <li><Link to="/gemstones" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">About Gemstones</Link></li>
               <li><Link to="/" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Zodiac Signs</Link></li>
               <li><Link to="/" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Numerology</Link></li>
               <li><Link to="/" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Vastu Shastra</Link></li>

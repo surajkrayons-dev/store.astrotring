@@ -229,7 +229,7 @@ import { openLoginModal } from '../redux/slices/uiSlice';
 import Loader from '@/components/common/Loader';
 import { placeOrder } from '../redux/slices/orderSlice';
 
-const RAZORPAY_KEY = 'rzp_test_SUyXgXcUvcqmCn'; // Replace with your actual test key
+const RAZORPAY_KEY = 'rzp_test_SUyXgXcUvcqmCn'; // actual test key
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
@@ -418,7 +418,7 @@ const CheckoutPage = () => {
           <div className="bg-white p-4 rounded shadow">
             {cartItems.map(item => (
               <div key={item.id} className="flex justify-between py-2 border-b">
-                <span>{item.name} x {item.quantity}</span>
+                <span>{`${item.name} ${item.ratti ? `(${item.ratti} ratti)` : ""}  `} x {item.quantity}</span>
                 <span>₹{item.price * item.quantity}</span>
               </div>
             ))}
