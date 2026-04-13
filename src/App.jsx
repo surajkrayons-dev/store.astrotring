@@ -66,8 +66,10 @@ function App() {
         
         
            {/* product info */}
+
          <Route path="/gemstones" element={<Gemstonesinfo />} />
-      <Route path="/gemstones/:name" element={<GemstoneDetails />} />
+      {/* <Route path="/gemstones/:name" element={<GemstoneDetails />} /> */}
+      <Route path="/gemstones/:name/:id" element={<GemstoneDetails />} />
         
         </Route>
 

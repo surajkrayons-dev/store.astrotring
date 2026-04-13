@@ -229,7 +229,7 @@ import { openLoginModal } from '../redux/slices/uiSlice';
 import Loader from '@/components/common/Loader';
 import { placeOrder } from '../redux/slices/orderSlice';
 
-const RAZORPAY_KEY = 'rzp_test_SUyXgXcUvcqmCn'; // actual test key
+const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID; // actual test key
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
@@ -307,7 +307,7 @@ const CheckoutPage = () => {
       });
       const paymentData = paymentResponse.data;
 
-      console.log("pYMENT", paymentData)
+      console.log("PAYMENT", paymentData)
 
       if (!paymentData.status) {
         throw new Error(paymentData.message || 'Failed to create Razorpay order');

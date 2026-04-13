@@ -175,7 +175,7 @@ const handleCancelOrder = async () => {
               <CreditCard className="w-5 h-5" /> Payment
             </h2>
             <p className="text-gray-600">Method: {order.payment_method || 'Online'}</p>
-            <p className="text-gray-600">Status: {order.payment_status === 'paid' ? 'Paid' : 'Pending'}</p>
+            {/* <p className="text-gray-600">Status: {order.payment_status === 'paid' ? 'Paid' : 'Pending'}</p> */}
           </div>
         </div>
       </div>
