@@ -2,14 +2,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '../baseApi';
 
-// ---------- NEW: Fetch wallet balance ----------
+// ---------- Fetch wallet balance ----------
 export const fetchWallet = createAsyncThunk(
   'wallet/fetchWallet',
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/store-wallet');
-      // Assume response.data contains { balance, ... }
-      console.log("wallet fetch",response.data.data)
+      console.log("wallet fetch", response.data.data);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch wallet');
@@ -17,30 +16,44 @@ export const fetchWallet = createAsyncThunk(
   }
 );
 
-// ---------- NEW: Fetch transaction history ----------
+// ---------- Fetch transaction history (all) ----------
 export const fetchWalletHistory = createAsyncThunk(
   'wallet/fetchHistory',
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/store-wallet/history');
-      console.log("wallet history",response.data.data)
-      return response.data.data; // expects array of transactions
+      console.log("wallet history", response.data.data);
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch history');
     }
   }
 );
 
-// ---------- NEW: Fetch wallet summary (optional) ----------
+// ---------- Fetch wallet summary ----------
 export const fetchWalletSummary = createAsyncThunk(
   'wallet/fetchSummary',
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/store-wallet/summary');
-      console.log("wallet summary",response.data.data)
+      console.log("wallet summary", response.data.data);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch summary');
+    }
+  }
+);
+
+// ---------- NEW: Fetch spend history (only debits) ----------
+export const fetchSpendHistory = createAsyncThunk(
+  'wallet/fetchSpendHistory',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/store-wallet/spend-history');
+      console.log("spend history", response.data.data);
+      return response.data.data; // expects array of spend transactions
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch spend history');
     }
   }
 );
@@ -51,7 +64,7 @@ export const createOrder = createAsyncThunk(
   async (amount, { rejectWithValue }) => {
     try {
       const response = await api.post('/wallet/topup/create-order', { amount });
-      console.log("add money to wallet",response.data.data)
+      console.log("add money to wallet", response.data.data);
       return response.data; // { order_id, amount, currency? }
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to create order');
@@ -68,9 +81,8 @@ export const verifyPayment = createAsyncThunk(
         ...paymentData,
         amount,
       });
-      // After successful verification, refetch wallet balance
       await dispatch(fetchWallet());
-      console.log("verufy wallet",response.data.data)
+      console.log("verify wallet", response.data.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Payment verification failed');
@@ -82,8 +94,9 @@ const walletSlice = createSlice({
   name: 'wallet',
   initialState: {
     balance: 0,
-    transactions: [],
-    summary: null,
+    transactions: [],      // all transactions (credits + debits)
+    summary: null,         // summary data
+    spendHistory: [],      // only spend/debit transactions
     loading: false,
     error: null,
   },
@@ -130,6 +143,19 @@ const walletSlice = createSlice({
         state.summary = action.payload;
       })
       .addCase(fetchWalletSummary.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // fetchSpendHistory (new)
+      .addCase(fetchSpendHistory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSpendHistory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.spendHistory = action.payload.data ?? action.payload;
+      })
+      .addCase(fetchSpendHistory.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
