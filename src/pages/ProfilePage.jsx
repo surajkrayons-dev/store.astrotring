@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { userProfile, userUpdate } from "../redux/slices/userAuthSlice";
+import { fetchWallet, fetchSpendHistory } from "../redux/slices/walletSlice";
 import Loader from "@/components/common/Loader";
 import { toast } from "react-toastify";
 import {
@@ -12,16 +13,20 @@ import {
   FaSave,
   FaTimes,
   FaCamera,
+  FaWallet,
+  FaHistory,
 } from "react-icons/fa";
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const ProfilePage = () => {
+
+  console.log("ProfilePage rendering, user =", useSelector(state => state.userAuth.user));
+  // ... rest
   const dispatch = useDispatch();
   const { user, loading, error } = useSelector((state) => state.userAuth);
-  const navigate = useNavigate()
-
-  console.log(user)
+  const { balance, spendHistory, loading: walletLoading } = useSelector((state) => state.wallet);
+  let navigate = useNavigate();
 
   // UI state
   const [isEditing, setIsEditing] = useState(false);
@@ -36,15 +41,28 @@ const ProfilePage = () => {
   });
 
   // Image handling
-  const [currentImageUrl, setCurrentImageUrl] = useState(null); // from server
-  const [newImageBase64, setNewImageBase64] = useState(null); // base64 of new image
+  const [currentImageUrl, setCurrentImageUrl] = useState(null);
+  const [newImageBase64, setNewImageBase64] = useState(null);
 
   // Fetch user profile if not already available
   useEffect(() => {
+    
     if (!user) {
       dispatch(userProfile());
     }
   }, [dispatch, user]);
+
+  // Fetch wallet data when user is logged in
+useEffect(() => {
+  console.log("🔄 Checking user for wallet fetch...", user);
+  if (user?.id) {
+    console.log("✅ User has ID, fetching wallet data");
+    dispatch(fetchWallet());
+    dispatch(fetchSpendHistory());
+  } else {
+    console.log("⏳ User not ready yet");
+  }
+}, [dispatch, user?.id]);
 
   // Populate form and image when user data is available
   useEffect(() => {
@@ -56,40 +74,31 @@ const ProfilePage = () => {
         username: user.username || "",
       });
       setCurrentImageUrl(user.profile_image || null);
-      setNewImageBase64(null); // reset new image when user data changes
+      setNewImageBase64(null);
     }
   }, [user]);
 
-  // Handle input changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Handle image selection: convert to base64
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    // Validate file type and size
     if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file (JPEG, PNG, etc.)");
+      toast.error("Please select an image file");
       return;
     }
     if (file.size > 2 * 1024 * 1024) {
       toast.error("Image size must be less than 2MB");
       return;
     }
-
     const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64String = reader.result; // e.g., "data:image/png;base64,iVB..."
-      setNewImageBase64(base64String);
-    };
+    reader.onloadend = () => setNewImageBase64(reader.result);
     reader.readAsDataURL(file);
   };
 
-  // Cancel editing: revert to original data
   const handleCancelEdit = () => {
     setFormData({
       name: user.name || "",
@@ -101,26 +110,22 @@ const ProfilePage = () => {
     setIsEditing(false);
   };
 
-  // Submit updated profile
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
     const payload = {
       name: formData.name,
       email: formData.email,
     };
     if (formData.mobile) payload.mobile = formData.mobile;
     if (formData.username) payload.username = formData.username;
-    if (newImageBase64) payload.profile_image = newImageBase64; // send as base64
+    if (newImageBase64) payload.profile_image = newImageBase64;
 
     try {
       await dispatch(userUpdate(payload)).unwrap();
       toast.success("Profile updated successfully");
       setIsEditing(false);
-      // Refresh user profile to get updated data from server
       dispatch(userProfile());
-      // Clear temporary image
       setNewImageBase64(null);
     } catch (err) {
       toast.error(err || "Failed to update profile");
@@ -129,12 +134,10 @@ const ProfilePage = () => {
     }
   };
 
-  // Loading / error states
   if (loading) return <Loader data="Loading profile..." />;
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
   if (!user) return <div className="text-center py-10">No user data found</div>;
 
-  // Determine which image to display (new image if selected, else current)
   const displayImage = newImageBase64 || currentImageUrl;
 
   return (
@@ -183,8 +186,7 @@ const ProfilePage = () => {
                       {user.name}
                     </h2>
                     <p className="text-gray-500 text-sm">
-                      Member since{" "}
-                      {new Date(user.created_at).toLocaleDateString()}
+                      Member since {new Date(user.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
@@ -216,11 +218,44 @@ const ProfilePage = () => {
                     </div>
                   )}
                 </div>
+
+                {/* Wallet Section */}
+                <div className="border-t pt-6">
+                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-3">
+                    <FaWallet className="text-amber-600" /> Wallet
+                  </h3>
+                  {walletLoading ? (
+                    <p className="text-gray-500">Loading wallet...</p>
+                  ) : (
+                    <div className="bg-amber-50 p-4 rounded-xl">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-gray-600">Available Balance</span>
+                        <span className="text-2xl font-bold text-amber-600">
+                          ₹{balance?.toFixed(2) || "0.00"}
+                        </span>
+                      </div>
+                      {spendHistory && spendHistory.length > 0 && (
+                        <div className="mt-3 pt-3 border-t border-amber-200">
+                          <p className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                            <FaHistory className="text-amber-600" /> Recent Spend Transactions
+                          </p>
+                          <ul className="mt-2 space-y-1">
+                            {spendHistory.slice(0, 5).map((tx, idx) => (
+                              <li key={idx} className="text-sm text-gray-600 flex justify-between">
+                                <span>{tx.description || "Order payment"}</span>
+                                <span className="font-medium">-₹{tx.amount}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
-              // --- Edit Mode ---
+              // --- Edit Mode (same as before) ---
               <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Profile Picture */}
                 <div className="flex flex-col items-center gap-3">
                   <div className="relative">
                     {displayImage ? (
@@ -244,12 +279,9 @@ const ProfilePage = () => {
                       />
                     </label>
                   </div>
-                  <p className="text-xs text-gray-500">
-                    Click camera icon to change photo
-                  </p>
+                  <p className="text-xs text-gray-500">Click camera icon to change photo</p>
                 </div>
 
-                {/* Form Fields */}
                 <div className="grid grid-cols-1 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -303,7 +335,6 @@ const ProfilePage = () => {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex justify-end gap-3 pt-4">
                   <button
                     type="button"
@@ -317,13 +348,7 @@ const ProfilePage = () => {
                     disabled={isSubmitting}
                     className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-50 flex items-center gap-2"
                   >
-                    {isSubmitting ? (
-                      "Saving..."
-                    ) : (
-                      <>
-                        <FaSave /> Save Changes
-                      </>
-                    )}
+                    {isSubmitting ? "Saving..." : <><FaSave /> Save Changes</>}
                   </button>
                 </div>
               </form>
@@ -334,9 +359,9 @@ const ProfilePage = () => {
 
       <div
         onClick={() => navigate('/')}
-        className="flex items-center justify-center gap-2 text-amber-600  mt-4 hover:underline mb-6 text-center cursor-pointer"
+        className="flex items-center justify-center gap-2 text-amber-600 mt-4 hover:underline mb-6 text-center cursor-pointer"
       >
-        <ArrowLeft className="w-4 h-4 text-center" /> Back to Home
+        <ArrowLeft className="w-4 h-4" /> Back to Home
       </div>
     </div>
   );

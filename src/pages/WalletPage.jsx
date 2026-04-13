@@ -12,6 +12,7 @@ import {
 import Loader from '@/components/common/Loader';
 import { toast } from 'react-toastify';
 import { Wallet, PlusCircle, History, BarChart3, ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const loadRazorpayScript = () => {
   return new Promise((resolve) => {
@@ -36,6 +37,9 @@ const WalletPage = () => {
   const [amount, setAmount] = useState('');
   const [adding, setAdding] = useState(false);
   const [activeTab, setActiveTab] = useState('balance'); // 'balance', 'history', 'summary'
+
+
+  let navigate = useNavigate()
 
   useEffect(() => {
     if (isLoggedIn) {
