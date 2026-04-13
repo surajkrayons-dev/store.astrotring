@@ -95,9 +95,9 @@ const CategoryPage = () => {
       </div>
 
       {/* ---------- PRODUCTS & INFO SECTIONS (full width) ---------- */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-20">
         {products.length === 0 ? (
-          <p className="text-center text-gray-500">No products found</p>
+          <p className="text-center font-bold text-3xl  text-orange-700">Comming Soon...</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
             {products.map((product) => (

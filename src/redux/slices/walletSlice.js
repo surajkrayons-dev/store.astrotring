@@ -2,38 +2,64 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '../baseApi';
 
-// Fetch wallet balance
+// ---------- NEW: Fetch wallet balance ----------
 export const fetchWallet = createAsyncThunk(
   'wallet/fetchWallet',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await api.get('/wallet'); // backend will provide this endpoint
-
-      console.log("fetch wallet",response.data)
-      return response.data; // expects { balance: number } or { data: { balance } }
+      const response = await api.get('/store-wallet');
+      // Assume response.data contains { balance, ... }
+      console.log("wallet fetch",response.data.data)
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch wallet');
     }
   }
 );
 
-// Create order for adding money
+// ---------- NEW: Fetch transaction history ----------
+export const fetchWalletHistory = createAsyncThunk(
+  'wallet/fetchHistory',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/store-wallet/history');
+      console.log("wallet history",response.data.data)
+      return response.data.data; // expects array of transactions
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch history');
+    }
+  }
+);
+
+// ---------- NEW: Fetch wallet summary (optional) ----------
+export const fetchWalletSummary = createAsyncThunk(
+  'wallet/fetchSummary',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get('/store-wallet/summary');
+      console.log("wallet summary",response.data.data)
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch summary');
+    }
+  }
+);
+
+// ---------- Create order for adding money ----------
 export const createOrder = createAsyncThunk(
   'wallet/createOrder',
   async (amount, { rejectWithValue }) => {
     try {
       const response = await api.post('/wallet/topup/create-order', { amount });
-
-            console.log("add money to wallet",response.data)
-
-      return response.data; // expects { order_id, amount, currency }
+      console.log("add money to wallet",response.data.data)
+      return response.data; // { order_id, amount, currency? }
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to create order');
     }
   }
 );
 
-// Verify payment after successful transaction
+// ---------- Verify payment after successful transaction ----------
 export const verifyPayment = createAsyncThunk(
   'wallet/verifyPayment',
   async ({ paymentData, amount }, { rejectWithValue, dispatch }) => {
@@ -42,10 +68,9 @@ export const verifyPayment = createAsyncThunk(
         ...paymentData,
         amount,
       });
-      // After verification, refresh wallet balance
+      // After successful verification, refetch wallet balance
       await dispatch(fetchWallet());
-
-              console.log("verify wallet",response.data)
+      console.log("verufy wallet",response.data.data)
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Payment verification failed');
@@ -57,6 +82,8 @@ const walletSlice = createSlice({
   name: 'wallet',
   initialState: {
     balance: 0,
+    transactions: [],
+    summary: null,
     loading: false,
     error: null,
   },
@@ -74,10 +101,35 @@ const walletSlice = createSlice({
       })
       .addCase(fetchWallet.fulfilled, (state, action) => {
         state.loading = false;
-        // adjust based on actual response structure
-        state.balance = action.payload.balance ?? action.payload.data?.balance ?? 0;
+        state.balance = action.payload.balance ?? action.payload?.data?.balance ?? 0;
       })
       .addCase(fetchWallet.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // fetchWalletHistory
+      .addCase(fetchWalletHistory.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchWalletHistory.fulfilled, (state, action) => {
+        state.loading = false;
+        state.transactions = action.payload.data ?? action.payload;
+      })
+      .addCase(fetchWalletHistory.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // fetchWalletSummary
+      .addCase(fetchWalletSummary.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchWalletSummary.fulfilled, (state, action) => {
+        state.loading = false;
+        state.summary = action.payload;
+      })
+      .addCase(fetchWalletSummary.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -100,7 +152,6 @@ const walletSlice = createSlice({
       })
       .addCase(verifyPayment.fulfilled, (state) => {
         state.loading = false;
-        // balance is updated via fetchWallet called inside the thunk
       })
       .addCase(verifyPayment.rejected, (state, action) => {
         state.loading = false;
