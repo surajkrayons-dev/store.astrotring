@@ -5,13 +5,14 @@ import {
   fetchWallet,
   fetchWalletHistory,
   fetchWalletSummary,
+  fetchSpendHistory,
   createOrder,
   verifyPayment,
   clearWalletError,
 } from '@/redux/slices/walletSlice';
 import Loader from '@/components/common/Loader';
 import { toast } from 'react-toastify';
-import { Wallet, PlusCircle, History, BarChart3, ArrowLeft } from 'lucide-react';
+import { Wallet, PlusCircle, History, BarChart3, ArrowLeft, TrendingDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const loadRazorpayScript = () => {
@@ -24,7 +25,6 @@ const loadRazorpayScript = () => {
   });
 };
 
-// Helper to safely format balance
 const formatBalance = (bal) => {
   const num = typeof bal === 'number' ? bal : parseFloat(bal);
   return isNaN(num) ? '0.00' : num.toFixed(2);
@@ -32,20 +32,26 @@ const formatBalance = (bal) => {
 
 const WalletPage = () => {
   const dispatch = useDispatch();
-  const { balance, transactions, summary, loading, error } = useSelector((state) => state.wallet);
+  const {
+    balance,
+    transactions,
+    summary,
+    spendHistory,
+    loading,
+    error,
+  } = useSelector((state) => state.wallet);
   const { isLoggedIn } = useSelector((state) => state.userAuth);
   const [amount, setAmount] = useState('');
   const [adding, setAdding] = useState(false);
-  const [activeTab, setActiveTab] = useState('balance'); // 'balance', 'history', 'summary'
-
-
-  let navigate = useNavigate()
+  const [activeTab, setActiveTab] = useState('balance');
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (isLoggedIn) {
       dispatch(fetchWallet());
       dispatch(fetchWalletHistory());
       dispatch(fetchWalletSummary());
+      dispatch(fetchSpendHistory());
     }
   }, [dispatch, isLoggedIn]);
 
@@ -108,15 +114,12 @@ const WalletPage = () => {
             dispatch(fetchWallet());
             dispatch(fetchWalletHistory());
             dispatch(fetchWalletSummary());
+            dispatch(fetchSpendHistory());
           } catch (err) {
             toast.error('Payment verification failed. Please contact support.');
           }
         },
-        prefill: {
-          name: '',
-          email: '',
-          contact: '',
-        },
+        prefill: { name: '', email: '', contact: '' },
         theme: { color: '#ea580c' },
       };
       const razorpay = new window.Razorpay(options);
@@ -149,10 +152,10 @@ const WalletPage = () => {
           </div>
 
           {/* Tabs */}
-          <div className="flex border-b">
+          <div className="flex border-b overflow-x-auto">
             <button
               onClick={() => setActiveTab('balance')}
-              className={`flex-1 py-3 text-center font-medium transition ${
+              className={`flex-1 py-3 text-center font-medium transition whitespace-nowrap ${
                 activeTab === 'balance'
                   ? 'text-amber-600 border-b-2 border-amber-600'
                   : 'text-gray-500 hover:text-gray-700'
@@ -162,7 +165,7 @@ const WalletPage = () => {
             </button>
             <button
               onClick={() => setActiveTab('history')}
-              className={`flex-1 py-3 text-center font-medium transition ${
+              className={`flex-1 py-3 text-center font-medium transition whitespace-nowrap ${
                 activeTab === 'history'
                   ? 'text-amber-600 border-b-2 border-amber-600'
                   : 'text-gray-500 hover:text-gray-700'
@@ -171,8 +174,18 @@ const WalletPage = () => {
               <History className="w-4 h-4 inline mr-1" /> History
             </button>
             <button
+              onClick={() => setActiveTab('spendHistory')}
+              className={`flex-1 py-3 text-center font-medium transition whitespace-nowrap ${
+                activeTab === 'spendHistory'
+                  ? 'text-amber-600 border-b-2 border-amber-600'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              <TrendingDown className="w-4 h-4 inline mr-1" /> Spend History
+            </button>
+            <button
               onClick={() => setActiveTab('summary')}
-              className={`flex-1 py-3 text-center font-medium transition ${
+              className={`flex-1 py-3 text-center font-medium transition whitespace-nowrap ${
                 activeTab === 'summary'
                   ? 'text-amber-600 border-b-2 border-amber-600'
                   : 'text-gray-500 hover:text-gray-700'
@@ -217,7 +230,7 @@ const WalletPage = () => {
               </>
             )}
 
-            {/* History Tab */}
+            {/* History Tab (all transactions) */}
             {activeTab === 'history' && (
               <>
                 <h2 className="text-lg font-semibold mb-4">Transaction History</h2>
@@ -235,6 +248,32 @@ const WalletPage = () => {
                         </div>
                         <div className={`font-semibold ${tx.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
                           {tx.amount > 0 ? `+₹${formatBalance(tx.amount)}` : `-₹${formatBalance(Math.abs(tx.amount))}`}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* Spend History Tab (only debits) */}
+            {activeTab === 'spendHistory' && (
+              <>
+                <h2 className="text-lg font-semibold mb-4">Spend History (Debits)</h2>
+                {spendHistory.length === 0 ? (
+                  <p className="text-gray-500 text-center py-4">No spend transactions yet.</p>
+                ) : (
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {spendHistory.map((tx, idx) => (
+                      <div key={idx} className="flex justify-between border-b pb-2">
+                        <div>
+                          <p className="font-medium">{tx.description || 'Spent on order'}</p>
+                          <p className="text-xs text-gray-400">
+                            {new Date(tx.created_at).toLocaleString()}
+                          </p>
+                        </div>
+                        <div className="font-semibold text-red-600">
+                          -₹{formatBalance(tx.amount)}
                         </div>
                       </div>
                     ))}
@@ -280,9 +319,9 @@ const WalletPage = () => {
       </div>
       <div
         onClick={() => navigate('/')}
-        className="flex items-center justify-center gap-2 text-amber-600  mt-4 hover:underline mb-6 text-center cursor-pointer"
+        className="flex items-center justify-center gap-2 text-amber-600 mt-4 hover:underline mb-6 text-center cursor-pointer"
       >
-        <ArrowLeft className="w-4 h-4 text-center" /> Back to Home
+        <ArrowLeft className="w-4 h-4" /> Back to Home
       </div>
     </div>
   );
