@@ -148,14 +148,14 @@ const CartPage = () => {
   const subtotal = cartItems.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
   const originalTotal = subtotal;
   const productSavings = originalTotal - subtotal;
-  const shippingFee = subtotal > 599 ? 0 : 199;
-  const freeShippingRemaining = Math.max(0, 599 - subtotal);
+  const shippingFee = subtotal >= 800 ? 0 : 199;
+  const freeShippingRemaining = Math.max(0, 800 - subtotal);
 
   // couponDiscount is already in Redux, but we recalc if needed? Actually we already have it from state.
   // But we need to ensure it's consistent with the coupon logic. The discount is stored when applied.
   // The couponDiscount variable from Redux is used.
 
-  const totalSavings = productSavings + couponDiscount + (shippingFee === 0 && subtotal > 599 ? 199 : 0);
+  const totalSavings = productSavings + couponDiscount + (shippingFee === 0 && subtotal > 800 ? 199 : 0);
   const grandTotal = subtotal + shippingFee - couponDiscount;
 
   const proceedToCheckout = () => {
@@ -306,7 +306,7 @@ const CartPage = () => {
                       <div className="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-gradient-to-r from-amber-600 to-amber-500 transition-all"
-                          style={{ width: `${Math.min(100, (subtotal / 599) * 100)}%` }}
+                          style={{ width: `${Math.min(100, (subtotal / 800) * 100)}%` }}
                         />
                       </div>
                     </>

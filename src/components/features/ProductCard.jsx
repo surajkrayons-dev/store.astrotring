@@ -118,17 +118,17 @@ const ProductCard = ({ product, addToCart, compact = false }) => {
               View
             </button>
             <button
-  onClick={(e) => {
-    e.stopPropagation();
-    addToCart({ 
-      product_id: product?.id, 
-      quantity: 1, 
-      name: product?.name,
-      ratti: defaultRatti
-    });
-  }}
-  className={overlayCartClass}
->
+              onClick={(e) => {
+                e.stopPropagation();
+                addToCart({
+                  product_id: product?.id,
+                  quantity: 1,
+                  name: product?.name,
+                  ratti: defaultRatti
+                });
+              }}
+              className={overlayCartClass}
+            >
               <svg
                 width={compact ? 10 : 12}
                 height={compact ? 10 : 12}
@@ -170,15 +170,15 @@ const ProductCard = ({ product, addToCart, compact = false }) => {
 
           {/* Quick add button */}
           <button
-             onClick={(e) => {
-    e.stopPropagation();
-    addToCart({ 
-      product_id: product?.id, 
-      quantity: 1, 
-      name: product?.name,
-      ratti: defaultRatti
-    });
-  }}
+            onClick={(e) => {
+              e.stopPropagation();
+              addToCart({
+                product_id: product?.id,
+                quantity: 1,
+                name: product?.name,
+                ratti: defaultRatti
+              });
+            }}
             className={`bg-amber-100 border border-amber-300 text-amber-900 rounded-lg cursor-pointer flex items-center justify-center transition-colors hover:bg-amber-200 ${quickAddSize}`}
             aria-label="Add to cart"
           >

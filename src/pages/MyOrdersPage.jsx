@@ -11,6 +11,7 @@ const statusColors = {
   processing: "bg-blue-100 text-blue-800",
   shipped: "bg-purple-100 text-purple-800",
   delivered: "bg-green-100 text-green-800",
+  paid: "bg-green-100 text-green-800",
   cancelled: "bg-red-100 text-red-800",
 };
 
@@ -69,13 +70,13 @@ const MyOrdersPage = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
-      <button
+      <div className="max-w-4xl mx-auto px-4">
+        <button
           onClick={() => navigate('/')}
           className="flex items-center gap-2 text-amber-600 hover:underline mb-6"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Home
         </button>
-      <div className="max-w-4xl mx-auto px-4">
         <h1 className="text-2xl font-bold text-gray-900 mb-6">My Orders</h1>
 
         <div className="space-y-4">
@@ -85,29 +86,33 @@ const MyOrdersPage = () => {
             const discount = getDiscount(order);
             const total = order.total || (subtotal + shipping - discount);
 
+            const handleViewDetails = (e) => {
+              e.stopPropagation(); // Prevent card click from firing twice
+              navigate(`/orders/${order.order_id}`);
+            };
+
             return (
               <div
                 key={order.id}
                 className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition"
-                onClick={() => navigate(`/orders/${order.order_id}`)} // consistent route
+                onClick={() => navigate(`/orders/${order.order_id}`)}
               >
                 {/* Order Header */}
-                <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-wrap justify-between items-center">
+                <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-wrap justify-between items-center gap-3">
                   <div>
-                    <p className="text-sm text-gray-500">Order #{order.
-                      order_number
-                    }</p>
+                    <p className="text-sm text-gray-500">Order #{order.order_number}</p>
                     <p className="text-sm text-gray-500">
                       {new Date(order.created_at).toLocaleDateString()}
                     </p>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[order.status] || "bg-gray-100"}`}>
                       {order.status?.toUpperCase() || "PENDING"}
                     </span>
                     <span className="font-semibold text-gray-900">
                       ₹{parseFloat(total).toLocaleString()}
                     </span>
+                  
                   </div>
                 </div>
 
@@ -123,7 +128,6 @@ const MyOrdersPage = () => {
                           <h3 className="font-medium text-gray-800">{item.name}</h3>
                           <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
                           {item.ratti && <p className="text-sm text-gray-500">Ratti: {item.ratti}</p>}
-
                           <p className="text-sm text-gray-600">₹{item.price} each</p>
                         </div>
                         <div className="text-right">
@@ -137,6 +141,12 @@ const MyOrdersPage = () => {
 
                   {/* Order Summary */}
                   <div className="mt-4 pt-4 border-t border-gray-200 text-right">
+                      <button
+                      onClick={handleViewDetails}
+                      className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-amber-600 bg-amber-50 rounded-lg hover:bg-amber-100 transition-all duration-200 cursor-pointer"
+                    >
+                      View Details <ArrowRight className="w-4 h-4" />
+                    </button>
                     <p className="text-sm text-gray-500">Subtotal: ₹{subtotal.toLocaleString()}</p>
                     {shipping > 0 && <p className="text-sm text-gray-500">Shipping: ₹{shipping.toLocaleString()}</p>}
                     {discount > 0 && <p className="text-sm text-green-600">Discount: -₹{discount.toLocaleString()}</p>}

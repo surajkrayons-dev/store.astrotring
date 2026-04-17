@@ -65,7 +65,7 @@ const ProductDetailsPage = () => {
   const [selectedRatti, setSelectedRatti] = useState("");
   const [openFaq, setOpenFaq] = useState(null);
   const [pincode, setPincode] = useState("");
-  
+
 
   // Redux state
   const { selectedProduct: product, items: allProducts, loading, error } = useSelector(
@@ -103,12 +103,12 @@ const ProductDetailsPage = () => {
     if (id) dispatch(fetchProductById(id));
     return () => dispatch(clearSelectedProduct());
   }, [dispatch, id]);
-// wishlist
+  // wishlist
   useEffect(() => {
-  if (isLoggedIn) {
-    dispatch(fetchWishlist());
-  }
-}, [dispatch, isLoggedIn]);
+    if (isLoggedIn) {
+      dispatch(fetchWishlist());
+    }
+  }, [dispatch, isLoggedIn]);
 
   // --- Set default Ratti when product loads ---
   useEffect(() => {
@@ -137,13 +137,13 @@ const ProductDetailsPage = () => {
       (p) => p.category?.slug === currentCategory && p.id !== product?.id
     );
   }, [allProducts, product]);
-    const isInWishlist = useMemo(() => {
-  return wishlistItems.some(item => item.id === product?.id);
-}, [wishlistItems, product?.id]);
+  const isInWishlist = useMemo(() => {
+    return wishlistItems.some(item => item.id === product?.id);
+  }, [wishlistItems, product?.id]);
 
   console.log('Wishlist items:', wishlistItems);
-console.log('Current product id:', product?.id);
-console.log('Is in wishlist?', isInWishlist);
+  console.log('Current product id:', product?.id);
+  console.log('Is in wishlist?', isInWishlist);
 
   if (loading) return <Loader data="Loading product..." />;
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>;
@@ -229,9 +229,9 @@ console.log('Is in wishlist?', isInWishlist);
   const certificates =
     product?.lab_certificates && Array.isArray(product.lab_certificates)
       ? product.lab_certificates.map((cert, idx) => ({
-          id: idx,
-          image: cert.image || cert,
-        }))
+        id: idx,
+        image: cert.image || cert,
+      }))
       : [];
 
   // Payment methods (static)
@@ -292,26 +292,26 @@ console.log('Is in wishlist?', isInWishlist);
     }
   };
 
-const handleWishlistToggle = async () => {
-  if (!isLoggedIn) {
-    toast.warning("Please login to add to wishlist");
-    dispatch(openLoginModal());
-    return;
-  }
-  try {
-    if (isInWishlist) {
-      await dispatch(removeFromWishlist({ product_id: product.id })).unwrap();
-      toast.info("Removed from wishlist");
-    } else {
-      await dispatch(addToWishlist({ product_id: product.id })).unwrap();
-      toast.success("Added to wishlist");
+  const handleWishlistToggle = async () => {
+    if (!isLoggedIn) {
+      toast.warning("Please login to add to wishlist");
+      dispatch(openLoginModal());
+      return;
     }
-    // Refetch to keep UI in sync (optimistic update would be better but simpler)
-    dispatch(fetchWishlist());
-  } catch (err) {
-    toast.error(err || "Failed to update wishlist");
-  }
-};
+    try {
+      if (isInWishlist) {
+        await dispatch(removeFromWishlist({ product_id: product.id })).unwrap();
+        toast.info("Removed from wishlist");
+      } else {
+        await dispatch(addToWishlist({ product_id: product.id })).unwrap();
+        toast.success("Added to wishlist");
+      }
+      // Refetch to keep UI in sync (optimistic update would be better but simpler)
+      dispatch(fetchWishlist());
+    } catch (err) {
+      toast.error(err || "Failed to update wishlist");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -392,22 +392,21 @@ const handleWishlistToggle = async () => {
                     <button
                       key={idx}
                       onClick={() => setSelectedMediaIndex(idx)}
-                      className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 overflow-hidden transition-all cursor-pointer ${
-                        selectedMediaIndex === idx
+                      className={`flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg border-2 overflow-hidden transition-all cursor-pointer ${selectedMediaIndex === idx
                           ? "border-amber-600 shadow-md"
                           : "border-gray-200 hover:border-gray-300"
-                      }`}
+                        }`}
                     >
-                      {isVideo ?  (
-            <video
-              src={item.url}
-              className="w-full h-full object-cover"
-              autoPlay
-              muted
-              loop
-              playsInline
-            />
-          ) : (
+                      {isVideo ? (
+                        <video
+                          src={item.url}
+                          className="w-full h-full object-cover"
+                          autoPlay
+                          muted
+                          loop
+                          playsInline
+                        />
+                      ) : (
                         <img
                           src={thumbUrl}
                           alt={`thumb-${idx}`}
@@ -494,11 +493,10 @@ const handleWishlistToggle = async () => {
                     <button
                       key={opt.ratti}
                       onClick={() => setSelectedRatti(opt.ratti.toString())}
-                      className={`px-4 py-2 border rounded-lg text-sm font-medium transition-all cursor-pointer ${
-                        selectedRatti === opt.ratti.toString()
+                      className={`px-4 py-2 border rounded-lg text-sm font-medium transition-all cursor-pointer ${selectedRatti === opt.ratti.toString()
                           ? "border-amber-600 bg-amber-50 text-amber-700"
                           : "border-gray-300 hover:border-gray-400 text-gray-700"
-                      }`}
+                        }`}
                     >
                       {opt.ratti}
                     </button>
@@ -543,9 +541,8 @@ const handleWishlistToggle = async () => {
                 className="px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-400 transition cursor-pointer"
               >
                 <Heart
-                  className={`w-5 h-5 ${
-                    isInWishlist  ? "fill-red-500 text-red-500" : "text-gray-600"
-                  }`}
+                  className={`w-5 h-5 ${isInWishlist ? "fill-red-500 text-red-500" : "text-gray-600"
+                    }`}
                 />
               </button>
             </div>
@@ -556,7 +553,7 @@ const handleWishlistToggle = async () => {
                 <Truck className="w-5 h-5 text-gray-500" />
                 <div className="text-xs">
                   <p className="font-semibold">Free Shipping</p>
-                  <p className="text-gray-500">on ₹599+</p>
+                  <p className="text-gray-500">on ₹800+</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
@@ -686,16 +683,14 @@ const handleWishlistToggle = async () => {
                       className="w-full flex items-center justify-between p-4 text-left bg-gray-50 hover:bg-gray-100 transition cursor-pointer"
                     >
                       <span
-                        className={`text-sm ${
-                          openFaq === idx ? "text-amber-500 font-medium" : "text-gray-700"
-                        }`}
+                        className={`text-sm ${openFaq === idx ? "text-amber-500 font-medium" : "text-gray-700"
+                          }`}
                       >
                         {faq.question}
                       </span>
                       <ChevronDown
-                        className={`w-5 h-5 transition-transform ${
-                          openFaq === idx ? "rotate-180 text-amber-500" : "text-gray-400"
-                        }`}
+                        className={`w-5 h-5 transition-transform ${openFaq === idx ? "rotate-180 text-amber-500" : "text-gray-400"
+                          }`}
                       />
                     </button>
                     {openFaq === idx && (
@@ -711,10 +706,10 @@ const handleWishlistToggle = async () => {
 
           {/* You May Also Like */}
           {suggestedProducts.length > 0 && <ProductYouMayAlsoLike products={suggestedProducts} />}
-{/* product reviews */}
-           <ProductReviews productId={product.id} />
+          {/* product reviews */}
+          <ProductReviews productId={product.id} />
         </div>
-       
+
       </div>
     </div>
   );

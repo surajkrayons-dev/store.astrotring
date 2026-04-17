@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchOrderDetails, clearOrderError, clearCurrentOrder } from '../redux/slices/orderSlice';
+import { fetchOrderDetails, clearOrderError, clearCurrentOrder, cancelOrder } from '../redux/slices/orderSlice';
 import { toast } from 'react-toastify';
-import { api } from '../redux/baseApi'; 
 import Loader from '@/components/common/Loader';
-import { ArrowLeft, Calendar, Package, MapPin, CreditCard } from 'lucide-react';
-import { cancelOrder } from '../redux/slices/orderSlice';
+import { ArrowLeft, Calendar, Package, MapPin, CreditCard, XCircle } from 'lucide-react';
 
 const MyOrderDetailsPage = () => {
   const { id } = useParams();
@@ -32,18 +30,21 @@ const MyOrderDetailsPage = () => {
     }
   }, [error, dispatch]);
 
- 
+  const handleCancelOrder = async () => {
+    if (!window.confirm('Are you sure you want to cancel this order?')) return;
+    setCancelling(true);
+    try {
+      await dispatch(cancelOrder(id)).unwrap();
+      toast.success('Order cancelled successfully');
+      // Refresh order details
+      dispatch(fetchOrderDetails(id));
+    } catch (err) {
+      toast.error(err || 'Failed to cancel order');
+    } finally {
+      setCancelling(false);
+    }
+  };
 
-const handleCancelOrder = async () => {
-  if (!window.confirm('Are you sure you want to cancel this order?')) return;
-  try {
-    await dispatch(cancelOrder(id)).unwrap();
-    toast.success('Order cancelled successfully');
-    
-  } catch (err) {
-    // toast.error(err || 'Failed to cancel order');
-  }
-};
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -59,15 +60,12 @@ const handleCancelOrder = async () => {
   }
 
   const order = currentOrder;
-
-  // Compute subtotal if not provided
   const subtotal = order.subtotal || order.items?.reduce((sum, item) => sum + (item.price * item.quantity), 0) || 0;
   const shipping = order.shipping_cost || 0;
   const discount = order.discount || 0;
   const total = order.total || subtotal + shipping - discount;
-
-  // Determine if order can be cancelled (not delivered, not cancelled)
-  const canCancel = order.status !== 'delivered' && order.status !== 'cancelled';
+  const isCancelled = order.status === 'cancelled';
+  const canCancel = !isCancelled && order.status !== 'delivered';
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -88,31 +86,14 @@ const handleCancelOrder = async () => {
                 <Calendar className="w-3 h-3" /> {new Date(order.created_at).toLocaleString()}
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                'bg-yellow-100 text-yellow-800'
-              }`}>
-                {order.status?.toUpperCase() || 'PENDING'}
-              </span>
-              {canCancel && (
-                <button
-                  onClick={handleCancelOrder}
-                  disabled={cancelling}
-                  className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 hover:bg-red-200 transition disabled:opacity-50 flex items-center gap-1"
-                >
-                  {cancelling ? (
-                    <>
-                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-red-700"></div>
-                      Cancelling...
-                    </>
-                  ) : (
-                    'Cancel Order'
-                  )}
-                </button>
-              )}
-            </div>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+              order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+              order.status === 'paid' ? 'bg-green-100 text-green-800' :
+              order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+              'bg-yellow-100 text-yellow-800'
+            }`}>
+              {order.status?.toUpperCase() || 'PENDING'}
+            </span>
           </div>
 
           {/* Items */}
@@ -143,12 +124,42 @@ const handleCancelOrder = async () => {
               )}
             </div>
 
-            {/* Order Summary */}
-            <div className="mt-6 pt-4 border-t border-gray-200 text-right">
-              <p className="text-sm text-gray-500">Subtotal: ₹{subtotal.toLocaleString()}</p>
-              {shipping > 0 && <p className="text-sm text-gray-500">Shipping: ₹{shipping.toLocaleString()}</p>}
-              {discount > 0 && <p className="text-sm text-green-600">Discount: -₹{discount.toLocaleString()}</p>}
-              <p className="text-lg font-bold text-gray-900 mt-1">Total: ₹{total.toLocaleString()}</p>
+            {/* Order Summary with Cancel Button on Left */}
+            <div className="mt-6 pt-4 border-t border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div>
+                {canCancel ? (
+                  <button
+                    onClick={handleCancelOrder}
+                    disabled={cancelling}
+                    className="group flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {cancelling ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-600"></div>
+                        <span>Cancelling...</span>
+                      </>
+                    ) : (
+                      <>
+                        <XCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                        <span>Cancel Order</span>
+                      </>
+                    )}
+                  </button>
+                ) : isCancelled ? (
+                  <div className="flex items-center gap-2 text-red-600 bg-red-50 px-4 py-2 rounded-lg">
+                    <XCircle className="w-4 h-4" />
+                    <span className="text-sm font-medium">This order has been cancelled</span>
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500">Order cannot be cancelled at this stage</div>
+                )}
+              </div>
+              <div className="text-right">
+                <p className="text-sm text-gray-500">Subtotal: ₹{subtotal.toLocaleString()}</p>
+                {shipping > 0 && <p className="text-sm text-gray-500">Shipping: ₹{shipping.toLocaleString()}</p>}
+                {discount > 0 && <p className="text-sm text-green-600">Discount: -₹{discount.toLocaleString()}</p>}
+                <p className="text-lg font-bold text-gray-900 mt-1">Total: ₹{total.toLocaleString()}</p>
+              </div>
             </div>
           </div>
 
@@ -175,7 +186,6 @@ const handleCancelOrder = async () => {
               <CreditCard className="w-5 h-5" /> Payment
             </h2>
             <p className="text-gray-600">Method: {order.payment_method || 'Online'}</p>
-            {/* <p className="text-gray-600">Status: {order.payment_status === 'paid' ? 'Paid' : 'Pending'}</p> */}
           </div>
         </div>
       </div>
