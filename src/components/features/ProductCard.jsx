@@ -23,7 +23,7 @@ const ProductCard = ({ product, addToCart, compact = false }) => {
       : 0;
 
   // Image fallback: product.image or first from images array
-  const imageUrl = product?.image || product?.images?.[0]?.image || "";
+  const imageUrl = product?.image || "";
 
   // Conditional classes (unchanged)
   const cardClass = compact

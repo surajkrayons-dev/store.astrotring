@@ -176,6 +176,13 @@ const ProductDetailsPage = () => {
 
   // --- Media: objects with url, type, and thumbnail ---
   let mediaItems = [];
+  if (product?.image){
+    const url =product.image;
+    mediaItems.push({
+        url
+        
+      });
+  }
   if (product?.images?.length) {
     product.images.forEach(item => {
       const url = item.image;
