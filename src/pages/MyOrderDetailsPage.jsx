@@ -86,12 +86,11 @@ const MyOrderDetailsPage = () => {
                 <Calendar className="w-3 h-3" /> {new Date(order.created_at).toLocaleString()}
               </p>
             </div>
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-              order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-              order.status === 'paid' ? 'bg-green-100 text-green-800' :
-              order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-              'bg-yellow-100 text-yellow-800'
-            }`}>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+                order.status === 'paid' ? 'bg-green-100 text-green-800' :
+                  order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                    'bg-yellow-100 text-yellow-800'
+              }`}>
               {order.status?.toUpperCase() || 'PENDING'}
             </span>
           </div>
@@ -168,12 +167,12 @@ const MyOrderDetailsPage = () => {
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <MapPin className="w-5 h-5" /> Delivery Address
             </h2>
-            {order.address ? (
+            {order?.address?.snapshot ? (
               <>
-                <p className="text-gray-800 font-medium">{order.address.name}</p>
-                <p className="text-gray-600">{order.address.address}</p>
-                <p className="text-gray-600">Mobile: {order.address.mobile}</p>
-                <p className="text-gray-500 text-sm">Country Code: {order.address.country_code}</p>
+                <p className="text-gray-800 font-medium">{order?.address?.snapshot.name}</p>
+                <p className="text-gray-600">Mobile: {order?.address?.snapshot.mobile}, {order?.address?.snapshot.alternative_mobile}</p>
+                <p className="text-gray-600">Address: {order?.address?.snapshot.address}</p>
+                <p className="text-gray-500 text-sm">Pin Code: {order?.address?.snapshot.pincode}</p>
               </>
             ) : (
               <p className="text-gray-500">Address not available</p>
