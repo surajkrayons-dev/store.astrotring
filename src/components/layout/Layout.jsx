@@ -4,6 +4,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import UserLogin from "../auth/UserLogin"; 
 import TopPromoSlider from "../common/TopPromoSlider";
+import WhatsAppButton from "../common/WhatsAppButton";
 
 const Layout = () => {
   return (
@@ -15,6 +16,7 @@ const Layout = () => {
       </main>
       <Footer />
       <UserLogin /> 
+      <WhatsAppButton />
     </div>
   );
 };

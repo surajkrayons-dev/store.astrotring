@@ -1,0 +1,23 @@
+import React from "react";
+import { FaWhatsapp } from "react-icons/fa";
+
+const WhatsAppButton = () => {
+  
+
+  return (
+    <a
+      href="https://wa.me/919485628238"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="fixed bottom-6 right-6 z-50 group"
+      aria-label="Chat on WhatsApp"
+    >
+      {/* Button with floating animation */}
+      <div className="bg-green-600 hover:bg-green-700 text-white rounded-full p-2 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 animate-float">
+        <FaWhatsapp className="h-6 w-6 sm:w-10 sm:h-10 " />
+      </div>
+    </a>
+  );
+};
+
+export default WhatsAppButton;

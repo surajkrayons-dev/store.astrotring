@@ -76,7 +76,8 @@ export const userProfile = createAsyncThunk(
     async (data, thunkApi) => {
         try {
             const res = await api.get("/user/profile");
-            return res.data.user;
+            console.log("user profile",res.data)
+            return res.data;
         } catch (error) {
 
             return thunkApi.rejectWithValue(
@@ -133,6 +134,7 @@ const tokenFromStorage = localStorage.getItem("token");
 
 const initialState = {
     user: null,
+    userWallet:null,
     token: tokenFromStorage,
     loading: false,
     isLoggedIn: !!tokenFromStorage,
@@ -192,7 +194,8 @@ const UserAuthSlice = createSlice({
             })
             .addCase(userProfile.fulfilled, (state, action) => {
                 state.loading = false;
-                state.user = action.payload;
+                state.user = action.payload.user;
+                state.userWallet =action.payload.wallet
             })
             .addCase(userProfile.rejected, (state, action) => {
                 state.loading = false;

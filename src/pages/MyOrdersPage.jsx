@@ -1,0 +1,165 @@
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { fetchMyOrders, clearOrderError } from "../redux/slices/orderSlice";
+import Loader from "@/components/common/Loader";
+import { toast } from "react-toastify";
+import { Package, ArrowRight, ArrowLeft } from "lucide-react";
+
+const statusColors = {
+  pending: "bg-yellow-100 text-yellow-800",
+  processing: "bg-blue-100 text-blue-800",
+  shipped: "bg-purple-100 text-purple-800",
+  delivered: "bg-green-100 text-green-800",
+  paid: "bg-green-100 text-green-800",
+  cancelled: "bg-red-100 text-red-800",
+};
+
+const MyOrdersPage = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { orders, loading, error } = useSelector((state) => state.order);
+  const { isLoggedIn } = useSelector((state) => state.userAuth);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      dispatch(fetchMyOrders());
+    }
+  }, [dispatch, isLoggedIn]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      dispatch(clearOrderError());
+    }
+  }, [error, dispatch]);
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600">Please log in to view your orders.</p>
+      </div>
+    );
+  }
+
+  if (loading) return <Loader data="Loading orders..." />;
+
+  if (!orders.length) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <h2 className="text-xl font-semibold text-gray-800">No orders yet</h2>
+          <p className="text-gray-500 mt-2">Your order history will appear here.</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Helper to calculate subtotal from items if not provided
+  const getSubtotal = (order) => {
+    if (order.subtotal) return order.subtotal;
+    if (order.items && order.items.length) {
+      return order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    }
+    return 0;
+  };
+
+  const getShipping = (order) => order.shipping_cost || 0;
+  const getDiscount = (order) => order.discount || 0;
+
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 text-amber-600 hover:underline mb-6"
+        >
+          <ArrowLeft className="w-4 h-4" /> Back to Home
+        </button>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">My Orders</h1>
+
+        <div className="space-y-4">
+          {orders.map((order) => {
+            const subtotal = getSubtotal(order);
+            const shipping = getShipping(order);
+            const discount = getDiscount(order);
+            const total = order.total || (subtotal + shipping - discount);
+
+            const handleViewDetails = (e) => {
+              e.stopPropagation(); // Prevent card click from firing twice
+              navigate(`/orders/${order.order_id}`);
+            };
+
+            return (
+              <div
+                key={order.id}
+                className="bg-white rounded-xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition"
+                onClick={() => navigate(`/orders/${order.order_id}`)}
+              >
+                {/* Order Header */}
+                <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-wrap justify-between items-center gap-3">
+                  <div>
+                    <p className="text-sm text-gray-500">Order #{order.order_number}</p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(order.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[order.status] || "bg-gray-100"}`}>
+                      {order.status?.toUpperCase() || "PENDING"}
+                    </span>
+                    <span className="font-semibold text-gray-900">
+                      ₹{parseFloat(total).toLocaleString()}
+                    </span>
+                  
+                  </div>
+                </div>
+
+                {/* Order Items */}
+                <div className="p-6 space-y-4">
+                  {order.items && order.items.length > 0 ? (
+                    order.items.map((item, idx) => (
+                      <div key={idx} className="flex gap-4 border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                        {item.image && (
+                          <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg" />
+                        )}
+                        <div className="flex-1">
+                          <h3 className="font-medium text-gray-800">{item.name}</h3>
+                          <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                          {item.ratti && <p className="text-sm text-gray-500">Ratti: {item.ratti}</p>}
+                          <p className="text-sm text-gray-600">₹{item.price} each</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold text-gray-900">₹{item.price * item.quantity}</p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500">No items found</p>
+                  )}
+
+                  {/* Order Summary */}
+                  <div className="mt-4 pt-4 border-t border-gray-200 text-right">
+                      <button
+                      onClick={handleViewDetails}
+                      className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-amber-600 bg-amber-50 rounded-lg hover:bg-amber-100 transition-all duration-200 cursor-pointer"
+                    >
+                      View Details <ArrowRight className="w-4 h-4" />
+                    </button>
+                    <p className="text-sm text-gray-500">Subtotal: ₹{subtotal.toLocaleString()}</p>
+                    {shipping > 0 && <p className="text-sm text-gray-500">Shipping: ₹{shipping.toLocaleString()}</p>}
+                    {discount > 0 && <p className="text-sm text-green-600">Discount: -₹{discount.toLocaleString()}</p>}
+                    <p className="text-lg font-bold text-gray-900 mt-1">Total: ₹{total.toLocaleString()}</p>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MyOrdersPage;

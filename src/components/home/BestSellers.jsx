@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom"; // 👈 import useNavigate
-import Slider from "../slider/Slider";
+import Slider from "../common/Slider";
 
 const getAfterPrice = (product) => parseFloat(product?.after_price) || 0;
 const getBeforePrice = (product) => parseFloat(product?.before_price) || 0;
