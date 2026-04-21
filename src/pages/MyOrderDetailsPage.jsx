@@ -170,8 +170,13 @@ const MyOrderDetailsPage = () => {
             {order?.address?.snapshot ? (
               <>
                 <p className="text-gray-800 font-medium">{order?.address?.snapshot.name}</p>
-                <p className="text-gray-600">Mobile: {order?.address?.snapshot.mobile}, {order?.address?.snapshot.alternative_mobile}</p>
-                <p className="text-gray-600">Address: {order?.address?.snapshot.address}</p>
+                <p className="text-gray-500 text-sm">Email: {order?.address?.snapshot.email}</p>
+                <p className="text-gray-600 text-sm">Mobile: {order?.address?.snapshot.mobile}, {order?.address?.snapshot.alternative_mobile}</p>
+                <p className="text-gray-600 text-sm">Address: {order?.address?.snapshot.address}</p>
+                <p className="text-gray-500 text-sm">City: {order?.address?.snapshot.city}</p>
+                <p className="text-gray-500 text-sm">State: {order?.address?.snapshot.state}</p>
+                <p className="text-gray-500 text-sm">Country: {order?.address?.snapshot.country}</p>
+                
                 <p className="text-gray-500 text-sm">Pin Code: {order?.address?.snapshot.pincode}</p>
               </>
             ) : (
