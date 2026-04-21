@@ -1,3 +1,4 @@
+// src/components/AddressManager.jsx
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Select from 'react-select';
@@ -9,8 +10,8 @@ import {
   clearAddressError,
 } from '../../redux/slices/addressSlice';
 import { toast } from 'react-toastify';
-import { MapPin, Home, Phone, Mail, Plus, Edit, Trash2, Star, X } from 'lucide-react';
-import { useCountryCodes } from '../../hooks/useCountryCodes'; // adjust path
+import { MapPin, Home, Phone, Mail, Plus, Edit, Trash2, Star, X, Building, Globe } from 'lucide-react';
+import { useCountryCodes } from '../../hooks/useCountryCodes';
 
 const AddressManager = () => {
   const dispatch = useDispatch();
@@ -18,18 +19,20 @@ const AddressManager = () => {
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    country_code: '+91',   // default India
+    email: '',
+    country_code: '+91',
     mobile: '',
     alternative_mobile: '',
+    city: '',
+    state: '',
+    country: 'India',
     address: '',
     pincode: '',
     is_default: false,
   });
 
-  // Fetch country codes
   const { countryCodes, loading: loadingCodes, error: codesError } = useCountryCodes();
 
-  // Convert countryCodes to react-select options
   const countryOptions = countryCodes.map(code => ({
     value: code.value,
     label: code.label,
@@ -63,9 +66,13 @@ const AddressManager = () => {
   const resetForm = () => {
     setFormData({
       name: '',
+      email: '',
       country_code: '+91',
       mobile: '',
       alternative_mobile: '',
+      city: '',
+      state: '',
+      country: 'India',
       address: '',
       pincode: '',
       is_default: false,
@@ -76,18 +83,22 @@ const AddressManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.mobile || !formData.address || !formData.pincode) {
+    if (!formData.name || !formData.email || !formData.mobile || !formData.address || !formData.pincode || !formData.city || !formData.state || !formData.country) {
       toast.error('Please fill all required fields');
       return;
     }
 
     const payload = {
       name: formData.name,
+      email: formData.email,
       country_code: formData.country_code,
       mobile: formData.mobile,
+      alternative_mobile: formData.alternative_mobile || null,
+      city: formData.city,
+      state: formData.state,
+      country: formData.country,
       address: formData.address,
       pincode: formData.pincode,
-      alternative_mobile: formData.alternative_mobile || null,
       is_default: formData.is_default ? 1 : 0,
     };
 
@@ -109,9 +120,13 @@ const AddressManager = () => {
     setEditingId(address.id);
     setFormData({
       name: address.name || '',
+      email: address.email || '',
       country_code: address.country_code || '+91',
       mobile: address.mobile || '',
       alternative_mobile: address.alternative_mobile || '',
+      city: address.city || '',
+      state: address.state || '',
+      country: address.country || 'India',
       address: address.address || '',
       pincode: address.pincode || '',
       is_default: address.is_default === 1 || address.is_default === true,
@@ -155,21 +170,26 @@ const AddressManager = () => {
                 value={formData.name}
                 onChange={handleChange}
                 placeholder="Home / Office / etc."
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:border-amber-500"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
               />
             </div>
 
-            {/* Country Code - Dynamic Select */}
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="your@email.com"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+              />
+            </div>
 
-
-
-
-
-            {/* Country Code - react-select */}
-            <div className="w-full sm:w-32">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Country Code *
-              </label>
+            {/* Country Code */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Country Code *</label>
               {loadingCodes ? (
                 <div className="border border-gray-300 rounded-md px-3 py-2 bg-gray-50 text-gray-500">
                   Loading codes...
@@ -193,27 +213,16 @@ const AddressManager = () => {
                       ...base,
                       borderColor: state.isFocused ? '#f59e0b' : '#d1d5db',
                       boxShadow: state.isFocused ? '0 0 0 1px #f59e0b' : 'none',
-                      '&:hover': {
-                        borderColor: '#f59e0b',
-                      },
+                      '&:hover': { borderColor: '#f59e0b' },
                       borderRadius: '0.375rem',
                       minHeight: '2.5rem',
                     }),
-                    menu: (base) => ({
-                      ...base,
-                      zIndex: 9999,
-                    }),
+                    menu: (base) => ({ ...base, zIndex: 9999 }),
                     option: (base, state) => ({
                       ...base,
                       backgroundColor: state.isSelected ? '#f59e0b' : state.isFocused ? '#fef3c7' : 'white',
                       color: state.isSelected ? 'white' : '#374151',
-                      '&:active': {
-                        backgroundColor: '#f59e0b',
-                      },
-                    }),
-                    placeholder: (base) => ({
-                      ...base,
-                      color: '#9ca3af',
+                      '&:active': { backgroundColor: '#f59e0b' },
                     }),
                   }}
                 />
@@ -229,7 +238,7 @@ const AddressManager = () => {
                 value={formData.mobile}
                 onChange={handleChange}
                 placeholder="9876543210"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:border-amber-500"
+               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
               />
             </div>
 
@@ -242,7 +251,46 @@ const AddressManager = () => {
                 value={formData.alternative_mobile}
                 onChange={handleChange}
                 placeholder="Optional"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:border-amber-500"
+               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+              />
+            </div>
+
+            {/* City */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+              <input
+                type="text"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                placeholder="Mumbai"
+              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+              />
+            </div>
+
+            {/* State */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">State *</label>
+              <input
+                type="text"
+                name="state"
+                value={formData.state}
+                onChange={handleChange}
+                placeholder="Maharashtra"
+               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+              />
+            </div>
+
+            {/* Country */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
+              <input
+                type="text"
+                name="country"
+                value={formData.country}
+                onChange={handleChange}
+                placeholder="India"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
               />
             </div>
 
@@ -255,12 +303,12 @@ const AddressManager = () => {
                 value={formData.address}
                 onChange={handleChange}
                 placeholder="House No., Street, Area"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:border-amber-500"
+               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
               />
             </div>
 
             {/* Pincode */}
-            <div className="sm:col-span-1">
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Pincode *</label>
               <input
                 type="text"
@@ -268,23 +316,24 @@ const AddressManager = () => {
                 value={formData.pincode}
                 onChange={handleChange}
                 placeholder="6-digit pincode"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:ring-1 focus:ring-amber-500 focus:border-amber-500"
+               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
               />
             </div>
 
-            {/* Default checkbox */}
-            <div className="sm:col-span-2 flex items-center gap-2">
+            
+          </div>
+          {/* Default checkbox */}
+            <div className="flex items-center gap-2">
               <input
                 type="checkbox"
                 name="is_default"
                 checked={formData.is_default}
                 onChange={handleChange}
                 id="default"
-                className="rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                className=" border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
               />
               <label htmlFor="default" className="text-sm text-gray-700">Set as default address</label>
             </div>
-          </div>
 
           <div className="flex gap-3 pt-2">
             <button
@@ -307,7 +356,7 @@ const AddressManager = () => {
         </form>
       </div>
 
-      {/* Address List - unchanged */}
+      {/* Address List */}
       {loading ? (
         <div className="text-center py-10">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-4 border-amber-600 border-t-transparent"></div>
@@ -343,38 +392,25 @@ const AddressManager = () => {
                       )}
                     </div>
                     <div className="flex gap-2">
-                      <button
-                        onClick={() => handleEdit(addr)}
-                        className="text-blue-600 hover:text-blue-800 p-1"
-                        title="Edit"
-                      >
+                      <button onClick={() => handleEdit(addr)} className="text-blue-600 hover:text-blue-800 p-1" title="Edit">
                         <Edit className="w-4 h-4" />
                       </button>
-                      <button
-                        onClick={() => handleDelete(addr.id)}
-                        className="text-red-600 hover:text-red-800 p-1"
-                        title="Delete"
-                      >
+                      <button onClick={() => handleDelete(addr.id)} className="text-red-600 hover:text-red-800 p-1" title="Delete">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                   <div className="space-y-1 text-sm text-gray-600">
-                    <p className="flex items-center gap-2">
-                      <Phone className="w-4 h-4" /> {addr.mobile}
-                    </p>
+                    <p className="flex items-center gap-2"><Mail className="w-4 h-4" /> {addr.email}</p>
+                    <p className="flex items-center gap-2"><Phone className="w-4 h-4" /> {addr.country_code} {addr.mobile}</p>
                     {addr.alternative_mobile && (
-                      <p className="flex items-center gap-2">
-                        <Phone className="w-4 h-4" /> {addr.alternative_mobile}
-                      </p>
+                      <p className="flex items-center gap-2"><Phone className="w-4 h-4" /> {addr.alternative_mobile}</p>
                     )}
                     <p className="flex items-start gap-2">
                       <MapPin className="w-4 h-4 mt-0.5" />
-                      <span>{addr.address}</span>
+                      <span>{addr.address}, {addr.city}, {addr.state} - {addr.pincode}</span>
                     </p>
-                    <p className="flex items-center gap-2">
-                      <Mail className="w-4 h-4" /> {addr.pincode}
-                    </p>
+                    <p className="flex items-center gap-2"><Globe className="w-4 h-4" /> {addr.country}</p>
                   </div>
                 </div>
               ))}
