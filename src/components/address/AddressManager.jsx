@@ -187,7 +187,34 @@ const AddressManager = () => {
               />
             </div>
 
-            {/* Country Code */}
+           
+
+            {/* Mobile */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Mobile *</label>
+              <input
+                type="tel"
+                name="mobile"
+                value={formData.mobile}
+                onChange={handleChange}
+                placeholder="9876543210"
+               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+              />
+            </div>
+
+            {/* Alternative Mobile */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Alternative Mobile (optional)</label>
+              <input
+                type="tel"
+                name="alternative_mobile"
+                value={formData.alternative_mobile}
+                onChange={handleChange}
+                placeholder="Optional"
+               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+              />
+            </div>
+              {/* Country Code */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Country Code *</label>
               {loadingCodes ? (
@@ -229,31 +256,20 @@ const AddressManager = () => {
               )}
             </div>
 
-            {/* Mobile */}
+            {/* Country */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mobile *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
               <input
-                type="tel"
-                name="mobile"
-                value={formData.mobile}
+                type="text"
+                name="country"
+                value={formData.country}
                 onChange={handleChange}
-                placeholder="9876543210"
-               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+                placeholder="India"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
               />
             </div>
 
-            {/* Alternative Mobile */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Alternative Mobile (optional)</label>
-              <input
-                type="tel"
-                name="alternative_mobile"
-                value={formData.alternative_mobile}
-                onChange={handleChange}
-                placeholder="Optional"
-               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
-              />
-            </div>
+            
 
             {/* City */}
             <div>
@@ -280,21 +296,7 @@ const AddressManager = () => {
                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
               />
             </div>
-
-            {/* Country */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
-              <input
-                type="text"
-                name="country"
-                value={formData.country}
-                onChange={handleChange}
-                placeholder="India"
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
-              />
-            </div>
-
-            {/* Full Address */}
+           {/* Full Address */}
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
               <input
