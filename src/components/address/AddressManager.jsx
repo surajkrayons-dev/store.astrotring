@@ -175,7 +175,7 @@ const AddressManager = () => {
             </div>
 
             {/* Email */}
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
               <input
                 type="email"
@@ -185,7 +185,7 @@ const AddressManager = () => {
                 placeholder="your@email.com"
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
               />
-            </div>
+            </div> */}
 
            
 
@@ -296,6 +296,19 @@ const AddressManager = () => {
                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
               />
             </div>
+            
+            {/* Pincode */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Pincode *</label>
+              <input
+                type="text"
+                name="pincode"
+                value={formData.pincode}
+                onChange={handleChange}
+                placeholder="6-digit pincode"
+               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
+              />
+            </div>
            {/* Full Address */}
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
@@ -309,18 +322,6 @@ const AddressManager = () => {
               />
             </div>
 
-            {/* Pincode */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Pincode *</label>
-              <input
-                type="text"
-                name="pincode"
-                value={formData.pincode}
-                onChange={handleChange}
-                placeholder="6-digit pincode"
-               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-colors"
-              />
-            </div>
 
             
           </div>
@@ -403,7 +404,7 @@ const AddressManager = () => {
                     </div>
                   </div>
                   <div className="space-y-1 text-sm text-gray-600">
-                    <p className="flex items-center gap-2"><Mail className="w-4 h-4" /> {addr.email}</p>
+                    {/* <p className="flex items-center gap-2"><Mail className="w-4 h-4" /> {addr.email}</p> */}
                     <p className="flex items-center gap-2"><Phone className="w-4 h-4" /> {addr.country_code} {addr.mobile}</p>
                     {addr.alternative_mobile && (
                       <p className="flex items-center gap-2"><Phone className="w-4 h-4" /> {addr.alternative_mobile}</p>
