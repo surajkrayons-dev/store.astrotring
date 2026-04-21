@@ -425,8 +425,13 @@ const CheckoutPage = () => {
                   />
                   <div>
                     <p className="font-medium">{addr.name}</p>
+                    {/* <p className="text-sm text-gray-600">{addr.email}</p> */}
+                    <p className="text-sm text-gray-600">{addr.mobile},{addr.alternative_mobile}</p>
                     <p className="text-sm text-gray-600">{addr.address}</p>
-                    <p className="text-sm text-gray-600">Mobile: {addr.mobile}</p>
+                    <p className="text-sm text-gray-600">{addr.city}, {addr.state}, {addr.country}-{addr.pincode}</p>
+                    
+                    
+                    
                     {addr.is_default && <span className="text-xs text-green-600">Default</span>}
                   </div>
                 </label>
