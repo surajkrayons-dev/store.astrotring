@@ -2,5 +2,4 @@
 deployment:
   tasks:
     - export DEPLOYPATH=/home/astrotri/astrotring.shop
-    - /bin/rm -rf $DEPLOYPATH/*
     - /bin/cp -R dist/. $DEPLOYPATH/
