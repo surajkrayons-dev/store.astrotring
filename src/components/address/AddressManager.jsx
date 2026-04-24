@@ -90,7 +90,7 @@ const AddressManager = () => {
 
     const payload = {
       name: formData.name,
-      email: formData.email,
+      email: formData.email || null,
       country_code: formData.country_code,
       mobile: formData.mobile,
       alternative_mobile: formData.alternative_mobile || null,
