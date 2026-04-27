@@ -195,10 +195,7 @@ const ProductDetailsPage = () => {
         thumbnail,
       });
     });
-  } else if (product?.image) {
-    mediaItems.push({ url: product.image, type: 'image', thumbnail: null });
   }
-
   const mediaList = mediaItems.map(m => m.url);
   const totalMedia = mediaList.length;
 
@@ -390,7 +387,7 @@ const ProductDetailsPage = () => {
             </div>
 
             {/* Thumbnails */}
-            {totalMedia > 1 && (
+            {totalMedia >= 1 && (
               <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
                 {mediaItems.map((item, idx) => {
                   const isVideo = item.type === 'video';
