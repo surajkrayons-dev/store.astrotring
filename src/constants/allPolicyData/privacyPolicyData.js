@@ -311,7 +311,7 @@ export const privacyPolicyData = {
     },
     {
       type: "paragraph",
-      text: "If a parent or guardian becomes aware that a child under the age of 13 has submitted personal information to the Platform, they must contact Veltex immediately at store@astrotring.com. Veltex will take prompt steps to delete such information from its systems."
+      text: "If a parent or guardian becomes aware that a child under the age of 13 has submitted personal information to the Platform, they must contact Veltex immediately at care@astrotring.com. Veltex will take prompt steps to delete such information from its systems."
     },
     {
       type: "paragraph",
@@ -367,7 +367,7 @@ export const privacyPolicyData = {
     },
     {
       type: "paragraph",
-      text: "Email: store@astrotring.com"
+      text: "Email: care@astrotring.com"
     },
     {
       type: "paragraph",
@@ -437,7 +437,7 @@ export const privacyPolicyData = {
     },
     {
       type: "paragraph",
-      text: "Email: store@astrotring.com"
+      text: "Email: care@astrotring.com"
     }
   ]
 }

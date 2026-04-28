@@ -241,13 +241,13 @@ const WalletPage = () => {
                     {transactions.map((tx, idx) => (
                       <div key={idx} className="flex justify-between border-b pb-2">
                         <div>
-                          <p className="font-medium">{tx.description || 'Wallet transaction'}</p>
+                          <p className="font-medium flex flex-col sm:flex-row sm:justify-center sm:items-center sm:gap-1">{tx.description || 'Wallet transaction'} <p className='text-xs text-gray-600'> ({tx.note})</p> </p>
                           <p className="text-xs text-gray-400">
                             {new Date(tx.created_at).toLocaleString()}
                           </p>
                         </div>
-                        <div className={`font-semibold ${tx.amount > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          {tx.amount > 0 ? `+₹${formatBalance(tx.amount)}` : `-₹${formatBalance(Math.abs(tx.amount))}`}
+                        <div className={`font-semibold ${tx.type === "credit" ? 'text-green-600' : 'text-red-600'}`}>
+                          {tx.type === "credit" ? `+₹${formatBalance(tx.amount)}` : `-₹${formatBalance(Math.abs(tx.amount))}`}
                         </div>
                       </div>
                     ))}
@@ -267,7 +267,7 @@ const WalletPage = () => {
                     {spendHistory.map((tx, idx) => (
                       <div key={idx} className="flex justify-between border-b pb-2">
                         <div>
-                          <p className="font-medium">{tx.description || 'Spent on order'}</p>
+                          <p className="font-medium flex flex-col sm:flex-row sm:justify-center sm:items-center sm:gap-1">{tx.description || 'Spent on order'} <p className='text-xs text-gray-600'>({tx?.note})</p> </p>
                           <p className="text-xs text-gray-400">
                             {new Date(tx.created_at).toLocaleString()}
                           </p>

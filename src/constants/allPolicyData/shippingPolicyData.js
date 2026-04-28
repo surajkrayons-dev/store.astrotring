@@ -244,7 +244,7 @@ export const shippingPolicyData = {
         },
         {
           type: "paragraph",
-          text: "Email: store@astrotring.com"
+          text: "Email: care@astrotring.com"
         },
         {
           type: "paragraph",

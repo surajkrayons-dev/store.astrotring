@@ -22,7 +22,7 @@ const Footer = () => {
             <img src={logo} alt="Astrotring" className="h-10 mb-4" />
           </Link>
           <p className="text-sm text-gray-700 leading-relaxed">
-            AstroTring Store offers a curated collection of authentic
+            Astrotring Shop offers a curated collection of authentic
             astrology and spiritual products designed to enhance positivity
             and balance in life. Explore a wide range of gemstones, rudraksha,
             healing bracelets, and vastu items carefully selected by experts.
@@ -96,11 +96,11 @@ const Footer = () => {
 
             <div className="mt-4">
               <a
-                href="mailto:store@astrotring.com"
+                href="mailto:care@astrotring.com"
                 className="flex items-center gap-3 text-sm text-gray-700 hover:text-amber-600 transition group flex-wrap"
               >
                 <Mail className="size-8 text-[#EA4335] border border-gray-600 p-1.5 rounded-full group-hover:bg-amber-600 group-hover:border-amber-600 group-hover:text-white transition" />
-                <span className="underline-offset-2 hover:underline">store@astrotring.com</span>
+                <span className="underline-offset-2 hover:underline">care@astrotring.com</span>
               </a>
             </div>
 
