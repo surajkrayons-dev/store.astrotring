@@ -78,7 +78,7 @@ export const refundPolicyData = {
             {
               type: "list",
               items: [
-                "Initiation: Contact Veltex customer support at store@astrotring.com with your order number, a description of the issue (defective, damaged, or incorrect item), and clear supporting photographs or video evidence. Return requests must be submitted within seven (7) days of receipt of the product.",
+                "Initiation: Contact Veltex customer support at care@astrotring.com with your order number, a description of the issue (defective, damaged, or incorrect item), and clear supporting photographs or video evidence. Return requests must be submitted within seven (7) days of receipt of the product.",
                 "Review and Approval: Veltex will review the return request and supporting evidence. Upon approval, the Customer will receive written confirmation and instructions on how to proceed. Veltex reserves the right to decline return requests that do not meet the eligibility criteria set out in this Policy.",
                 "Pickup and Return Shipping: Upon approval of the return, Veltex will arrange for the product to be picked up from the original delivery address. A prepaid shipping label will be provided to the Customer, which must be affixed to the return package. The Customer is responsible for ensuring the product is securely packaged for return shipment.",
                 "Processing and Resolution: Upon receipt and inspection of the returned product, Veltex will process the applicable refund or replacement in accordance with Section 5 of this Policy."
@@ -252,7 +252,7 @@ export const refundPolicyData = {
             },
             {
               type: "paragraph",
-              text: "Email: store@astrotring.com"
+              text: "Email: care@astrotring.com"
             },
             {
               type: "paragraph",

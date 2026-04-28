@@ -20,6 +20,7 @@ import OrderSuccessPage from "./pages/OrderSuccessPage";
 import WishlistPage from "./pages/WishlistPage";
 import Gemstonesinfo from "./pages/product info/GemstonesInfo";
 import GemstoneDetails from "./pages/product info/GemstoneDetails";
+import TrackMyOrderPage from "./pages/TrackMyOrderPage";
 
 // Lazy load all pages
 
@@ -76,19 +77,24 @@ function App() {
         {/* user details */}
         <Route path="/profile" element={<ProfilePage />} />
 
-        <Route path="/orders" element={<MyOrdersPage />} />
-        {/* address */}
-        <Route path="addresses" element={<AddressesPage />} />
+       
+       
         {/* checkout  */}
         <Route path="checkout" element={<CheckoutPage />} />
         {/* ordersuccess */}
         <Route path="order-success" element={<OrderSuccessPage />} />
+        {/* my order page */}
+         <Route path="/orders" element={<MyOrdersPage />} />
         {/* order details page */}
         <Route path="/orders/:id" element={<MyOrderDetailsPage />} />
+        {/* track my order page */}
+        <Route path="/track-order/:orderId?" element={<TrackMyOrderPage />} />
         {/* user wallet */}
         <Route path="/wallet" element={<WalletPage />} />
         {/* wishlist */}
         <Route path="/wishlist" element={<WishlistPage />} />
+         {/* address */}
+        <Route path="addresses" element={<AddressesPage />} />
 
      
       

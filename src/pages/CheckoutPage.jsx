@@ -352,7 +352,7 @@ const CheckoutPage = () => {
         key: RAZORPAY_KEY,
         amount: amountInPaise,
         currency: 'INR',
-        name: 'AstroTring',
+        name: 'Astrotring Store',
         description: `Order #${razorpayOrderId}`,
         order_id: razorpayOrderId,
         handler: async (response) => {

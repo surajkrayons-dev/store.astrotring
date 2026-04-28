@@ -542,12 +542,13 @@ const ProductDetailsPage = () => {
               </button>
               <button
                 onClick={handleWishlistToggle}
-                className="px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-400 transition cursor-pointer"
+                className="flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-400 transition cursor-pointer gap-2"
               >
                 <Heart
-                  className={`w-5 h-5 ${isInWishlist ? "fill-red-500 text-red-500" : "text-gray-600"
+                  className={`w-5 h-5 ${isInWishlist ? "fill-red-500 text-red-500" : "text-red-600"
                     }`}
                 />
+               <h1 className="sm:hidden">  Add to Wishlist</h1>
               </button>
             </div>
 

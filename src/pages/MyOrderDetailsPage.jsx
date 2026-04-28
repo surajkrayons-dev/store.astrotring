@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchOrderDetails, clearOrderError, clearCurrentOrder, cancelOrder } from '../redux/slices/orderSlice';
 import { toast } from 'react-toastify';
 import Loader from '@/components/common/Loader';
-import { ArrowLeft, Calendar, Package, MapPin, CreditCard, XCircle } from 'lucide-react';
+import { ArrowLeft, Calendar, Package, MapPin, CreditCard, XCircle, CheckCircle } from 'lucide-react';
 
 const MyOrderDetailsPage = () => {
   const { id } = useParams();
@@ -23,12 +23,13 @@ const MyOrderDetailsPage = () => {
     };
   }, [dispatch, id, isLoggedIn]);
 
+  // Avoid showing error toast during cancellation to prevent double toast
   useEffect(() => {
-    if (error) {
+    if (error && !cancelling) {
       toast.error(error);
       dispatch(clearOrderError());
     }
-  }, [error, dispatch]);
+  }, [error, dispatch, cancelling]);
 
   const handleCancelOrder = async () => {
     if (!window.confirm('Are you sure you want to cancel this order?')) return;
@@ -36,8 +37,8 @@ const MyOrderDetailsPage = () => {
     try {
       await dispatch(cancelOrder(id)).unwrap();
       toast.success('Order cancelled successfully');
-      // Refresh order details
-      dispatch(fetchOrderDetails(id));
+      // ✅ Refetch order details to get updated status
+      await dispatch(fetchOrderDetails(id)).unwrap();
     } catch (err) {
       toast.error(err || 'Failed to cancel order');
     } finally {
@@ -72,7 +73,7 @@ const MyOrderDetailsPage = () => {
       <div className="max-w-4xl mx-auto px-4">
         <button
           onClick={() => navigate('/orders')}
-          className="flex items-center gap-2 text-amber-600 hover:underline mb-6"
+          className="flex items-center gap-2 text-amber-600 hover:underline mb-6 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Orders
         </button>
@@ -81,16 +82,28 @@ const MyOrderDetailsPage = () => {
           {/* Header */}
           <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-wrap justify-between items-center gap-3">
             <div>
-              <p className="text-sm text-gray-500">Order Number: #{order.order_number}</p>
+              <p className="text-sm text-gray-500">Order Number : #{order.order_number}</p>
               <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
-                <Calendar className="w-3 h-3" /> {new Date(order.created_at).toLocaleString()}
+                <Calendar className="w-3 h-3" />Order On : {order?.timestamps?.created_at ? new Date(order.timestamps.created_at).toLocaleString() : 'N/A'}
               </p>
+              
+              {order.timestamps?.delivered_at && (
+                <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                  <CheckCircle className="w-3 h-3 text-green-500" /> Delivered On : {new Date(order.timestamps.delivered_at).toLocaleString()}
+                </p>
+              )}
+              {order.timestamps?.cancelled_at && (
+                <p className="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                  <XCircle className="w-3 h-3 text-red-500" /> Cancelled On : {new Date(order.timestamps.cancelled_at).toLocaleString()}
+                </p>
+              )}
             </div>
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${order.status === 'delivered' ? 'bg-green-100 text-green-800' :
-                order.status === 'paid' ? 'bg-green-100 text-green-800' :
-                  order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
-                    'bg-yellow-100 text-yellow-800'
-              }`}>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+              order.status === 'delivered' ? 'bg-green-100 text-green-800' :
+              order.status === 'paid' ? 'bg-green-100 text-green-800' :
+              order.status === 'cancelled' ? 'bg-red-100 text-red-800' :
+              'bg-yellow-100 text-yellow-800'
+            }`}>
               {order.status?.toUpperCase() || 'PENDING'}
             </span>
           </div>
@@ -170,13 +183,12 @@ const MyOrderDetailsPage = () => {
             {order?.address?.snapshot ? (
               <>
                 <p className="text-gray-800 font-medium">{order?.address?.snapshot.name}</p>
-                <p className="text-gray-500 text-sm">Email: {order?.address?.snapshot.email}</p>
+                {/* <p className="text-gray-500 text-sm">Email: {order?.address?.snapshot.email}</p> */}
                 <p className="text-gray-600 text-sm">Mobile: {order?.address?.snapshot.mobile}, {order?.address?.snapshot.alternative_mobile}</p>
                 <p className="text-gray-600 text-sm">Address: {order?.address?.snapshot.address}</p>
                 <p className="text-gray-500 text-sm">City: {order?.address?.snapshot.city}</p>
                 <p className="text-gray-500 text-sm">State: {order?.address?.snapshot.state}</p>
                 <p className="text-gray-500 text-sm">Country: {order?.address?.snapshot.country}</p>
-                
                 <p className="text-gray-500 text-sm">Pin Code: {order?.address?.snapshot.pincode}</p>
               </>
             ) : (
@@ -189,7 +201,10 @@ const MyOrderDetailsPage = () => {
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <CreditCard className="w-5 h-5" /> Payment
             </h2>
-            <p className="text-gray-600">Method: {order.payment_method || 'Online'}</p>
+            <p className="text-gray-600">Method: {order?.payment?.method || 'Online'}</p>
+            <p className="text-gray-600">
+              Date : {order?.payment?.paid_at ? new Date(order.payment.paid_at).toLocaleString() : 'N/A'}
+            </p>
           </div>
         </div>
       </div>
