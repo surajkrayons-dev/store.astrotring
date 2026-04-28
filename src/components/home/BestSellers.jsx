@@ -48,10 +48,10 @@ const BestSellers = () => {
                 alt={product.name}
                 className="w-full h-[120px] object-cover rounded-lg mb-2"
               />
-              <div className="text-sm font-bold truncate">{product.name}</div>
+              <div className="text-xs font-bold truncate">{product.name}</div>
 
               <div className="flex items-baseline gap-1 flex-wrap">
-                <span className="text-sm font-bold text-amber-600">
+                <span className="text-xs font-semibold text-amber-600">
                   ₹{afterPrice.toLocaleString()}
                 </span>
                 {beforePrice > afterPrice && (
