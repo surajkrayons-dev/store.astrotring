@@ -1,9 +1,9 @@
+// src/redux/slices/orderSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '../baseApi';
 
 // ---------- THUNKS ----------
 
-// order place abhi nhi use ho raha hai
 export const placeOrder = createAsyncThunk(
   'order/placeOrder',
   async (orderData, { rejectWithValue, getState }) => {
@@ -11,6 +11,7 @@ export const placeOrder = createAsyncThunk(
       const { userAuth } = getState();
       if (!userAuth.isLoggedIn) return rejectWithValue('Please login to place order');
       const response = await api.post('/user/order/place', orderData);
+      console.log("Place order",response.data.data)
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to place order');
@@ -25,7 +26,7 @@ export const fetchMyOrders = createAsyncThunk(
       const { userAuth } = getState();
       if (!userAuth.isLoggedIn) return rejectWithValue('Please login to view orders');
       const response = await api.get('/user/orders');
-      console.log("my orders",response.data.data);
+      console.log("my orders",response.data.data)
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch orders');
@@ -40,7 +41,6 @@ export const fetchOrderDetails = createAsyncThunk(
       const { userAuth } = getState();
       if (!userAuth.isLoggedIn) return rejectWithValue('Please login to view order details');
       const response = await api.get(`/user/orders/${orderId}`);
-      console.log("my order details",response.data.data)
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch order details');
@@ -48,8 +48,6 @@ export const fetchOrderDetails = createAsyncThunk(
   }
 );
 
-
-// markorderdelivered abhi nhi use ho raha hai
 export const markOrderDelivered = createAsyncThunk(
   'order/markOrderDelivered',
   async (orderId, { rejectWithValue, getState }) => {
@@ -71,9 +69,10 @@ export const cancelOrder = createAsyncThunk(
       const { userAuth } = getState();
       if (!userAuth.isLoggedIn) return rejectWithValue('Please login to cancel order');
       const response = await api.post(`/store/order/cancel/${orderId}`);
-      // response.data.data contains the updated order object
-      if (response.data.status && response.data.data) {
-        return response.data.data; // return the updated order directly
+      // Backend only returns { status: true, message, refund, pricing }
+      if (response.data.status) {
+        // Return just the orderId – we will refetch details later
+        return { orderId, success: true };
       } else {
         return rejectWithValue(response.data.message || 'Failed to cancel order');
       }
@@ -109,7 +108,7 @@ const orderSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // ---------- Place Order ----------
+      // Place Order
       .addCase(placeOrder.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -126,7 +125,7 @@ const orderSlice = createSlice({
         state.placeOrderSuccess = false;
       })
 
-      // ---------- Fetch My Orders ----------
+      // Fetch My Orders
       .addCase(fetchMyOrders.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -140,7 +139,7 @@ const orderSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ---------- Fetch Order Details ----------
+      // Fetch Order Details
       .addCase(fetchOrderDetails.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -154,7 +153,7 @@ const orderSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ---------- Mark Order Delivered ----------
+      // Mark Order Delivered
       .addCase(markOrderDelivered.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -162,7 +161,6 @@ const orderSlice = createSlice({
       .addCase(markOrderDelivered.fulfilled, (state, action) => {
         state.loading = false;
         const { orderId, data } = action.payload;
-        // Update status in orders list
         const index = state.orders.findIndex(o => o.id === orderId);
         if (index !== -1) {
           state.orders[index].status = 'delivered';
@@ -176,27 +174,14 @@ const orderSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ---------- Cancel Order ----------
+      // Cancel Order – we only set loading false and do NOT update currentOrder (will refetch later)
       .addCase(cancelOrder.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(cancelOrder.fulfilled, (state, action) => {
+      .addCase(cancelOrder.fulfilled, (state) => {
         state.loading = false;
-        const updatedOrder = action.payload; // the full updated order from API
-        const orderId = updatedOrder.order_id;
-
-        // Update orders list (if the order exists)
-        const index = state.orders.findIndex(o => o.id === orderId);
-        if (index !== -1) {
-          // Replace the old order with the updated one
-          state.orders[index] = { ...state.orders[index], ...updatedOrder };
-        }
-
-        // Update currentOrder if it matches
-        if (state.currentOrder?.id === orderId) {
-          state.currentOrder = { ...state.currentOrder, ...updatedOrder };
-        }
+        // No state update here – we will call fetchOrderDetails separately
       })
       .addCase(cancelOrder.rejected, (state, action) => {
         state.loading = false;

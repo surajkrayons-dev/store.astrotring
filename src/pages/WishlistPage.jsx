@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { FaHeart, FaTrash } from 'react-icons/fa';
 import Loader from '@/components/common/Loader';
 import StarRating from '@/components/common/StarRating';
+import { Heart } from 'lucide-react';
 
 const WishlistCard = ({ product, onRemove }) => {
   const afterPrice = Number(product?.after_price) || 0;
@@ -18,7 +19,7 @@ const WishlistCard = ({ product, onRemove }) => {
     : 0;
 
   return (
-    <div className="bg-white rounded-xl border border-gray-100 transition-all duration-250 flex flex-col hover:shadow-xl hover:-translate-y-0.5 shadow-md w-full">
+    <div className="bg-white rounded-xl border border-gray-100 transition-all duration-250 flex flex-col hover:shadow-xl hover:-translate-y-0.5 shadow-md w-full" title={product.name}>
       <Link to={`/product/${product.id}`} className="block">
         <div className="relative bg-stone-50 overflow-hidden aspect-square">
           <img
@@ -39,17 +40,29 @@ const WishlistCard = ({ product, onRemove }) => {
           )}
         </div>
         <div className="p-2">
-          <h3 className="text-xs  font-bold text-stone-800 leading-snug line-clamp-2 mb-1">
-            {product.name}
-          </h3>
-          <div className="flex items-center gap-1 mb-1">
-            <StarRating value={ratingValue} size={10} />
-            <span className="text-[10px]  text-stone-500 font-semibold">
-              {ratingValue.toFixed(1)}
-            </span>
+          <div className='flex justify-between'>
+            <div>
+              <h3 className="text-xs text-overflow: ellipsis;  font-bold text-stone-800 leading-snug line-clamp-2 mb-1">
+                {product.name}
+              </h3>
+              <div className="flex items-center gap-1 mb-1">
+                <StarRating value={ratingValue} size={10} />
+                <span className="text-[10px]  text-stone-500 font-semibold">
+                  {ratingValue.toFixed(1)}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={() => onRemove(product.id, product.name)}
+              className="w-10 h-10 flex items-center justify-center  text-red-600 border border-red-200 rounded-4xl p-1 hover:bg-red-50 transition cursor-pointer"
+            >
+              <Heart
+                className="fill-red-500 text-red-500"
+              />
+            </button>
           </div>
           <div className="flex items-end justify-between mt-auto">
-            <div>
+            <div className='flex justify-center items-center gap-2'>
               <div className="text-sm  font-extrabold text-stone-900">
                 ₹{afterPrice.toLocaleString()}
               </div>
@@ -60,16 +73,9 @@ const WishlistCard = ({ product, onRemove }) => {
               )}
             </div>
           </div>
+
         </div>
       </Link>
-      <div className="px-3 pb-3">
-        <button
-          onClick={() => onRemove(product.id, product.name)}
-          className="w-full flex items-center justify-center gap-2 text-red-600 border border-red-200 rounded-lg py-1 hover:bg-red-50 transition cursor-pointer text-xs"
-        >
-          <FaTrash size={12}  /> Remove
-        </button>
-      </div>
     </div>
   );
 };

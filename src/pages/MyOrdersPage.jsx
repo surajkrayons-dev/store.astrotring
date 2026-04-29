@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchMyOrders, clearOrderError } from "../redux/slices/orderSlice";
 import Loader from "@/components/common/Loader";
 import { toast } from "react-toastify";
-import { Package, ArrowRight, ArrowLeft } from "lucide-react";
+import { Package, ArrowRight, ArrowLeft, Truck } from "lucide-react";
 
 const statusColors = {
   pending: "bg-yellow-100 text-yellow-800",
@@ -56,24 +56,47 @@ const MyOrdersPage = () => {
     );
   }
 
-  // Helper to calculate subtotal from items if not provided
+  // Helper to get values from the order response structure
   const getSubtotal = (order) => {
-    if (order.subtotal) return order.subtotal;
+    if (order.pricing?.subtotal) return Number(order.pricing.subtotal);
+    if (order.subtotal) return Number(order.subtotal);
     if (order.items && order.items.length) {
       return order.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     }
     return 0;
   };
 
-  const getShipping = (order) => order.shipping_cost || 0;
-  const getDiscount = (order) => order.discount || 0;
+  const getShipping = (order) => {
+    if (order.pricing?.delivery_charge) return Number(order.pricing.delivery_charge);
+    return order.shipping_cost || 0;
+  };
+
+  const getDiscount = (order) => {
+    if (order.pricing?.discount) return Number(order.pricing.discount);
+    return order.discount || 0;
+  };
+
+  const getTotal = (order) => {
+    if (order.pricing?.total_amount) return Number(order.pricing.total_amount);
+    return order.total || 0;
+  };
+
+  const handleTrackOrder = (e, orderId) => {
+    e.stopPropagation();
+    navigate(`/track-order/${orderId}`);
+  };
+
+  const handleViewDetails = (e, orderId) => {
+    e.stopPropagation();
+    navigate(`/orders/${orderId}`);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <button
           onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-amber-600 hover:underline mb-6"
+          className="flex items-center gap-2 text-amber-600 hover:underline mb-6 cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Home
         </button>
@@ -84,12 +107,7 @@ const MyOrdersPage = () => {
             const subtotal = getSubtotal(order);
             const shipping = getShipping(order);
             const discount = getDiscount(order);
-            const total = order.total || (subtotal + shipping - discount);
-
-            const handleViewDetails = (e) => {
-              e.stopPropagation(); // Prevent card click from firing twice
-              navigate(`/orders/${order.order_id}`);
-            };
+            const total = getTotal(order);
 
             return (
               <div
@@ -100,19 +118,20 @@ const MyOrdersPage = () => {
                 {/* Order Header */}
                 <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-wrap justify-between items-center gap-3">
                   <div>
-                    <p className="text-sm text-gray-500">Order #{order.order_number}</p>
-                    <p className="text-sm text-gray-500">
-                      {new Date(order.created_at).toLocaleDateString()}
-                    </p>
+                    <p className="text-sm text-gray-500">Order Id : #{order.order_number}</p>
+                    {order.timestamps?.created_at && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        Order On : {new Date(order.timestamps.created_at).toLocaleDateString()}
+                      </p>
+                    )}
                   </div>
                   <div className="flex items-center gap-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-medium ${statusColors[order.status] || "bg-gray-100"}`}>
                       {order.status?.toUpperCase() || "PENDING"}
                     </span>
-                    <span className="font-semibold text-gray-900">
-                      ₹{parseFloat(total).toLocaleString()}
+                    <span className="font-base text-xs text-gray-900">
+                      {order.payment?.method || order.payment_method}
                     </span>
-                  
                   </div>
                 </div>
 
@@ -139,18 +158,31 @@ const MyOrdersPage = () => {
                     <p className="text-sm text-gray-500">No items found</p>
                   )}
 
-                  {/* Order Summary */}
-                  <div className="mt-4 pt-4 border-t border-gray-200 text-right">
+                  {/* Order Summary with both buttons */}
+                  <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-start sm:items-center gap-4">
+                    {/* Buttons - Left side */}
+                    <div className="flex sm:flex-row flex-col gap-3">
                       <button
-                      onClick={handleViewDetails}
-                      className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-amber-600 bg-amber-50 rounded-lg hover:bg-amber-100 transition-all duration-200 cursor-pointer"
-                    >
-                      View Details <ArrowRight className="w-4 h-4" />
-                    </button>
-                    <p className="text-sm text-gray-500">Subtotal: ₹{subtotal.toLocaleString()}</p>
-                    {shipping > 0 && <p className="text-sm text-gray-500">Shipping: ₹{shipping.toLocaleString()}</p>}
-                    {discount > 0 && <p className="text-sm text-green-600">Discount: -₹{discount.toLocaleString()}</p>}
-                    <p className="text-lg font-bold text-gray-900 mt-1">Total: ₹{total.toLocaleString()}</p>
+                        onClick={(e) => handleViewDetails(e, order.order_id)}
+                        className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-amber-600 bg-amber-50 rounded-lg hover:bg-amber-100 transition-all duration-200 cursor-pointer"
+                      >
+                        View Details <ArrowRight className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={(e) => handleTrackOrder(e, order.order_id)}
+                        className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition-all duration-200 cursor-pointer"
+                      >
+                        <Truck className="w-4 h-4" /> Track Order
+                      </button>
+                    </div>
+
+                    {/* Price Summary - Right side */}
+                    <div className="text-right">
+                      <p className="text-sm text-gray-500">Subtotal: ₹{subtotal.toLocaleString()}</p>
+                      <p className="text-sm text-gray-500">Shipping: ₹{shipping.toLocaleString()}</p>
+                      {discount > 0 && <p className="text-sm text-green-600">Discount: -₹{discount.toLocaleString()}</p>}
+                      <p className="text-lg font-bold text-gray-900 mt-1">Total: ₹{total.toLocaleString()}</p>
+                    </div>
                   </div>
                 </div>
               </div>
