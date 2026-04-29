@@ -505,7 +505,7 @@ const CheckoutPage = () => {
             disabled={loading || !selectedAddressId}
             className="w-full mt-6 py-3 bg-amber-600 text-white rounded-lg font-semibold hover:bg-amber-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Processing...' : 'Pay Now'}
+            {loading ? 'Please Wait...' : 'Pay Now'}
           </button>
         </div>
       </div>

@@ -44,11 +44,29 @@ const sortProducts = (products, sortType) => {
 };
 
 const filterProductsInCategory = (products, filters) => {
+  if (!products || !products.length) return [];
+  
   return products.filter(p => {
+    // Price filter
     if (filters.minPrice && getProductPrice(p) < Number(filters.minPrice)) return false;
     if (filters.maxPrice && getProductPrice(p) > Number(filters.maxPrice)) return false;
+    
+    // Rating filter
     if (filters.minRating && getProductRating(p) < Number(filters.minRating)) return false;
+    
+    // Discount filter
     if (filters.minDiscount && getDiscountPercent(p) < Number(filters.minDiscount)) return false;
+    
+    // Search filter
+    if (filters.search && filters.search.trim() !== "") {
+      const searchTerm = filters.search.toLowerCase().trim();
+      const productName = p.name?.toLowerCase() || "";
+      
+      if (!productName.includes(searchTerm)) {
+        return false;
+      }
+    }
+    
     return true;
   });
 };

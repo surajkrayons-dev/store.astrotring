@@ -13,6 +13,7 @@ export const CATEGORIES = [
   { id: "tower", slug: "tower", label: "Tower", icon: "🔺" },
   { id: "dome-tree", slug: "dome-tree", label: "Dome Tree", icon: "🌲" },
   { id: "gemstones", slug: "gemstones", label: "Gemstones", icon: "💎" },
+  { id: "frames", slug: "frames", label: "Frames", icon: "🖼️" },
   { id: "combo-bracelets", slug: "combo-bracelets", label: "Combo Bracelet", icon: "✨" },
   { id: "yantra", slug: "yantra", label: "Yantra", icon: "☸" },
   { id: "women-bracelet", slug: "women-bracelet", label: "Women Bracelet", icon: "🌸" },

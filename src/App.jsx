@@ -4,7 +4,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { lazy, Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { userProfile } from "./redux/slices/userAuthSlice";
-import Loader from "./components/common/Loader"; 
+import Loader from "./components/common/Loader";
 import Layout from "./components/layout/Layout";
 import HomePage from "./pages/HomePage";
 import CategoryPage from "./pages/CategoryPage";
@@ -21,6 +21,7 @@ import WishlistPage from "./pages/WishlistPage";
 import Gemstonesinfo from "./pages/product info/GemstonesInfo";
 import GemstoneDetails from "./pages/product info/GemstoneDetails";
 import TrackMyOrderPage from "./pages/TrackMyOrderPage";
+import ComingSoon from "./components/common/ComingSoon";
 
 // Lazy load all pages
 
@@ -64,40 +65,45 @@ function App() {
           <Route path="/terms-conditions" element={<TermsAndConditionsPage />} />
           {/* product catogaries page */}
           <Route path="/category/:slug" element={<CategoryPage />} />
-        
-        
-           {/* product info */}
 
-         <Route path="/gemstones" element={<Gemstonesinfo />} />
-      {/* <Route path="/gemstones/:name" element={<GemstoneDetails />} /> */}
-      <Route path="/gemstones/:name/:id" element={<GemstoneDetails />} />
-        
+
+          {/* product info */}
+
+          <Route path="/gemstones" element={<Gemstonesinfo />} />
+          {/* <Route path="/gemstones/:name" element={<GemstoneDetails />} /> */}
+          <Route path="/gemstones/:name/:id" element={<GemstoneDetails />} />
+
+
+          {/* comming soon route */}
+          <Route path="/coming-soon" element={<ComingSoon />} />
+
         </Route>
+
+        {/* ====================================================================================== */}
 
         {/* user details */}
         <Route path="/profile" element={<ProfilePage />} />
 
-       
-       
         {/* checkout  */}
         <Route path="checkout" element={<CheckoutPage />} />
         {/* ordersuccess */}
         <Route path="order-success" element={<OrderSuccessPage />} />
         {/* my order page */}
-         <Route path="/orders" element={<MyOrdersPage />} />
+        <Route path="/orders" element={<MyOrdersPage />} />
         {/* order details page */}
         <Route path="/orders/:id" element={<MyOrderDetailsPage />} />
         {/* track my order page */}
         <Route path="/track-order/:orderId?" element={<TrackMyOrderPage />} />
+        <Route path="/track-order/" element={<TrackMyOrderPage />} />
         {/* user wallet */}
         <Route path="/wallet" element={<WalletPage />} />
         {/* wishlist */}
         <Route path="/wishlist" element={<WishlistPage />} />
-         {/* address */}
+        {/* address */}
         <Route path="addresses" element={<AddressesPage />} />
 
-     
-      
+
+
 
 
       </Routes>
