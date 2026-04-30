@@ -74,46 +74,12 @@ const Footer = () => {
 
             <ul className="mt-4 space-y-2">
               {/* <li><Link to="/" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">About Us</Link></li> */}
-              <li>
-                <Link
-                  to="/privacy-policy"
-                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
-                >
-                  Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/terms-conditions"
-                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
-                >
-                  Terms & Conditions
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/refund-policy"
-                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
-                >
-                  Refund & Cancellation
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/shipping-policy"
-                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
-                >
-                  Shipping Policy
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/disclaimer"
-                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
-                >
-                  Disclaimer
-                </Link>
-              </li>
+              <li><Link to="/privacy-policy" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Privacy Policy</Link></li>
+              <li><Link to="/terms-conditions" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Terms & Conditions</Link></li>
+              <li><Link to="/refund-policy" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Refund & Cancellation</Link></li>
+              <li><Link to="/shipping-policy" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">
+                Shipping Policy</Link></li>
+              <li><Link to="/disclaimer" className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1">Disclaimer</Link></li>
             </ul>
           </div>
 
@@ -123,8 +89,17 @@ const Footer = () => {
               Contact us
             </h2>
 
-            <p className="text-sm text-gray-700 mt-4">
-              We are available 24x7 on chat support, click to start chat
+            <p className="text-sm text-gray-700 leading-relaxed mt-4">
+              We are available 24x7 on chat support,{' '}
+              <a
+                href="https://wa.me/919485628238?text=Hi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group/link relative inline-block font-normal text-amber-600 hover:text-amber-700 transition-colors duration-300 cursor-pointer"
+              >
+                click to start chat.
+                <span className="absolute bottom-[-2px] left-0 w-full h-[1.5px] bg-amber-500 scale-x-0 group-hover/link:scale-x-100 transition-transform duration-300 origin-left" />
+              </a>
             </p>
 
             <div className="mt-4">
@@ -133,7 +108,11 @@ const Footer = () => {
                 className="flex items-center gap-3 text-sm text-gray-700 hover:text-amber-600 transition group flex-wrap"
               >
                 <Mail className="size-8 text-[#EA4335] border border-gray-600 p-1.5 rounded-full group-hover:bg-amber-600 group-hover:border-amber-600 group-hover:text-white transition" />
-                <span className="underline-offset-2 hover:underline">care@astrotring.com</span>
+                <span className="group/link relative inline-block font-normal transition-colors duration-300 cursor-pointer">
+                  care@astrotring.com
+                  <span className="absolute bottom-[-2px] left-0 w-full h-[1.5px] bg-amber-500 scale-x-0 group-hover/link:scale-x-100 transition-transform duration-300 origin-left" />
+
+                </span>
               </a>
             </div>
 
@@ -181,15 +160,14 @@ const Footer = () => {
                   textColor: "text-[#FF0000]",
                 },
               ].map(({ Icon, href, textColor }, i) => (
-                <a
+                <Link
                   key={i}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  to="coming-soon"
+
                   className="border border-gray-600 rounded-full h-8 w-8 grid place-items-center text-gray-700 hover:bg-amber-600 hover:border-amber-600 hover:text-white transition"
                 >
                   <Icon className={`size-5 ${textColor}`} />
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -200,11 +178,10 @@ const Footer = () => {
               Download Our App
             </h3>
             <div className="flex flex-col gap-3 mt-4">
-              {/* Google Play Button – original icon, proper size */}
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
+              {/* Google Play Button */}
+              <Link
+                to="coming-soon"
+
                 className="flex items-center gap-2 bg-black text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-all duration-300 hover:scale-105 shadow-md w-fit min-w-[160px]"
               >
                 <FaGooglePlay size={20} className="text-white" />
@@ -212,13 +189,12 @@ const Footer = () => {
                   <span className="text-[8px] font-light">GET IT ON</span>
                   <span className="text-xs font-semibold">Google Play</span>
                 </div>
-              </a>
+              </Link>
 
-              {/* App Store Button – same size and style */}
-              <a
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
+              {/* App Store Button */}
+              <Link
+                to="coming-soon"
+
                 className="flex items-center gap-2 bg-black text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-all duration-300 hover:scale-105 shadow-md w-fit min-w-[160px]"
               >
                 <FaApple size={20} className="text-white" />
@@ -226,7 +202,7 @@ const Footer = () => {
                   <span className="text-[8px] font-light">Download on the</span>
                   <span className="text-xs font-semibold">App Store</span>
                 </div>
-              </a>
+              </Link>
             </div>
           </div>
         </div>

@@ -118,7 +118,7 @@ const MyOrdersPage = () => {
                 {/* Order Header */}
                 <div className="px-6 py-4 bg-gray-50 border-b border-gray-200 flex flex-wrap justify-between items-center gap-3">
                   <div>
-                    <p className="text-sm text-gray-500">Order Id : #{order.order_number}</p>
+                    <p className="text-sm text-gray-500">Order Number : #{order.order_number}</p>
                     {order.timestamps?.created_at && (
                       <p className="text-sm text-gray-500 mt-1">
                         Order On : {new Date(order.timestamps.created_at).toLocaleDateString()}
