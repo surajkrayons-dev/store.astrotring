@@ -163,7 +163,7 @@ const AddressManager = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Address Label */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Address Label *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Label <span className='text-amber-600'>*</span></label>
               <input
                 type="text"
                 name="name"
@@ -191,7 +191,7 @@ const AddressManager = () => {
 
             {/* Mobile */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Mobile *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Mobile <span className='text-amber-600'>*</span></label>
               <input
                 type="tel"
                 name="mobile"
@@ -258,7 +258,7 @@ const AddressManager = () => {
 
             {/* Country */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Country *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Country <span className='text-amber-600'>*</span></label>
               <input
                 type="text"
                 name="country"
@@ -273,7 +273,7 @@ const AddressManager = () => {
 
             {/* City */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">City *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">City <span className='text-amber-600'>*</span></label>
               <input
                 type="text"
                 name="city"
@@ -286,7 +286,7 @@ const AddressManager = () => {
 
             {/* State */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">State *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">State <span className='text-amber-600'>*</span></label>
               <input
                 type="text"
                 name="state"
@@ -299,7 +299,7 @@ const AddressManager = () => {
             
             {/* Pincode */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Pincode *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Pincode <span className='text-amber-600'>*</span></label>
               <input
                 type="text"
                 name="pincode"
@@ -311,7 +311,7 @@ const AddressManager = () => {
             </div>
            {/* Full Address */}
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Address *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Address <span className='text-amber-600'>*</span></label>
               <input
                 type="text"
                 name="address"
