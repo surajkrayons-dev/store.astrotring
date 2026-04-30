@@ -8,10 +8,24 @@ const ProductCard = ({ product, addToCart, compact = false }) => {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
 
-  // ✅ Direct extraction from API fields (with fallbacks)
-  const afterPrice = parseFloat(product?.after_price) || 0;
-  const beforePrice = parseFloat(product?.before_price) || 0;
+
+  // ✅ Price extraction logic - handles both gemstones and regular products
+let afterPrice = 0;
+let beforePrice = 0;
+
+// Check if product has ratti_options (gemstone) and has at least one option
+if (product?.ratti_options && product.ratti_options.length > 0) {
+  // For gemstones: take the first ratti option's price
+  const defaultRattiOption = product.ratti_options[0];
+  afterPrice = parseFloat(defaultRattiOption?.ratti_afterPrice) || 0;
+  beforePrice = parseFloat(defaultRattiOption?.ratti_beforePrice) || 0;
+} else {
+  // For regular products: use direct after_price/before_price
+  afterPrice = parseFloat(product?.after_price) || 0;
+  beforePrice = parseFloat(product?.before_price) || 0;
+}
   const ratingValue = parseFloat(product?.rating_avg) || 0;
+  
 
 
   // default ratti

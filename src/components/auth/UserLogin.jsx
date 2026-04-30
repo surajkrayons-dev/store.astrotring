@@ -25,7 +25,7 @@ const UserLogin = () => {   // 👈 trigger prop hata diya
   const [form, setForm] = useState({
     name: "",
     email: "",
-    country_code: "",
+    country_code: "+91",
     mobile: "",
     username: "",
     password: "",
