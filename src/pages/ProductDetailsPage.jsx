@@ -210,9 +210,10 @@ const ProductDetailsPage = () => {
       });
     }
    if (product?.weight) specs.push({ label: "Weight", value: product.weight + " gm" });
-    if (product?.length && product?.breadth && product?.height) specs.push({ label: "Dimension", value: `${Math.round(product.length)} X ${Math.round(product?.breadth)} X ${Math.round(product?.height)}` });
-    // if (product?.breadth) specs.push({ label: "Breadth", value: product.breadth + " mm" });
-    // if (product?.height) specs.push({ label: "Height", value: product.height + " mm" });
+    // if (product?.length && product?.breadth && product?.height) specs.push({ label: "Dimension", value: `${Math.round(product.length)} X ${Math.round(product?.breadth)} X ${Math.round(product?.height)}` });
+    if (product?.length) specs.push({ label: "Length", value: product.length + " mm" });
+    if (product?.breadth) specs.push({ label: "Breadth", value: product.breadth + " mm" });
+    if (product?.height) specs.push({ label: "Height", value: product.height + " mm" });
     if (product?.origin) specs.push({ label: "Origin", value: product.origin });
     if (product?.planet) specs.push({ label: "Planet", value: product.planet });
     if (product?.purity) specs.push({ label: "Purity", value: product.purity });
