@@ -210,7 +210,7 @@ const ProductDetailsPage = () => {
       });
     }
    if (product?.weight) specs.push({ label: "Weight", value: product.weight + " gm" });
-    if (product?.length && product?.breadth && product?.height) specs.push({ label: "Dimension", value: `${Math.round(product.length)} x ${Math.round(product?.breadth)} x ${Math.round(product?.height)}` });
+    if (product?.length && product?.breadth && product?.height) specs.push({ label: "Dimension", value: `${Math.round(product.length)} X ${Math.round(product?.breadth)} X ${Math.round(product?.height)}` });
     // if (product?.breadth) specs.push({ label: "Breadth", value: product.breadth + " mm" });
     // if (product?.height) specs.push({ label: "Height", value: product.height + " mm" });
     if (product?.origin) specs.push({ label: "Origin", value: product.origin });
