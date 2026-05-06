@@ -35,7 +35,6 @@ const OrderSuccessPage = () => {
     };
   }, [dispatch, orderId]);
   
-
   // Loading state
   if (loading) {
     return <Loader data="Loading order details..." />;
