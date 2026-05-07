@@ -39,7 +39,6 @@ const OrderSuccessPage = () => {
   const handlePrint = () => {
     window.print();
   };
-
   
   // Loading state
   if (loading) {
