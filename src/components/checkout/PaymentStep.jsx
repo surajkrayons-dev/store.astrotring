@@ -7,7 +7,7 @@ import { api } from '../../redux/baseApi';
 import { clearCart } from '../../redux/slices/cartSlice';
 import { fetchWallet } from '../../redux/slices/walletSlice';
 
-const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID; 
+const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
 const PaymentStep = forwardRef(({ selectedAddressId, onOrderComplete }, ref) => {
   const dispatch = useDispatch();
@@ -60,12 +60,12 @@ const PaymentStep = forwardRef(({ selectedAddressId, onOrderComplete }, ref) => 
           wallet_amount: useWallet ? walletAmount : 0,
           amount: grandTotal,
         });
-        console.log("walletverify",verify)
-        
-           
-            console.log("walletverify2",verify.data)
-            console.log("walletverify3",verify.data.order)
-            console.log("walletverify4",verify.data.order.order_id)
+        console.log("walletverify", verify)
+
+
+        console.log("walletverify2", verify.data)
+        console.log("walletverify3", verify.data.order)
+        console.log("walletverify4", verify.data.order.order_id)
         if (verify.data.status) {
           toast.success('Order placed!');
           navigate('/order-success', { state: { orderData: verify.data.order.order_id } });
@@ -95,13 +95,13 @@ const PaymentStep = forwardRef(({ selectedAddressId, onOrderComplete }, ref) => 
               amount: grandTotal,
             });
 
-            console.log("verify",verify)
-            console.log("verify2",verify.data)
-            console.log("verify3",verify.data.order)
-            console.log("verify4",verify.data.order.order_id)
+            console.log("verify", verify)
+            console.log("verify2", verify.data)
+            console.log("verify3", verify.data.order)
+            console.log("verify4", verify.data.order.order_id)
             if (verify.data.status) {
               toast.success('Payment successful!');
-              
+
               navigate('/order-success', { state: { orderData: verify.data.order.order_id } });
               dispatch(clearCart());
               onOrderComplete();
@@ -124,7 +124,9 @@ const PaymentStep = forwardRef(({ selectedAddressId, onOrderComplete }, ref) => 
   return (
     <div className="space-y-5">
       <h2 className="text-2xl font-bold text-gray-800">Payment Options</h2>
-      <div className="bg-gray-50 rounded-xl p-4">
+      <div className="bg-gray-50 rounded-xl p-4 space-y-4">
+
+        {/* 
         <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" checked={useWallet} onChange={(e) => {
             setUseWallet(e.target.checked);
@@ -145,6 +147,18 @@ const PaymentStep = forwardRef(({ selectedAddressId, onOrderComplete }, ref) => 
             <p className="text-xs text-gray-500 mt-1">Max: ₹{Math.min(walletBalance, grandTotal).toLocaleString()}</p>
           </div>
         )}
+ */}
+
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input type="radio" checked className="w-4 h-4 text-amber-600" />
+          <span className="font-medium text-sm">Pay Using UPI/ Wallet/ Cards/ Netbanking</span>
+        </label>
+
+
+        <label className="flex items-center gap-2 cursor-pointer">
+          <div className="w-4 h-4  rounded-full border-1 border-gray-500" />
+          <span className="font-medium text-gray-400 text-sm">COD (Coming soon)</span>
+        </label>
       </div>
       {/* <p className="text-sm text-gray-500 text-center">You will be redirected to Razorpay for secure payment.</p> */}
     </div>

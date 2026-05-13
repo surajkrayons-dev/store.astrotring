@@ -353,9 +353,9 @@ const OrderInvoice = () => {
 
         {/* FULL TABLE WITH ALL COLUMNS (original layout) */}
         <div className="mx-8 mt-6 border border-black">
-          <table className="w-full border-collapse text-sm">
+          <table className="w-full border-collapse text-sm ">
             <thead>
-              <tr className="bg-amber-200 font-bold">
+              <tr className="bg-white font-bold border-b">
                 <th className="border-r border-black p-1 w-[40px] align-middle">Sl.<br />No</th>
                 <th className="border-r border-black p-1 text-left align-middle">Description</th>
                 <th className="border-r border-black p-1 w-[70px] text-center align-middle">Unit<br />Price</th>
