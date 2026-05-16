@@ -8,7 +8,7 @@ export const fetchWallet = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/store-wallet');
-      console.log("wallet fetch", response.data.data);
+      // console.log("wallet fetch", response.data.data);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch wallet');
@@ -22,7 +22,7 @@ export const fetchWalletHistory = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/store-wallet/history');
-      console.log("wallet history", response.data.data);
+      // console.log("wallet history", response.data.data);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch history');
@@ -36,7 +36,7 @@ export const fetchWalletSummary = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/store-wallet/summary');
-      console.log("wallet summary", response.data.data);
+      // console.log("wallet summary", response.data.data);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch summary');
@@ -50,7 +50,7 @@ export const fetchSpendHistory = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/store-wallet/spend-history');
-      console.log("spend history", response.data.data);
+      // console.log("spend history", response.data.data);
       return response.data.data; // expects array of spend transactions
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch spend history');
@@ -64,7 +64,7 @@ export const createOrder = createAsyncThunk(
   async (amount, { rejectWithValue }) => {
     try {
       const response = await api.post('/wallet/topup/create-order', { amount });
-      console.log("add money to wallet", response.data.data);
+      // console.log("add money to wallet", response.data.data);
       return response.data; // { order_id, amount, currency? }
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to create order');
@@ -82,7 +82,7 @@ export const verifyPayment = createAsyncThunk(
         amount,
       });
       await dispatch(fetchWallet());
-      console.log("verify wallet", response.data.data);
+      // console.log("verify wallet", response.data.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Payment verification failed');

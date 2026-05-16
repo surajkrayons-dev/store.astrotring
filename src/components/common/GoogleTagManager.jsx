@@ -12,7 +12,7 @@ const GoogleTagManager = () => {
         event: 'pageview',
         page: location.pathname + location.search,
       });
-      console.log('Pageview tracked:', location.pathname);
+       console.log('Pageview tracked:', location.pathname);
     }
   }, [location]);
 

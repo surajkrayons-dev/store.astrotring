@@ -99,7 +99,7 @@ const CheckoutPage = () => {
         wallet_amount: useWallet ? walletAmount : 0,
         address_id: selectedAddressId,
       });
-      console.log("createorder",paymentResponse)
+      // console.log("createorder",paymentResponse)
       const paymentData = paymentResponse.data;
       if (!paymentData.status) throw new Error(paymentData.message || 'Failed to create order');
 
@@ -119,7 +119,7 @@ const CheckoutPage = () => {
           wallet_amount: useWallet ? walletAmount : 0,
           amount: grandTotal,
         });
-        console.log("verifyResponse",verifyResponse)
+        // console.log("verifyResponse",verifyResponse)
        if (verifyResponse.data.status) {
   toast.success('Order placed successfully using wallet!');
   // ✅ Send complete order data

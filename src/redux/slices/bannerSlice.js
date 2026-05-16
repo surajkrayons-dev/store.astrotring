@@ -6,7 +6,7 @@ export const fetchBanners = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get('/banners?type=store');
-      console.log("banner",response.data.data)
+      // console.log("banner",response.data.data)
       return response.data.data; // array of banners
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Banner fetch failed');

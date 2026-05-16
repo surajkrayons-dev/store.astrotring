@@ -7,7 +7,7 @@ const CategorySection = forwardRef(({ category, products, onAddToCart }, ref) =>
   const scrollContainerRef = useRef(null);
 
 
-  console.log("catProduct", products)
+  // console.log("catProduct", products)
 
   if (!products.length) return null;
 

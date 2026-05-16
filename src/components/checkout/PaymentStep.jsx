@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 import { api } from '../../redux/baseApi';
 import { clearCart } from '../../redux/slices/cartSlice';
 import { fetchWallet } from '../../redux/slices/walletSlice';
+import {FastForward,Wallet,CreditCard,Landmark,} from "lucide-react";
 
 const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
@@ -31,7 +32,7 @@ const PaymentStep = forwardRef(({ selectedAddressId, onOrderComplete }, ref) => 
   }, [dispatch]);
 
   const subtotal = cartItems.reduce((s, i) => s + i.price * i.quantity, 0);
-  const shipping = subtotal > 599 ? 0 : 199;
+  const shipping = subtotal >= 800 ? 0 : 149;
   const grandTotal = subtotal + shipping - couponDiscount;
 
   const handlePlaceOrder = async () => {
@@ -60,12 +61,6 @@ const PaymentStep = forwardRef(({ selectedAddressId, onOrderComplete }, ref) => 
           wallet_amount: useWallet ? walletAmount : 0,
           amount: grandTotal,
         });
-        console.log("walletverify", verify)
-
-
-        console.log("walletverify2", verify.data)
-        console.log("walletverify3", verify.data.order)
-        console.log("walletverify4", verify.data.order.order_id)
         if (verify.data.status) {
           toast.success('Order placed!');
           navigate('/order-success', { state: { orderData: verify.data.order.order_id } });
@@ -95,10 +90,6 @@ const PaymentStep = forwardRef(({ selectedAddressId, onOrderComplete }, ref) => 
               amount: grandTotal,
             });
 
-            console.log("verify", verify)
-            console.log("verify2", verify.data)
-            console.log("verify3", verify.data.order)
-            console.log("verify4", verify.data.order.order_id)
             if (verify.data.status) {
               toast.success('Payment successful!');
 
@@ -126,7 +117,11 @@ const PaymentStep = forwardRef(({ selectedAddressId, onOrderComplete }, ref) => 
       <h2 className="text-2xl font-bold text-gray-800">Payment Options</h2>
       <div className="bg-gray-50 rounded-xl p-4 space-y-4">
 
+
         {/* 
+
+        // pay through wallet option
+
         <label className="flex items-center gap-2 cursor-pointer">
           <input type="checkbox" checked={useWallet} onChange={(e) => {
             setUseWallet(e.target.checked);
@@ -149,10 +144,47 @@ const PaymentStep = forwardRef(({ selectedAddressId, onOrderComplete }, ref) => 
         )}
  */}
 
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input type="radio" checked className="w-4 h-4 text-amber-600" />
-          <span className="font-medium text-sm">Pay Using UPI/ Wallet/ Cards/ Netbanking</span>
-        </label>
+
+<label className="flex items-start gap-3 cursor-pointer">
+  <input
+    type="radio"
+    checked
+    className="mt-1 w-4 h-4 text-amber-600 accent-amber-600"
+  />
+
+  <div className="flex flex-col gap-2">
+    <span className="font-medium text-sm text-gray-800">
+      Pay Using UPI / Wallet / Cards / Netbanking
+    </span>
+
+    {/* Payment Icons */}
+    <div className="flex items-center gap-3 flex-wrap">
+      {/* UPI */}
+      <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-gray-50 border border-gray-200">
+        <FastForward size={14} className="text-amber-600" />
+        <span className="text-xs text-gray-600">UPI</span>
+      </div>
+
+      {/* Wallet */}
+      <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-gray-50 border border-gray-200">
+        <Wallet size={14} className="text-amber-600" />
+        <span className="text-xs text-gray-600">Wallet</span>
+      </div>
+
+      {/* Cards */}
+      <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-gray-50 border border-gray-200">
+        <CreditCard size={14} className="text-amber-600" />
+        <span className="text-xs text-gray-600">Cards</span>
+      </div>
+
+      {/* Netbanking */}
+      <div className="flex items-center gap-1.5 px-2 py-1 rounded-md bg-gray-50 border border-gray-200">
+        <Landmark size={14} className="text-amber-600" />
+        <span className="text-xs text-gray-600">Netbanking</span>
+      </div>
+    </div>
+  </div>
+</label>
 
 
         <label className="flex items-center gap-2 cursor-pointer">

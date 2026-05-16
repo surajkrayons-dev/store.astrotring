@@ -21,7 +21,7 @@ const ProfilePage = () => {
   const { user, loading, error } = useSelector((state) => state.userAuth);
   const navigate = useNavigate()
 
-  console.log(user)
+  // console.log(user)
 
   // UI state
   const [isEditing, setIsEditing] = useState(false);

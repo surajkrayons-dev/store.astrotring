@@ -7,7 +7,7 @@ export const userLogin = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const res = await api.post("/user/login", data);
-      console.log("checking user login data", res.data.user);
+      // console.log("checking user login data", res.data.user);
       if (res?.data?.user?.role_id === 2) {
         return thunkApi.rejectWithValue("Astrologer cannot login from here");
       } else {
@@ -62,7 +62,7 @@ export const userUpdate = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const res = await api.post("/user/update", data);
-      console.log(res.data);
+      // console.log(res.data);
       return res.data;
     } catch (error) {
       return thunkApi.rejectWithValue(
@@ -76,7 +76,7 @@ export const userLogout = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const res = await api.post("/user/logout", data);
-      console.log(res.data);
+      // console.log(res.data);
       return res.data;
     } catch (error) {
       return thunkApi.rejectWithValue(
@@ -90,7 +90,7 @@ export const userProfile = createAsyncThunk(
   async (data, thunkApi) => {
     try {
       const res = await api.get("/user/profile");
-      console.log("user profile", res.data);
+      // console.log("user profile", res.data);
       return res.data;
     } catch (error) {
       return thunkApi.rejectWithValue(

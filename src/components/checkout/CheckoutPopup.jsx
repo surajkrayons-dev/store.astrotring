@@ -54,7 +54,7 @@ const CheckoutPopup = ({ isOpen, onClose }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn">
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-[2px] flex items-center justify-center z-50 animate-fadeIn">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[480px] h-[90vh] flex flex-col relative overflow-hidden animate-slideUp">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-white sticky top-0 z-10">

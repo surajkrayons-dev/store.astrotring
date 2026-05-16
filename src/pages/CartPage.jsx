@@ -142,9 +142,9 @@ const CartPage = () => {
   const subtotal = cartItems.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
   const originalTotal = subtotal;
   const productSavings = originalTotal - subtotal;
-  const shippingFee = subtotal >= 800 ? 0 : 199;
+  const shippingFee = subtotal >= 800 ? 0 : 149;
   const freeShippingRemaining = Math.max(0, 800 - subtotal);
-  const totalSavings = productSavings + couponDiscount + (shippingFee === 0 && subtotal > 800 ? 199 : 0);
+  const totalSavings = productSavings + couponDiscount + (shippingFee === 0 && subtotal >= 800 ? 149 : 0);
   const grandTotal = subtotal + shippingFee - couponDiscount;
 
   // Simple function – only opens the popup

@@ -7,7 +7,7 @@ export const fetchAllProducts = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await api.get("/products");
-      console.log("all products", res.data.data);
+      // console.log("all products", res.data.data);
       return res.data.data; // array of products
     } catch (error) {
       return rejectWithValue(
@@ -26,7 +26,7 @@ export const fetchProductById = createAsyncThunk(
       const product = Array.isArray(res.data.data)
         ? res.data.data[0]
         : res.data.data;
-      console.log("object", product);
+      // console.log("object", product);
       return product;
     } catch (error) {
       return rejectWithValue(
@@ -42,7 +42,7 @@ export const fetchAllProductCategories = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const res = await api.get("/categories");
-      console.log("all categories", res.data.data);
+      // console.log("all categories", res.data.data);
       return res.data.data;
     } catch (error) {
       return rejectWithValue(
@@ -60,7 +60,7 @@ export const fetchProductCategoryById = createAsyncThunk(
       const category = Array.isArray(res.data.data)
         ? res.data.data[0]
         : res.data.data;
-      console.log("category", category);
+      // console.log("category", category);
       return category;
     } catch (error) {
       return rejectWithValue(

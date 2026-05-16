@@ -19,7 +19,7 @@ const AddressStep = ({ selectedAddressId, onSelectAddress }) => {
     country_code: '+91',
     country: 'India',
     state_code: '',      // ✅ added
-    is_default: false,
+    by_default: false,
   });
   const [adding, setAdding] = useState(false);
   const [pincodeLoading, setPincodeLoading] = useState(false);
@@ -98,7 +98,7 @@ const AddressStep = ({ selectedAddressId, onSelectAddress }) => {
       country_code: newAddress.country_code,
       country: newAddress.country,
       state_code: newAddress.state_code,   // ✅ send state_code
-      is_default: newAddress.is_default ? 1 : 0,
+      by_default: newAddress.by_default ? 1 : 0,
     };
     try {
       await dispatch(addAddress(payload)).unwrap();
@@ -114,7 +114,7 @@ const AddressStep = ({ selectedAddressId, onSelectAddress }) => {
         country_code: '+91',
         country: 'India',
         state_code: '',
-        is_default: false,
+        by_default: false,
       });
       setPincodeError('');
       hasFetched.current = false;
@@ -133,7 +133,7 @@ const AddressStep = ({ selectedAddressId, onSelectAddress }) => {
       <h2 className="text-xl font-semibold text-gray-800">Delivery Address</h2>
       {/* Address List */}
       {addresses.length > 0 && (
-        <div className="space-y-3 max-h-64 overflow-y-auto pr-1">
+        <div className="space-y-3 pr-1">
           {addresses.map((addr) => (
             <label
               key={addr.id}
@@ -153,7 +153,7 @@ const AddressStep = ({ selectedAddressId, onSelectAddress }) => {
                 <div className="flex items-center gap-2 flex-wrap">
                   <Home className="w-4 h-4 text-gray-500" />
                   <span className="font-medium">{addr.name}</span>
-                  {addr.is_default && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Default</span>}
+                  {Number(addr.by_default) === 1 && <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Default</span>}
                 </div>
                 <p className="text-gray-600 text-sm mt-1">{addr.address}, {addr.city}, {addr.state} - {addr.pincode}</p>
                 <p className="text-gray-500 text-xs mt-1">Mobile: {addr.country_code} {addr.mobile}</p>
@@ -272,8 +272,8 @@ const AddressStep = ({ selectedAddressId, onSelectAddress }) => {
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
-              checked={newAddress.is_default}
-              onChange={(e) => setNewAddress({ ...newAddress, is_default: e.target.checked })}
+              checked={newAddress.by_default}
+              onChange={(e) => setNewAddress({ ...newAddress, by_default: e.target.checked })}
             />
             Set as default address
           </label>

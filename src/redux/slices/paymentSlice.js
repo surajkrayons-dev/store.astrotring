@@ -5,8 +5,8 @@ import { api } from '../baseApi';
 export const initiatePayment = createAsyncThunk(
   'payment/initiate',
   async ({ order_id, method = 'online' }, { rejectWithValue }) => {
-    console.log("initiate payment order_id ",order_id)     
-      console.log("initiate payment method ",method) 
+    // console.log("initiate payment order_id ",order_id)     
+      // console.log("initiate payment method ",method) 
     try {
       const response = await api.post('/user/payment/initiate', { order_id, method });
 
@@ -29,7 +29,7 @@ export const verifyPayment = createAsyncThunk(
         razorpay_signature,
       });
 
-      console.log("razopar-pay verification",response.data)
+      // console.log("razopar-pay verification",response.data)
       return response.data; // expects { success: true, ... }
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Payment verification failed');

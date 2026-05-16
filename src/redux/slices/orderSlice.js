@@ -11,7 +11,7 @@ export const placeOrder = createAsyncThunk(
       const { userAuth } = getState();
       if (!userAuth.isLoggedIn) return rejectWithValue('Please login to place order');
       const response = await api.post('/user/order/place', orderData);
-      console.log("Place order",response.data.data)
+      // console.log("Place order",response.data.data)
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to place order');
@@ -26,7 +26,7 @@ export const fetchMyOrders = createAsyncThunk(
       const { userAuth } = getState();
       if (!userAuth.isLoggedIn) return rejectWithValue('Please login to view orders');
       const response = await api.get('/user/orders');
-      console.log("my orders",response.data.data)
+      // console.log("my orders",response.data.data)
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch orders');
@@ -41,7 +41,7 @@ export const fetchOrderDetails = createAsyncThunk(
       const { userAuth } = getState();
       if (!userAuth.isLoggedIn) return rejectWithValue('Please login to view order details');
       const response = await api.get(`/user/orders/${orderId}`);
-      console.log("fetchOrderDetails",response.data.data)
+      // console.log("fetchOrderDetails",response.data.data)
       return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch order details');

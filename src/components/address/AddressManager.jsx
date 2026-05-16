@@ -30,7 +30,7 @@ const AddressManager = () => {
     country: 'India',
     address: '',
     pincode: '',
-    is_default: false,
+    by_default: false,
     state_code: '',   // ✅ changed from stateCode
   });
   const [pincodeLoading, setPincodeLoading] = useState(false);
@@ -75,7 +75,7 @@ const AddressManager = () => {
     setPincodeError('');
     try {
       const response = await dispatch(fetchPincodeDetails(pincode)).unwrap();
-      console.log('Pincode response:', response);
+      // console.log('Pincode response:', response);
       if (response?.status === true && response.data?.length > 0) {
         const first = response.data[0];
         setFormData((prev) => ({
@@ -137,7 +137,7 @@ const AddressManager = () => {
       address: '',
       pincode: '',
       state_code: '',
-      is_default: false,
+      by_default: false,
     });
     setEditingId(null);
     setPincodeError('');
@@ -172,7 +172,7 @@ const AddressManager = () => {
       country: formData.country,
       address: formData.address,
       pincode: formData.pincode,
-      is_default: formData.is_default ? 1 : 0,
+      by_default: formData.by_default ? 1 : 0,
     };
 
     try {
@@ -203,7 +203,7 @@ const AddressManager = () => {
       address: address.address || '',
       pincode: address.pincode || '',
       state_code: address.state_code || '',
-      is_default: address.is_default === 1 || address.is_default === true,
+      by_default: address.by_default === 1 || address.by_default === true,
     });
   };
 
@@ -391,8 +391,8 @@ const AddressManager = () => {
           <div className="flex items-center gap-2">
             <input
               type="checkbox"
-              name="is_default"
-              checked={formData.is_default}
+              name="by_default"
+              checked={formData.by_default}
               onChange={handleChange}
               id="default"
               className="border border-gray-300 rounded-md focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
@@ -443,19 +443,21 @@ const AddressManager = () => {
                 <div
                   key={addr.id}
                   className={`border rounded-lg p-4 transition-all hover:shadow-md ${
-                    addr.is_default ? 'border-amber-200 bg-amber-50' : 'border-gray-200 bg-white'
+                    addr.by_default ? 'border-amber-300 bg-amber-50' : 'border-gray-200 bg-white'
                   }`}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
                       <Home className="w-4 h-4 text-amber-600" />
                       <span className="font-medium text-gray-800">{addr.name}</span>
-                      {addr.is_default && (
+                      
+                      {Number(addr.by_default) === 1 && ( 
                         <span className="inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
                           <Star className="w-3 h-3 fill-amber-500" /> Default
                         </span>
                       )}
                     </div>
+                    
                     <div className="flex gap-2">
                       <button onClick={() => handleEdit(addr)} className="text-blue-600 hover:text-blue-800 p-1" title="Edit">
                         <Edit className="w-4 h-4" />

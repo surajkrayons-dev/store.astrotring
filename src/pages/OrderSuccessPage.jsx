@@ -16,7 +16,6 @@ const OrderSuccessPage = () => {
   const orderId = location.state?.orderData;
 
   useEffect(() => {
-    console.log("successpageorderid", orderId)
     if (orderId) {
 
       // GTM Event Fire

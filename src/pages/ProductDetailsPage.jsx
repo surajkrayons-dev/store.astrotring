@@ -144,9 +144,9 @@ const ProductDetailsPage = () => {
     return wishlistItems.some(item => item.id === product?.id);
   }, [wishlistItems, product?.id]);
 
-  console.log('Wishlist items:', wishlistItems);
-  console.log('Current product id:', product?.id);
-  console.log('Is in wishlist?', isInWishlist);
+  // console.log('Wishlist items:', wishlistItems);
+  // console.log('Current product id:', product?.id);
+  // console.log('Is in wishlist?', isInWishlist);
 
   if (loading) return <Loader data="Loading product..." />;
   if (error) return <div className="text-center py-10 text-red-500">{error}</div>;

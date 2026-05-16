@@ -72,7 +72,7 @@ export const fetchCart = createAsyncThunk(
     //  LOGGED IN USER - Fetch from API
     try {
       const response = await api.get('/user/cart');
-      console.log("fetchcart", response.data.data);
+      // console.log("fetchcart", response.data.data);
       return { items: response.data.data.items, isGuest: false };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch cart');
@@ -391,7 +391,7 @@ export default cartSlice.reducer;
 //     try {
 //       const response = await api.get('/user/cart');
 //       // API returns { status: true, data: { items: [...], grand_total } }
-//       console.log("fetchcart",response.data.data)
+//       // console.log("fetchcart",response.data.data)
 //       return response.data.data.items; // extract the items array
 //     } catch (error) {
 //       return rejectWithValue(error.response?.data?.message || 'Failed to fetch cart');
@@ -408,9 +408,9 @@ export default cartSlice.reducer;
 // //     }
 // //     try {
 // //       const response = await api.post('/user/cart/add', { product_id, quantity });
-// //       console.log("addtocart",response.data)
-// //       console.log("addtocart id",product_id)
-// //       console.log("addtocart qty",quantity)
+// //       // console.log("addtocart",response.data)
+// //       // console.log("addtocart id",product_id)
+// //       // console.log("addtocart qty",quantity)
 // //       // response is { status: true, message: 'Product added to cart' }
 // //       // No cart data returned, so we just return success indicator
 // //       return { success: true };
@@ -448,8 +448,8 @@ export default cartSlice.reducer;
 //     }
 //     try {
 //       const response = await api.post('/user/cart/update', { item_id, quantity }); // 👈 changed
-//       // console.log("cart qty" ,quantity)
-//       // console.log("cart update res" ,response)
+//       // // console.log("cart qty" ,quantity)
+//       // // console.log("cart update res" ,response)
 
 //       return { success: true };
 //     } catch (error) {

@@ -7,7 +7,7 @@ export const fetchAddresses = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get("/user/addresses");
-      console.log("view address", response.data.data);
+      // console.log("view address", response.data.data);
       return response.data.data; // assuming API returns { data: [...] }
     } catch (error) {
       return rejectWithValue(
@@ -24,7 +24,7 @@ export const addAddress = createAsyncThunk(
       const response = await api.post("/user/addresses", addressData, {
         headers: { "Content-Type": "application/json" },
       });
-      console.log("add address", response.data.data);
+      // console.log("add address", response.data.data);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(
@@ -41,7 +41,7 @@ export const updateAddress = createAsyncThunk(
       const response = await api.put(`/user/addresses/${id}`, addressData, {
         headers: { "Content-Type": "application/json" },
       });
-      console.log("update address", response.data.data);
+      // console.log("update address", response.data.data);
       return response.data.data;
     } catch (error) {
       return rejectWithValue(
@@ -57,7 +57,7 @@ export const deleteAddress = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       const response = await api.delete(`/user/addresses/${id}`);
-      console.log("delete address", response.data);
+      // console.log("delete address", response.data);
       return id; // return the deleted id to remove from state
     } catch (error) {
       return rejectWithValue(
@@ -73,7 +73,7 @@ export const fetchPincodeDetails = createAsyncThunk(
   async (pincode, { rejectWithValue }) => {
     try {
       const response = await api.post("/user/get-pincode-data", { pincode });
-      console.log("Pincode API response:", response.data);
+      // console.log("Pincode API response:", response.data);
       return response.data; // full response data
     } catch (error) {
       return rejectWithValue(
@@ -163,7 +163,7 @@ const addressSlice = createSlice({
       .addCase(fetchPincodeDetails.fulfilled, (state, action) => {
         state.loading = false;
         // You can store pincode data in a separate state if needed
-        console.log("Pincode fulfilled data:", action.payload);
+        // console.log("Pincode fulfilled data:", action.payload);
       })
       .addCase(fetchPincodeDetails.rejected, (state, action) => {
         state.loading = false;
