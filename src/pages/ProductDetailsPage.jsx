@@ -27,7 +27,7 @@ import {
 } from "../redux/slices/productSlice";
 import Loader from "@/components/common/Loader";
 import StarRating from "@/components/common/StarRating";
-import { openLoginModal } from "@/redux/slices/uiSlice";
+import { openCartDrawer, openLoginModal } from "@/redux/slices/uiSlice";
 
 // Extracted components
 import ProductYouMayAlsoLike from "@/components/product/ProductYouMayAlsoLike";
@@ -310,7 +310,7 @@ useEffect(() => {
       })).unwrap();
       toast.success(`${product?.name} added to cart!`);
       dispatch(fetchCart());
-      navigate('/cart');
+      dispatch(openCartDrawer())
     } catch (err) {
       toast.error(err || "Failed to add to cart");
     }
@@ -327,7 +327,7 @@ useEffect(() => {
         image: product.image,
       })).unwrap();
       toast.success(`${product?.name} added to cart!`);
-      navigate('/cart'); // redirect to cart page
+      dispatch(openCartDrawer()) // redirect to cart page
     } catch (err) {
       toast.error(err || "Failed to add to cart");
     }

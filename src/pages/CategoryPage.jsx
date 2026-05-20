@@ -8,6 +8,7 @@ import ProductCard from "@/components/features/ProductCard";
 import { toast } from "react-toastify";
 import { categoryStaticData } from "../constants/categoryStaticData";
 import AccordionSection from "@/components/common/AccordionSection";
+import { openCartDrawer } from "@/redux/slices/uiSlice";
 
 /* ---------- MAIN ---------- */
 const CategoryPage = () => {
@@ -64,7 +65,8 @@ const handleAddToCart = async ({ product_id, quantity, name, ratti,price ,image 
     await dispatch(addToCart({ product_id, quantity, name, ratti,price ,image })).unwrap();
     toast.success(`${name} added to cart!`);
     dispatch(fetchCart());
-    navigate('/cart');
+    dispatch(openCartDrawer())
+    // navigate('/cart');
   } catch (err) {
     toast.error(err || 'Failed to add to cart');
   }

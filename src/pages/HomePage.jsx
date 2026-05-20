@@ -15,6 +15,7 @@ import Loader from "@/components/common/Loader";
 import { CATEGORIES } from "../constants/categories";
 import { addToCart, fetchCart } from "../redux/slices/cartSlice";
 import { fetchAllProducts } from '../redux/slices/productSlice';
+import { openCartDrawer } from "@/redux/slices/uiSlice";
 
 // ----- Helper Functions (for new API structure) -----
 const getProductPrice = (product) => Number(product?.after_price) || 0;
@@ -183,7 +184,7 @@ const handleAddToCart = async ({ product_id, quantity, name, ratti,price ,image 
     await dispatch(addToCart({ product_id, quantity, name, ratti,price ,image })).unwrap();
     toast.success(`${name} added to cart!`);
     dispatch(fetchCart());
-    navigate("/cart")
+    dispatch(openCartDrawer())
   } catch (err) {
     toast.error(err || 'Failed to add to cart');
   }

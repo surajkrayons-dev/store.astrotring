@@ -16,13 +16,39 @@ const CheckoutPopup = ({ isOpen, onClose }) => {
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [isSummaryOpen, setIsSummaryOpen] = useState(true);
   const [showCancelPopup, setShowCancelPopup] = useState(false);
+  const [codCharge, setCodCharge] = useState(0);
+  const [isCodLoading, setIsCodLoading] = useState(false);
 
   const [apiDeliveryCharge, setApiDeliveryCharge] = useState(null);
   const paymentRef = useRef();
+  console.log("paymentref", paymentRef)
 
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState('online'); // 'online' or 'cod'
-  const COD_SURCHARGE = +import.meta.env.VITE_COD_SURCHARGE;
+  // const COD_SURCHARGE = +import.meta.env.VITE_COD_SURCHARGE;
+  console.log("cartitems", cartItems)
 
+  // cod charge fetch
+  useEffect(() => {
+    if (selectedPaymentMethod === 'cod' && selectedAddressId) {
+      const fetchCodCharge = async () => {
+        setIsCodLoading(true);
+        try {
+          const { data } = await api.get('/store/cod-charge', {
+            address_id: selectedAddressId,
+          });
+          console.log("codcharge",data)
+          if (data.status) setCodCharge(data.cod_charge);
+        } catch (err) {
+          console.error('Failed to fetch COD charge', err);
+        } finally {
+          setIsCodLoading(false);
+        }
+      };
+      fetchCodCharge();
+    } else {
+      setCodCharge(0);
+    }
+  }, [selectedPaymentMethod, selectedAddressId]);
 
   useEffect(() => {
     if (!selectedAddressId) return;
@@ -58,7 +84,7 @@ const CheckoutPopup = ({ isOpen, onClose }) => {
 
   const grandTotal = subtotal + shipping - couponDiscount;
   // For display, add surcharge if COD
-  const displayTotal = selectedPaymentMethod === 'cod' ? grandTotal + COD_SURCHARGE : grandTotal;
+  const displayTotal = selectedPaymentMethod === 'cod' ? grandTotal + codCharge : grandTotal;
 
   const handleBack = () => {
     if (step === 'login') onClose();
@@ -96,14 +122,14 @@ const CheckoutPopup = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-white sticky top-0 z-10">
           {/* back button */}
-          <button onClick={handleBack} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors duration-200">
-            <ArrowLeft size={20} className="text-gray-600" />
+          <button onClick={handleBack} className="p-1.5 hover:bg-gray-100 rounded-full transition-colors duration-200 cursor-pointer">
+            <ArrowLeft size={20} className="text-gray-600 " />
           </button>
           <img src={logo} alt="Astrotring" className="h-8" />
           {/* cross button */}
           <button
             onClick={() => setShowCancelPopup(true)}
-            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors duration-200"
+            className="p-1.5 hover:bg-gray-100 rounded-full transition-colors duration-200 cursor-pointer"
           >
             <X size={20} className="text-gray-600" />
           </button>
@@ -160,7 +186,7 @@ const CheckoutPopup = ({ isOpen, onClose }) => {
                 {selectedPaymentMethod === 'cod' && (
                   <div className="flex justify-between text-amber-600 text-sm">
                     <span>COD charge</span>
-                    <span>₹{COD_SURCHARGE}</span>
+                    <span>{isCodLoading ? '...' : `₹${codCharge}`}</span>
                   </div>
                 )}
                 <div className="flex justify-between font-bold text-gray-800 pt-2 border-t">
@@ -171,6 +197,7 @@ const CheckoutPopup = ({ isOpen, onClose }) => {
             </div>
           )}
         </div>
+
 
         {/* Step Content */}
         <div className="flex-1 overflow-y-auto p-5 scrollbar-hide">
@@ -186,6 +213,9 @@ const CheckoutPopup = ({ isOpen, onClose }) => {
               selectedAddressId={selectedAddressId}
               onOrderComplete={handleOrderComplete}
               deliveryCharge={shipping}
+              grandTotal={grandTotal}
+              codCharge={codCharge}
+              isCodLoading={isCodLoading}
               selectedPaymentMethod={selectedPaymentMethod}
               onPaymentMethodChange={setSelectedPaymentMethod}
 
@@ -204,7 +234,10 @@ const CheckoutPopup = ({ isOpen, onClose }) => {
             </button>
           </div>
         )}
-      </div>{/* Cancel Payment Popup */}
+
+      </div>
+
+      {/* Cancel Payment Popup */}
       {showCancelPopup && (
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-4 w-[90%] max-w-sm shadow-2xl animate-fadeIn">

@@ -235,7 +235,7 @@ const MyOrderDetailsPage = () => {
             </h2>
             <p className="text-gray-600">Mode: {order?.payment?.mode || 'Online'}</p>
             <p className="text-gray-600">
-              Date : {order?.payment?.paid_at ? new Date(order.payment.paid_at).toLocaleString('en-IN') : 'N/A'}
+              Payment Status : {order?.status}
             </p>
           </div>
         </div>

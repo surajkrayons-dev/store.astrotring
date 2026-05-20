@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { api } from '../../redux/baseApi';
 import { toast } from 'react-toastify';
+import { userRegister } from '@/redux/slices/userAuthSlice';
 
 const SignupStep = ({ onSignupSuccess, onBackToLogin }) => {
   const [form, setForm] = useState({ name: '', email: '', country_code: '+91', mobile: '', terms_accepted: 0 });
@@ -20,29 +20,23 @@ const SignupStep = ({ onSignupSuccess, onBackToLogin }) => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.terms_accepted) {
-      toast.error('You must accept the Terms & Conditions');
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await api.post('/user/register', form);
-      if (res.data.token) {
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('role_id', res.data.role_id);
-        toast.success('Registration successful! Please login.');
-        onBackToLogin(); // go back to login step
-      } else {
-        toast.error('Registration failed');
-      }
-    } catch (err) {
-      toast.error(err.response?.data?.message || 'Registration failed');
-    } finally {
-      setLoading(false);
-    }
-  };
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  if (!form.terms_accepted) {
+    toast.error('You must accept the Terms & Conditions');
+    return;
+  }
+  setLoading(true);
+  try {
+    await dispatch(userRegister(form)).unwrap();
+    toast.success('Registration successful! Please login.');
+    onBackToLogin(); // go back to login step
+  } catch (err) {
+    toast.error(err || 'Registration failed');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="space-y-5">

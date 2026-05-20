@@ -17,7 +17,8 @@ import {
 import { validateCoupon } from '../redux/slices/couponSlice';
 import { toast } from 'react-toastify';
 // import CheckoutHeader from '@/components/checkout/CheckoutHeader';
-import CheckoutPopup from '@/components/checkout/CheckoutPopup';
+// import CheckoutPopup from '@/components/checkout/CheckoutPopup';
+import { closeCartDrawer, closeCheckout, openCheckout } from '@/redux/slices/uiSlice';
 // import { openLoginModal } from '../redux/slices/uiSlice'; // no longer needed
 // import CheckoutModal from '../components/checkout/CheckoutModal'; // removed – using inline modal
 
@@ -32,16 +33,13 @@ const CartPage = () => {
   const [couponValidating, setCouponValidating] = useState(false);
   const [removingId, setRemovingId] = useState(null);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
-  // New state for the simple popup
-  const [showPopup, setShowPopup] = useState(false);
+ 
 
 
   // const SHIPPING_CHARGES = +import.meta.env.VITE_SHIPING_CHARGES;
-const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
+  const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
 
-  useEffect(() => {
-    dispatch(fetchCart());
-  }, [dispatch]);
+
 
   useEffect(() => {
     if (error) {
@@ -51,13 +49,13 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
   }, [error, dispatch]);
 
   useEffect(() => {
-    if(couponCode==='WELCOMEOFFER' && cartItems.length > 0 && !appliedCoupon){
-     applyCoupon()
+    if (couponCode === 'WELCOMEOFFER' && cartItems.length > 0 && !appliedCoupon) {
+      applyCoupon()
     }
-  
-   
-  }, [cartItems,appliedCoupon])
-  
+
+
+  }, [cartItems, appliedCoupon])
+
 
   const handleRemoveItem = (id) => {
     setRemovingId(id);
@@ -155,15 +153,12 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
   const subtotal = cartItems.reduce((sum, item) => sum + (parseFloat(item.price) * item.quantity), 0);
   const originalTotal = subtotal;
   const productSavings = originalTotal - subtotal;
-  const shippingFee = subtotal >= MIN_FREE_SHIPPING  && 0  ;
-  const freeShippingRemaining = Math.max(0, MIN_FREE_SHIPPING  - subtotal);
-  const totalSavings = productSavings + couponDiscount 
-  const grandTotal = subtotal  - couponDiscount;
+  const shippingFee = subtotal >= MIN_FREE_SHIPPING && 0;
+  const freeShippingRemaining = Math.max(0, MIN_FREE_SHIPPING - subtotal);
+  const totalSavings = productSavings + couponDiscount
+  const grandTotal = subtotal - couponDiscount;
 
-  // Simple function – only opens the popup
-  const handleCheckoutClick = () => {
-    setShowPopup(true);
-  };
+
 
   if (loading && cartItems.length === 0) {
     return (
@@ -175,16 +170,10 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
 
   return (
     <>
-      <div className="min-h-screen bg-stone-50 p-4 pb-10">
+      <div className="min-h-screen bg-stone-50 p-4 pb-10 ">
         {/* Header unchanged */}
-        <div className="max-w-6xl mx-auto mb-6 flex items-center gap-3">
-          <button
-            className="w-10 h-10 rounded-lg bg-white border border-stone-200 flex items-center justify-center shadow-sm hover:bg-amber-600 hover:text-white hover:border-amber-600 transition-colors cursor-pointer"
-            onClick={() => navigate(-1)}
-            aria-label="Go back"
-          >
-            <ArrowLeft size={18} strokeWidth={2.5} />
-          </button>
+        <div className="max-w-6xl mx-auto mb-6 flex justify-between">
+
           <div className="flex items-center gap-2">
             <ShoppingCart size={22} strokeWidth={2} className="text-amber-600" />
             <h1 className="text-xl font-bold text-stone-900">My Cart</h1>
@@ -192,12 +181,19 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
               {cartItems.length}
             </span>
           </div>
+          <button
+            className="w-10 h-10 rounded-lg bg-white border border-stone-200 flex items-center justify-center shadow-sm hover:bg-amber-600 hover:text-white hover:border-amber-600 transition-colors cursor-pointer"
+            onClick={() => dispatch(closeCartDrawer())}
+            aria-label="Go back"
+          >
+            <X size={20} className="text-gray-600" />
+          </button>
         </div>
 
         {/* Cart items and sidebar – unchanged except the button's onClick */}
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Left column – cart items (same as before) */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-1">
             <div className="bg-white rounded-xl border border-stone-200 shadow-md overflow-hidden">
               <div className="flex justify-between items-center p-4 border-b border-stone-200">
                 <span className="text-sm font-semibold uppercase text-stone-500">Items</span>
@@ -291,7 +287,7 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
                           Add <strong>₹{freeShippingRemaining.toLocaleString()}</strong> more for free shipping
                         </p>
                         <div className="w-full h-1.5 bg-stone-200 rounded-full overflow-hidden">
-                          <div className="h-full bg-gradient-to-r from-amber-600 to-amber-500 transition-all" style={{ width: `${Math.min(100, (subtotal / MIN_FREE_SHIPPING ) * 100)}%` }} />
+                          <div className="h-full bg-gradient-to-r from-amber-600 to-amber-500 transition-all" style={{ width: `${Math.min(100, (subtotal / MIN_FREE_SHIPPING) * 100)}%` }} />
                         </div>
                       </>
                     )}
@@ -393,7 +389,7 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
                     <button
                       className={`w-full mt-2 py-4 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-xl font-bold text-base flex items-center justify-center gap-2 transition-all hover:shadow-md cursor-pointer ${isCheckingOut ? 'opacity-70 pointer-events-none' : ''
                         }`}
-                      onClick={handleCheckoutClick}
+                      onClick={() => dispatch(openCheckout())}
                     >
                       {isCheckingOut ? (
                         <>
@@ -414,14 +410,7 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
         </div>
       </div>
 
-      {/* Simple centered scrollable popup */}
-      {showPopup && (
-        <div className="fixed inset-0 bg-black/30  bg-opacity-50 flex items-center justify-center z-500">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-[400px] h-[90vh] overflow-y-auto relative">
-          <CheckoutPopup isOpen={showPopup} onClose={() => setShowPopup(false)} />
-          </div>
-        </div>
-      )}
+     
     </>
   );
 };

@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { FaUser, FaShoppingCart, FaSignOutAlt, FaUserCircle, FaClipboardList, FaHeart, FaHome } from "react-icons/fa";
 import logo from "../../assets/logo.png";
 import { logout, userLogout} from "../../redux/slices/userAuthSlice";
-import { openLoginModal } from "../../redux/slices/uiSlice";
+import { openCartDrawer, openLoginModal } from "../../redux/slices/uiSlice";
 import { toast } from "react-toastify";
 import { fetchCart } from "@/redux/slices/cartSlice";
 import { MapPin, WalletIcon } from "lucide-react";
@@ -94,7 +94,7 @@ const handleLogout = async () => {
 
   return (
     <nav
-      className={`w-full mb-4 sticky top-0 z-[100] bg-white transition-all duration-500 ${
+      className={`w-full mb-4 sticky top-0 z-30 bg-white transition-all duration-500 ${
         scrolled ? "shadow-md" : ""
       } ${isNavHidden ? "-translate-y-full" : "translate-y-0"}`}
     >
@@ -107,7 +107,7 @@ const handleLogout = async () => {
         {/* Right side buttons */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Cart button */}
-          <NavButton onClick={() => navigate("/cart")} icon={FaShoppingCart} label="CART" count={cartCount} />
+          <NavButton onClick={() => dispatch(openCartDrawer())} icon={FaShoppingCart} label="CART" count={cartCount} />
 
           {/* User / Login button */}
           {isLoggedIn ? (
