@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { api } from '../../redux/baseApi';
 import { clearCart } from '../../redux/slices/cartSlice';
 import { fetchWallet } from '../../redux/slices/walletSlice';
-import { FastForward, Wallet, CreditCard, Landmark, } from "lucide-react";
+import { FastForward, Wallet, CreditCard, Landmark, Info, } from "lucide-react";
 
 const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
@@ -238,9 +238,19 @@ const PaymentStep = forwardRef(({ selectedAddressId,
             onChange={() => onPaymentMethodChange('cod')}
             className="w-4 h-4 text-amber-600 accent-amber-600"
           />
-          <span className="font-medium text-sm text-gray-800">
-            COD {isCodLoading ? '(fetching...)' : `(₹49)`}
-          </span>
+          <span className="font-medium text-sm text-gray-800">COD</span>
+
+          <details className="relative inline-flex">
+            <summary className="list-none inline-flex cursor-pointer">
+              <Info className="w-4 h-4 text-gray-400 hover:text-amber-500 transition-colors" />
+            </summary>
+            <div className="absolute z-10 bottom-full left-2  w-64 p-2 bg-gray-800 text-white text-[10px] rounded-tl-2xl rounded-br-2xl shadow-lg">
+
+              <p className="mb-1">A convenience / handling fee is applicable on Cash on Delivery.</p>
+              <p>Cash on Delivery isn't yet available for all pin codes.</p>
+              <p>COD charges will not be refundable.</p>
+            </div>
+          </details>
         </label>
       </div>
       {/* <p className="text-sm text-gray-500 text-center">You will be redirected to Razorpay for secure payment.</p> */}

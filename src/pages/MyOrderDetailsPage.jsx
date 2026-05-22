@@ -86,14 +86,14 @@ const MyOrderDetailsPage = () => {
           >
             <ArrowLeft className="w-4 h-4" /> Back to Orders
           </button>
-          {currentOrder.payment.status === "paid" && <Link
+          <Link
             to={`/invoice/${currentOrder.order_id}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-2 py-2 mr-2 bg-amber-500 text-white/90 rounded-lg hover:bg-amber-600 transition"
           >
             <Printer className="w-4 h-4" /> Print Invoice
-          </Link>}
+          </Link>
           {currentOrder.payment.status === "paid" && <Link
             to={`/invoice/${currentOrder.order_id}`}
             target="_blank"

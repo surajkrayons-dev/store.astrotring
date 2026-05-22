@@ -452,9 +452,9 @@ const OrderInvoice = () => {
                   <p className="font-bold">Date & Time:</p>
                   <p className='text-nowrap'>{paidAt}</p>
                 </td>}
-                <td colSpan="2" className="p-2 align-top">
+                <td colSpan="2" className={`p-2 align-top ${order?.payment?.mode === "cod" && "flex gap-1"}`}>
                   <p className="font-bold text-nowrap">Mode of Payment:</p>
-                  <p>{paymentMode}</p>
+                  <p>{paymentMode.toUpperCase()}</p>
                 </td>
               </tr>
             </tfoot>

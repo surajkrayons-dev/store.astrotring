@@ -290,14 +290,14 @@ const OrderSuccessPage = () => {
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row justify-between gap-3 mt-6">
-         {order.payment.status === "paid" && <Link
+         <Link
             to={`/invoice/${orderId}`}
             target='_blank'
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm font-medium"
           >
             <Printer className="w-4 h-4" /> Print Invoice
-          </Link>}
+          </Link>
           <div className="flex gap-3">
             <Link
               to="/orders"
