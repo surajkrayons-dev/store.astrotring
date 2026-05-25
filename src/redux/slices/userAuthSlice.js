@@ -4,11 +4,12 @@ import { success } from "zod";
 
 export const userLogin = createAsyncThunk(
   "user/login",
-  async (mobile, thunkApi) => {   // mobile number as argument
+  async (mobile, thunkApi) => {
+    // mobile number as argument
     try {
       const res = await api.post("/user/login", { mobile });
       // No token returned now, just success
-      console.log("userLOgin",res.data)
+      console.log("userLOgin", res.data);
       return res.data; // { message: "OTP sent", ... }
     } catch (error) {
       return thunkApi.rejectWithValue(
@@ -141,6 +142,26 @@ export const userResetPassword = createAsyncThunk(
   },
 );
 
+// delete account
+// userAuthSlice.js – add this with your other thunks
+
+export const userDeleteAccount = createAsyncThunk(
+  "user/deleteAccount",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.delete("/user/delete");
+      // optionally clear local storage
+      localStorage.removeItem("token");
+      localStorage.removeItem("role_id");
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Account deletion failed",
+      );
+    }
+  },
+);
+
 const tokenFromStorage = localStorage.getItem("token");
 
 const initialState = {
@@ -258,7 +279,20 @@ const UserAuthSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.user = null;
-        
+      })
+      // delete user
+      .addCase(userDeleteAccount.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(userDeleteAccount.fulfilled, (state) => {
+        state.loading = false;
+        state.user = null;
+        state.token = null;
+        state.isLoggedIn = false;
+      })
+      .addCase(userDeleteAccount.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

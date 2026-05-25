@@ -156,9 +156,7 @@ const PaymentStep = forwardRef(({ selectedAddressId,
       <h2 className="text-2xl font-bold text-gray-800">Payment Options</h2>
       <div className="bg-gray-50 rounded-xl p-4 space-y-4">
 
-
-        {/* 
-
+{/* 
         // pay through wallet option
 
         <label className="flex items-center gap-2 cursor-pointer">
