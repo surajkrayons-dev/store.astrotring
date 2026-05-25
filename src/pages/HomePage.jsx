@@ -230,7 +230,7 @@ const handleAddToCart = async ({ product_id, quantity, name, ratti,price ,image 
         <div className="flex-1 min-w-0">
           {/* Sticky navigation bar */}
           <div
-            className="sticky z-30 bg-white/95 backdrop-blur-sm transition-all duration-300"
+            className="sticky z-20 bg-white/95 backdrop-blur-sm transition-all duration-300"
             style={{ top: homeNavTop }}
           >
             <HomeNav

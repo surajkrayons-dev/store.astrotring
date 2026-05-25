@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { userProfile, userUpdate } from "../redux/slices/userAuthSlice";
+import { userDeleteAccount, userProfile, userUpdate } from "../redux/slices/userAuthSlice";
 import Loader from "@/components/common/Loader";
 import { toast } from "react-toastify";
 import {
@@ -13,8 +13,9 @@ import {
   FaTimes,
   FaCamera,
 } from "react-icons/fa";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Trash } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { RiDeleteBinLine } from "react-icons/ri";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
@@ -26,6 +27,8 @@ const ProfilePage = () => {
   // UI state
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Form data (without image)
   const [formData, setFormData] = useState({
@@ -128,6 +131,21 @@ const ProfilePage = () => {
       setIsSubmitting(false);
     }
   };
+  // handle delete cccount
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    try {
+      await dispatch(userDeleteAccount()).unwrap();
+      toast.success("Account deleted successfully");
+      // Redirect to home page or login page after deletion
+      navigate("/");
+    } catch (err) {
+      toast.error(err || "Failed to delete account");
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
+    }
+  };
 
   // Loading / error states
   if (loading) return <Loader data="Loading profile..." />;
@@ -144,18 +162,8 @@ const ProfilePage = () => {
           {/* Header */}
           <div className="bg-amber-600 px-6 py-4 flex justify-between items-center">
             <h1 className="text-2xl font-bold text-white">My Profile</h1>
-            {!isEditing ? (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 text-white hover:text-amber-200 transition"
-              >
-                <FaEdit /> Edit Profile
-              </button>
-            ) : (
-              <button
-                onClick={handleCancelEdit}
-                className="text-white hover:text-amber-200 transition"
-              >
+            {isEditing && (
+              <button onClick={handleCancelEdit} className="text-white hover:text-amber-200 transition">
                 <FaTimes />
               </button>
             )}
@@ -215,7 +223,25 @@ const ProfilePage = () => {
                       </div>
                     </div>
                   )}
+
                 </div>
+
+                {!isEditing && (
+                  <div className="flex justify-end gap-3 border-t pt-6 mt-6">
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition cursor-pointer"
+                    >
+                      <FaEdit /> Edit Profile
+                    </button>
+                    <button
+                      onClick={() => setShowDeleteConfirm(true)}
+                      className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition cursor-pointer"
+                    >
+                      <RiDeleteBinLine className="w-4 h-4" /> Delete Account
+                    </button>
+                  </div>
+                )}
               </>
             ) : (
               // --- Edit Mode ---
@@ -308,14 +334,14 @@ const ProfilePage = () => {
                   <button
                     type="button"
                     onClick={handleCancelEdit}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-50 flex items-center gap-2"
+                    className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 disabled:opacity-50 flex items-center gap-2 cursor-pointer"
                   >
                     {isSubmitting ? (
                       "Saving..."
@@ -328,8 +354,38 @@ const ProfilePage = () => {
                 </div>
               </form>
             )}
+
+
           </div>
+
+
         </div>
+
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-4 max-w-md w-full mx-2">
+             
+              <p className="text-gray-600 mb-4">
+                If you delete your account permanently, you will not be able to retrieve your current wallet balance. Do you still want to proceed?
+              </p>
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={isDeleting}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 cursor-pointer"
+                >
+                  {isDeleting ? "Deleting..." : "Yes, Delete"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div
@@ -338,6 +394,8 @@ const ProfilePage = () => {
       >
         <ArrowLeft className="w-4 h-4 text-center" /> Back to Home
       </div>
+
+
     </div>
   );
 };
