@@ -47,6 +47,8 @@ function numberToWords(amount) {
 
 const OrderInvoice = ({order}) => {
 
+   console.log("OrderInvoice rendered", Date.now());
+
 
   if (!order) return <p className="text-center py-10">Order not found.</p>;
 

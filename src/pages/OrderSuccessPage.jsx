@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { CheckCircle, Download, ShoppingBag, Truck } from 'lucide-react';
@@ -7,18 +7,21 @@ import Loader from '@/components/common/Loader';
 import OrderInvoice from './OrderInvoice';
  import html2canvas from 'html2canvas-pro';
 import jsPDF from 'jspdf';
+import { toast } from 'react-toastify';
 
 const OrderSuccessPage = () => {
+
   const location = useLocation();
   const dispatch = useDispatch();
   const invoiceRef = useRef(null);
+  const [downloadInvoiceLoading, setDownloadInvoiceLoading]= useState(false)
 
 
   // Redux state se data lo
   const { currentOrder: order, loading, error } = useSelector((state) => state.order);
 
   // Navigation state se orderId lo
-  const orderId = location.state?.orderData;
+  const orderId = location.state?.orderData || 253;
   
 
 console.log(order)
@@ -44,19 +47,35 @@ console.log(order)
     };
   }, [dispatch, orderId]);
 
-  const handleDownloadInvoice = async () => {
-  if (!order || !invoiceRef.current) return;
+const handleDownloadInvoice = async () => {
+  if (!order || !invoiceRef.current) {
+    toast.error("Invoice data not ready.");
+    return;
+  }
   const element = invoiceRef.current;
   try {
+    setDownloadInvoiceLoading(true);
     const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
     const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
     const imgWidth = 210;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
-    pdf.save(`Invoice_${order.order_number}.pdf`);
+
+    //  Data URL method – works in both browser and WebView
+    const pdfDataUrl = pdf.output('dataurlstring');
+    const link = document.createElement('a');
+    link.href = pdfDataUrl;
+    link.download = `Invoice_${order.order_number}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    // toast.success("Invoice downloaded!");
   } catch (err) {
-    toast.error(`Download failed: ${error.message}`);
+    console.error("PDF Error:", err);
+    toast.error(`Download failed: ${err.message || "Download failed"}`);
+  } finally {
+    setDownloadInvoiceLoading(false);
   }
 };
 
@@ -311,7 +330,7 @@ console.log(order)
             onClick={handleDownloadInvoice}
             className="flex items-center justify-center gap-2 px-5 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition text-sm font-medium cursor-pointer"
           >
-            <Download className="w-4 h-4" /> Download Invoice
+            <Download className="w-4 h-4" /> {downloadInvoiceLoading ? "Downloading...": "Download Invoice"}
           </button>
           <div className="flex gap-3">
             <Link
