@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { api } from '../redux/baseApi';
-import { fetchAddresses } from '../redux/slices/addressSlice';
-import { clearCart } from '../redux/slices/cartSlice';
-import { openLoginModal } from '../redux/slices/uiSlice';
-import { fetchWallet } from '../redux/slices/walletSlice';
-import Loader from '@/components/common/Loader';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { api } from "../redux/baseApi";
+import { fetchAddresses } from "../redux/slices/addressSlice";
+import { clearCart } from "../redux/slices/cartSlice";
+import { openLoginModal } from "../redux/slices/uiSlice";
+import { fetchWallet } from "../redux/slices/walletSlice";
+import Loader from "@/components/common/Loader";
 
 const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID;
 
@@ -16,19 +16,26 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
 
   const { isLoggedIn } = useSelector((state) => state.userAuth);
-  const { items: cartItems, loading: cartLoading } = useSelector((state) => state.cart);
-  const { addresses, loading: addressesLoading } = useSelector((state) => state.address);
+  const { items: cartItems, loading: cartLoading } = useSelector(
+    (state) => state.cart,
+  );
+  const { addresses, loading: addressesLoading } = useSelector(
+    (state) => state.address,
+  );
   const { appliedCoupon, couponDiscount } = useSelector((state) => state.cart);
-  const { balance: walletBalance, loading: walletLoading } = useSelector((state) => state.wallet);
+  const { balance: walletBalance, loading: walletLoading } = useSelector(
+    (state) => state.wallet,
+  );
 
-  const [selectedAddressId, setSelectedAddressId] = useState('');
+  const [selectedAddressId, setSelectedAddressId] = useState("");
   const [loading, setLoading] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false); // ✅ Payment ke liye alag state
   const [useWallet, setUseWallet] = useState(false);
   const [walletAmount, setWalletAmount] = useState(0);
 
   const SHIPPING_CHARGES = +import.meta.env.VITE_SHIPING_CHARGES; // "149"
-const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
+  const MIN_FREE_SHIPPING = +import.meta.env
+    .VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
 
   useEffect(() => {
     if (isLoggedIn && addresses.length === 0) dispatch(fetchAddresses());
@@ -42,8 +49,11 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
     }
   }, [isLoggedIn, dispatch, navigate]);
 
-  const subtotal = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-  const shipping = subtotal > MIN_FREE_SHIPPING  ? 0 : SHIPPING_CHARGES;
+  const subtotal = cartItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+  const shipping = subtotal > MIN_FREE_SHIPPING ? 0 : SHIPPING_CHARGES;
   const grandTotal = subtotal + shipping - couponDiscount;
 
   const handleUseWalletChange = (checked) => {
@@ -65,12 +75,16 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
   useEffect(() => {
     const loadRazorpayScript = () => {
       return new Promise((resolve) => {
-        if (document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]')) {
+        if (
+          document.querySelector(
+            'script[src="https://checkout.razorpay.com/v1/checkout.js"]',
+          )
+        ) {
           resolve(true);
           return;
         }
-        const script = document.createElement('script');
-        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
         script.onload = () => resolve(true);
         script.onerror = () => resolve(false);
         document.body.appendChild(script);
@@ -81,21 +95,21 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
 
   const handlePlaceOrder = async () => {
     if (!selectedAddressId) {
-      toast.error('Please select a delivery address');
+      toast.error("Please select a delivery address");
       return;
     }
     if (useWallet && walletAmount > walletBalance) {
-      toast.error('Wallet amount exceeds available balance');
+      toast.error("Wallet amount exceeds available balance");
       return;
     }
     if (useWallet && walletAmount > grandTotal) {
-      toast.error('Wallet amount cannot exceed order total');
+      toast.error("Wallet amount cannot exceed order total");
       return;
     }
 
     setLoading(true);
     try {
-      const paymentResponse = await api.post('/store/create-order', {
+      const paymentResponse = await api.post("/store/create-order", {
         amount: grandTotal,
         coupon_code: appliedCoupon?.code || null,
         delivery_charge: shipping,
@@ -104,18 +118,19 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
       });
       // console.log("createorder",paymentResponse)
       const paymentData = paymentResponse.data;
-      if (!paymentData.status) throw new Error(paymentData.message || 'Failed to create order');
+      if (!paymentData.status)
+        throw new Error(paymentData.message || "Failed to create order");
 
       const razorpayOrderId = paymentData.order_id;
       const amountToPayOnline = paymentData.amount;
       const paymentMode = paymentData.payment_mode;
 
       // Wallet-only payment (no online payment needed)
-      if (amountToPayOnline <= 0 || paymentMode === 'wallet_only') {
-        const verifyResponse = await api.post('/store/verify-payment', {
+      if (amountToPayOnline <= 0 || paymentMode === "wallet_only") {
+        const verifyResponse = await api.post("/store/verify-payment", {
           razorpay_order_id: razorpayOrderId,
-          razorpay_payment_id: 'wallet_payment',
-          razorpay_signature: 'wallet_paid',
+          razorpay_payment_id: "wallet_payment",
+          razorpay_signature: "wallet_paid",
           coupon_code: appliedCoupon?.code || null,
           delivery_charge: shipping,
           address_id: selectedAddressId,
@@ -123,13 +138,15 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
           amount: grandTotal,
         });
         // console.log("verifyResponse",verifyResponse)
-       if (verifyResponse.data.status) {
-  toast.success('Order placed successfully using wallet!');
-  // ✅ Send complete order data
-  navigate('/order-success', { state: { orderData: verifyResponse.data.order } });
-  dispatch(clearCart());
-} else {
-          toast.error('Failed to place order. Please contact support.');
+        if (verifyResponse.data.status) {
+          toast.success("Order placed successfully using wallet!");
+          // ✅ Send complete order data
+          navigate("/order-success", {
+            state: { orderData: verifyResponse.data.order },
+          });
+          dispatch(clearCart());
+        } else {
+          toast.error("Failed to place order. Please contact support.");
         }
         setLoading(false);
         return;
@@ -140,15 +157,15 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
       const options = {
         key: RAZORPAY_KEY,
         amount: amountInPaise,
-        currency: 'INR',
-        name: 'Astrotring Store',
+        currency: "INR",
+        name: "Astrotring Store",
         description: `Order #${razorpayOrderId}`,
         order_id: razorpayOrderId,
         handler: async (response) => {
           setIsProcessingPayment(true); // Payment processing start
-          
+
           try {
-            const verifyResponse = await api.post('/store/verify-payment', {
+            const verifyResponse = await api.post("/store/verify-payment", {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
@@ -158,46 +175,55 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
               wallet_amount: useWallet ? walletAmount : 0,
               amount: grandTotal,
             });
-            
+
             if (verifyResponse.data.status) {
-  toast.success('Payment successful! Order placed.');
-  // ✅ Send complete order data instead of just orderId
-  navigate('/order-success', { state: { orderData: verifyResponse.data.order } });
-  dispatch(clearCart());
-} else {
-              toast.error('Payment verification failed. Please contact support.');
+              toast.success("Payment successful! Order placed.");
+              // ✅ Send complete order data instead of just orderId
+              navigate("/order-success", {
+                state: { orderData: verifyResponse.data.order },
+              });
+              dispatch(clearCart());
+            } else {
+              toast.error(
+                "Payment verification failed. Please contact support.",
+              );
             }
           } catch (err) {
-            console.error('Verification error:', err);
-            toast.error('Payment verification failed. Please contact support.');
+            console.error("Verification error:", err);
+            toast.error("Payment verification failed. Please contact support.");
           } finally {
             setIsProcessingPayment(false); // ✅ Payment processing done
             setLoading(false);
           }
         },
-        modal: { 
+        modal: {
           ondismiss: () => {
-            toast.info('Payment cancelled');
+            toast.info("Payment cancelled");
             setLoading(false);
-          }
+          },
         },
       };
       const razorpay = new window.Razorpay(options);
       razorpay.open();
-      
     } catch (error) {
-      console.error('Order error:', error);
-      toast.error(error?.response?.data?.message || 'Failed to place order');
+      console.error("Order error:", error);
+      toast.error(error?.response?.data?.message || "Failed to place order");
       setLoading(false);
     }
   };
 
   if (!isLoggedIn) return null;
-  if (cartLoading || addressesLoading || walletLoading) return <Loader data="Loading..." />;
+  if (cartLoading || addressesLoading || walletLoading)
+    return <Loader data="Loading..." />;
   if (cartItems.length === 0) {
     return (
       <div className="max-w-4xl mx-auto p-4 text-center">
-        <p>Your cart is empty. <a href="/" className="text-amber-600 hover:underline">Continue shopping</a></p>
+        <p>
+          Your cart is empty.{" "}
+          <a href="/" className="text-amber-600 hover:underline">
+            Continue shopping
+          </a>
+        </p>
       </div>
     );
   }
@@ -213,14 +239,20 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
           {addresses.length === 0 ? (
             <div className="bg-white p-4 rounded shadow">
               <p className="text-gray-600">No saved addresses.</p>
-              <button onClick={() => navigate('/addresses')} className="mt-2 text-amber-600 hover:underline">
+              <button
+                onClick={() => navigate("/addresses")}
+                className="mt-2 text-amber-600 hover:underline"
+              >
                 Add a new address
               </button>
             </div>
           ) : (
             <div className="space-y-3">
-              {addresses.map(addr => (
-                <label key={addr.id} className="flex items-start gap-3 p-3 border rounded cursor-pointer hover:bg-gray-50">
+              {addresses.map((addr) => (
+                <label
+                  key={addr.id}
+                  className="flex items-start gap-3 p-3 border rounded cursor-pointer hover:bg-gray-50"
+                >
                   <input
                     type="radio"
                     name="address"
@@ -231,14 +263,23 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
                   />
                   <div>
                     <p className="font-medium">{addr.name}</p>
-                    <p className="text-sm text-gray-600">{addr.mobile},{addr.alternative_mobile}</p>
+                    <p className="text-sm text-gray-600">
+                      {addr.mobile},{addr.alternative_mobile}
+                    </p>
                     <p className="text-sm text-gray-600">{addr.address}</p>
-                    <p className="text-sm text-gray-600">{addr.city}, {addr.state}, {addr.country}-{addr.pincode}</p>
-                    {addr.is_default && <span className="text-xs text-green-600">Default</span>}
+                    <p className="text-sm text-gray-600">
+                      {addr.city}, {addr.state}, {addr.country}-{addr.pincode}
+                    </p>
+                    {addr.is_default && (
+                      <span className="text-xs text-green-600">Default</span>
+                    )}
                   </div>
                 </label>
               ))}
-              <button onClick={() => navigate('/addresses')} className="text-amber-600 text-sm hover:underline">
+              <button
+                onClick={() => navigate("/addresses")}
+                className="text-amber-600 text-sm hover:underline"
+              >
                 + Add new address
               </button>
             </div>
@@ -249,7 +290,7 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
         <div>
           <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
           <div className="bg-white p-4 rounded shadow">
-            {cartItems.map(item => (
+            {cartItems.map((item) => (
               <div key={item.id} className="flex justify-between py-2 border-b">
                 <span>{`${item.name} ${item.ratti ? `(${item.ratti} ratti)` : ""} x ${item.quantity}`}</span>
                 <span>₹{item.price * item.quantity}</span>
@@ -261,7 +302,7 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
             </div>
             <div className="flex justify-between py-2">
               <span>Shipping</span>
-              <span>{shipping === 0 ? 'FREE' : `₹${shipping}`}</span>
+              <span>{shipping === 0 ? "FREE" : `₹${shipping}`}</span>
             </div>
             {appliedCoupon && (
               <div className="flex justify-between py-2 text-green-600 font-semibold">
@@ -278,11 +319,15 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
                   onChange={(e) => handleUseWalletChange(e.target.checked)}
                   className="w-4 h-4 text-amber-600"
                 />
-                <span className="text-sm font-medium">Pay via Wallet (Balance: ₹{walletBalance.toFixed(2)})</span>
+                <span className="text-sm font-medium">
+                  Pay via Wallet (Balance: ₹{walletBalance.toFixed(2)})
+                </span>
               </label>
               {useWallet && (
                 <div className="mt-2 ml-6">
-                  <label className="block text-sm text-gray-600 mb-1">Amount to use from wallet:</label>
+                  <label className="block text-sm text-gray-600 mb-1">
+                    Amount to use from wallet:
+                  </label>
                   <input
                     type="number"
                     value={walletAmount}
@@ -292,13 +337,18 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
                     step="10"
                     className="w-full px-3 py-1 border rounded focus:ring-amber-500"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Max: ₹{Math.min(walletBalance, grandTotal).toFixed(2)}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Max: ₹{Math.min(walletBalance, grandTotal).toFixed(2)}
+                  </p>
                 </div>
               )}
             </div>
             <div className="flex justify-between py-2 text-lg font-bold border-t mt-2">
               <span>Total to Pay</span>
-              <span>₹{(grandTotal - (useWallet ? walletAmount : 0)).toLocaleString()}</span>
+              <span>
+                ₹
+                {(grandTotal - (useWallet ? walletAmount : 0)).toLocaleString()}
+              </span>
             </div>
           </div>
 
@@ -309,16 +359,32 @@ const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
           >
             {isProcessingPayment ? (
               <>
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <svg
+                  className="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
                 </svg>
                 Processing Payment...
               </>
             ) : loading ? (
-              'Please Wait...'
+              "Please Wait..."
             ) : (
-              'Pay Now'
+              "Pay Now"
             )}
           </button>
         </div>

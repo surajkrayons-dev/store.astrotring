@@ -9,7 +9,7 @@ const SignupStep = ({ onSignupSuccess, onBackToLogin }) => {
   const [form, setForm] = useState({ name: '', email: '', country_code: '+91', mobile: '', terms_accepted: 0 });
   const [loading, setLoading] = useState(false);
 
-  
+  const dispatch = useDispatch()
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

@@ -374,7 +374,7 @@ const AffiliateSignup = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full md:w-auto px-8 py-3 text-lg font-semibold bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-70"
+                  className="w-full md:w-auto px-8 py-3 text-lg font-semibold bg-gradient-to-r from-yellow-500 to-yellow-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-70 cursor-pointer"
                 >
                   {loading ? (
                     <span className="flex items-center justify-center gap-2">
@@ -401,7 +401,7 @@ const AffiliateSignup = () => {
                         setShowSuccessModal(false);
                         navigate("https://backend.astrotring.shop/");
                       }}
-                      className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
+                      className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition cursor-pointer"
                     >
                       OK
                     </button>

@@ -66,6 +66,15 @@ const CheckoutPopup = ({ isOpen, onClose }) => {
     fetchDeliveryCharge();
   }, [selectedAddressId, appliedCoupon]);
 
+  // Add this after your existing useEffects
+useEffect(() => {
+  if (!isLoggedIn && step !== 'login') {
+    setStep('login');
+  } else if (isLoggedIn && step === 'login') {
+    setStep('address');
+  }
+}, [isLoggedIn, step]);
+
   // const SHIPPING_CHARGES = +import.meta.env.VITE_SHIPING_CHARGES; // "149"
   const MIN_FREE_SHIPPING = +import.meta.env.VITE_MINIMUM_ORDER_FOR_AVOID_SHIPING;
 
