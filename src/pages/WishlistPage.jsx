@@ -20,7 +20,7 @@ const WishlistCard = ({ product, onRemove }) => {
 
   return (
     <div className="bg-white rounded-sm md:rounded-xl border border-gray-100 transition-all duration-250 flex flex-col hover:shadow-xl hover:-translate-y-0.5 shadow-md w-full" title={product.name}>
-      <Link to={`/product/${product.id}`} className="block">
+      <Link to={`/product/${product?.slug}`} className="block">
         <div className="relative bg-stone-50 overflow-hidden aspect-square">
           <img
             src={imageUrl}

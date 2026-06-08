@@ -175,13 +175,13 @@ const MyOrderDetailsPage = () => {
             >
               <ArrowLeft className="w-4 h-4" /> Back to Orders
             </button>
-            <button
+            {!isCancelled && <button
               onClick={handleDownloadInvoice}
               className="flex items-center gap-2 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition font-medium cursor-pointer"
             >
               <Download className="w-4 h-4" />{" "}
               {downloadInvoiceLoading ? "Downloading..." : "Download Invoice"}
-            </button>
+            </button>}
           </div>
 
           <div className="bg-white rounded-xl shadow-md overflow-hidden">

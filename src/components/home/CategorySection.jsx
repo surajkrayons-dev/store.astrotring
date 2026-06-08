@@ -24,7 +24,7 @@ const CategorySection = forwardRef(({ category, products, onAddToCart }, ref) =>
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-xl sm:text-2xl">{category.icon}</span>
-          <h3 className="text-base sm:text-lg font-bold text-stone-900">
+          <h3 className="text-base sm:text-lg font-bold whitespace-nowrap text-stone-900">
             {category.label}
           </h3>
           <span className="text-xs text-stone-400 font-semibold">({products.length})</span>

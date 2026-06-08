@@ -82,7 +82,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
-          <Route path="/product/:id" element={<ProductDetailsPage />} />
+          <Route path="/product/:slug" element={<ProductDetailsPage />} />
 
           {/* Policies and T&C */}
           <Route path="/disclaimer" element={<DisclaimerPage />} />
@@ -100,7 +100,7 @@ function App() {
 
           <Route path="/gemstones" element={<Gemstonesinfo />} />
           {/* <Route path="/gemstones/:name" element={<GemstoneDetails />} /> */}
-          <Route path="/gemstones/:name/:id" element={<GemstoneDetails />} />
+          <Route path="/gemstones/:slug" element={<GemstoneDetails />} />
 
           {/* comming soon route */}
           <Route path="/coming-soon" element={<ComingSoon />} />

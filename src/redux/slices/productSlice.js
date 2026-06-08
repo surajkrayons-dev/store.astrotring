@@ -16,13 +16,17 @@ export const fetchAllProducts = createAsyncThunk(
     }
   },
 );
-
-export const fetchProductById = createAsyncThunk(
+// fetch product by id or slug
+export const fetchProductByIdorSlug = createAsyncThunk(
   "product/fetchOne",
-  async (id, { rejectWithValue }) => {
+  async ({id,slug}, { rejectWithValue }) => {
     try {
-      const res = await api.get(`/products?product_id=${id}`);
+
+       const query = slug? `slug=${slug}` : `product_id=${id}`;
+      const res = await api.get(`/products?${query}`);
       // API ka structure check karo – agar data array mein aa raha hai to pehla element lo
+
+      console.log(res)
       const product = Array.isArray(res.data.data)
         ? res.data.data[0]
         : res.data.data;
@@ -125,15 +129,15 @@ const productSlice = createSlice({
       })
 
       // ---------- FETCH SINGLE PRODUCT ----------
-      .addCase(fetchProductById.pending, (state) => {
+      .addCase(fetchProductByIdorSlug.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchProductById.fulfilled, (state, action) => {
+      .addCase(fetchProductByIdorSlug.fulfilled, (state, action) => {
         state.loading = false;
         state.selectedProduct = action.payload;
       })
-      .addCase(fetchProductById.rejected, (state, action) => {
+      .addCase(fetchProductByIdorSlug.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

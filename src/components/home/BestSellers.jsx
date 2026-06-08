@@ -1,6 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Slider from "../common/Slider";
 
 // ✅ Price extraction logic - handles both gemstones and regular products
@@ -48,14 +48,12 @@ const BestSellers = () => {
           const discount = getDiscountPercent(beforePrice, afterPrice);
           const imageUrl = product.image || product.images?.[0]?.image || "";
 
-          const handleClick = () => {
-            navigate(`/product/${product.id}`);
-          };
+         
 
           return (
-            <div
+            <Link
               key={product.id}
-              onClick={handleClick}
+              to={`/product/${product?.slug}`} 
               className="bg-white md:rounded-lg border border-gray-100 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
             >
               <img
@@ -80,7 +78,7 @@ const BestSellers = () => {
                   </span>
                 )}
               </div>
-            </div>
+            </Link>
           );
         })}
       </Slider>

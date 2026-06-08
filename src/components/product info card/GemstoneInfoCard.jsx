@@ -7,7 +7,7 @@ const GemstoneInfoCard = ({ gemstone }) => {
 
   return (
     <Link
-      to={`/gemstones/${slug}/${id}`}
+      to={`/gemstones/${slug}`}
        title={name} 
       className="group block bg-white transition-all duration-300 overflow-hidden"
     >

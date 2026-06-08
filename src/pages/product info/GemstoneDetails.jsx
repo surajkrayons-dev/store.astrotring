@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { toast } from "react-toastify";
 import {
-  fetchProductById,
+  fetchProductByIdorSlug,
   clearSelectedProduct,
   fetchAllProducts,
 } from "../../redux/slices/productSlice";
@@ -26,7 +26,7 @@ const fallbackImage =
 
 // ---------- Main Component ----------
 const ProductDetailsPage = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const dispatch = useDispatch();
 
   // Local state
@@ -47,9 +47,9 @@ const ProductDetailsPage = () => {
 
   // --- Fetch current product ---
   useEffect(() => {
-    if (id) dispatch(fetchProductById(id));
+    if (slug) dispatch(fetchProductByIdorSlug({slug}));
     return () => dispatch(clearSelectedProduct());
-  }, [dispatch, id]);
+  }, [dispatch, slug]);
 
   // --- Related products (same category) ---
   const suggestedProducts = useMemo(() => {

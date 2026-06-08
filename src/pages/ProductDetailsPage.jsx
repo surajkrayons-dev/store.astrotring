@@ -14,14 +14,11 @@ import {
   RefreshCw,
   Award,
   ChevronDown,
-  MapPin,
-  Gift,
-  Play,
 } from "lucide-react";
 import { toast } from "react-toastify";
 import { addToCart } from "../redux/slices/cartSlice";
 import {
-  fetchProductById,
+  fetchProductByIdorSlug,
   clearSelectedProduct,
   fetchAllProducts,
 } from "../redux/slices/productSlice";
@@ -57,7 +54,8 @@ const fallbackImage =
 
 // ---------- Main Component ----------
 const ProductDetailsPage = () => {
-  const { id } = useParams();
+  
+  const { slug } = useParams();
   const dispatch = useDispatch();
 
   // Local state
@@ -103,11 +101,11 @@ const ProductDetailsPage = () => {
     }
   }, [dispatch, allProducts.length]);
 
-  // --- Fetch current product ---
+  //Fetch current product
   useEffect(() => {
-    if (id) dispatch(fetchProductById(id));
+    if (slug) dispatch(fetchProductByIdorSlug({slug}));
     return () => dispatch(clearSelectedProduct());
-  }, [dispatch, id]);
+  }, [dispatch, slug]);
   // wishlist
   useEffect(() => {
     if (isLoggedIn) {
@@ -492,7 +490,7 @@ useEffect(() => {
                 </span> */}
 
                 <div className="flex items-center gap-1 text-green-600">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#18AC57" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-badge-percent-icon lucide-badge-percent"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" /><path d="m15 9-6 6" /><path d="M9 9h.01" /><path d="M15 15h.01" /></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#18AC57" strokeWidth="3" strokeLinecap="round" strokeLyinejoin="round" className="lucide lucide-badge-percent-icon lucide-badge-percent"><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z" /><path d="m15 9-6 6" /><path d="M9 9h.01" /><path d="M15 15h.01" /></svg>
                   <span className="text-lg font-semibold">Best price</span>
                   <span className="font-semibold text-xl" >
                     ₹{displayAfterPrice.toLocaleString()}
@@ -597,7 +595,7 @@ useEffect(() => {
               <button onClick={handleBuyNow} className="flex-1 bg-gray-900 hover:bg-gray-800 text-white/85 py-3 px-4  rounded-lg font-medium flex items-center justify-center gap-2 transition">
                 <ShoppingBag className="w-5 h-5" /> Buy Now
               </button>
-
+{/* add to wishlist */}
               <button onClick={handleWishlistToggle} className="flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg hover:border-gray-400 transition gap-2">
                 <Heart className={`w-5 h-5 ${isInWishlist ? "fill-red-500 text-red-500" : "text-red-600"}`} />
                 <span className="sm:hidden">Wishlist</span>
@@ -764,7 +762,7 @@ useEffect(() => {
           {/* You May Also Like */}
           {suggestedProducts.length > 0 && <ProductYouMayAlsoLike products={suggestedProducts} />}
           {/* product reviews */}
-          {/* <ProductReviews productId={product.id} /> */}
+          <ProductReviews productId={product.id} />
         </div>
 
       </div>

@@ -1,13 +1,15 @@
 
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import StarRating from "../common/StarRating";
 import { ShoppingBag } from "lucide-react";
 
 const ProductCard = ({ product, addToCart, compact = false }) => {
   const navigate = useNavigate();
   const [hovered, setHovered] = useState(false);
+
+  console.log(product)
 
 
   // ✅ Price extraction logic - handles both gemstones and regular products
@@ -78,12 +80,9 @@ if (product?.ratti_options && product.ratti_options.length > 0) {
       className={cardClass}
     >
       {/* Image container */}
-      <div
+      <Link
         className="relative bg-stone-50 overflow-hidden aspect-square cursor-pointer"
-        onClick={(e) => {
-          e.stopPropagation();
-          navigate(`/product/${product?.id}`);
-        }}
+        to={`/product/${product?.slug}`}
       >
         <img
           src={imageUrl}
@@ -117,54 +116,7 @@ if (product?.ratti_options && product.ratti_options.length > 0) {
           </div>
         )}
 
-        {/* Hover overlay */}
-        {/* <div
-          className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-stone-900/70 to-transparent px-2 py-2 pt-6 transition-opacity duration-250 ${hovered ? "opacity-100" : "opacity-100"
-            }`}
-        >
-          <div className="flex gap-1.5">
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                navigate(`/product/${product?.id}`);
-              }}
-              className={overlayButtonClass}
-            >
-              View
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                addToCart({
-                  product_id: product?.id,
-                  quantity: 1,
-                  name: product?.name,
-                  ratti: defaultRatti,
-                  price:product.after_price || afterPrice,
-                  image:product?.image,
-                });
-              }}
-              className={overlayCartClass}
-            >
-              <svg
-                width={compact ? 10 : 12}
-                height={compact ? 10 : 12}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#fff"
-                strokeWidth={2.5}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx={9} cy={21} r={1} />
-                <circle cx={20} cy={21} r={1} />
-                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
-              </svg>
-              <span className="hidden xs:inline">Cart</span>
-            </button>
-          </div>
-        </div> */}
-      </div>
+      </Link>
 
       {/* Product info */}
       <div className={`${compact ? "p-1.5" : "p-2.5 sm:p-3.5"} flex-1 flex flex-col`}>
@@ -194,23 +146,6 @@ if (product?.ratti_options && product.ratti_options.length > 0) {
           </div>
 
           {/* Quick add button */}
-          {/* <button className="bg-black border border-black-300 flex justify-center items-center rounded-md px-4 py-2 gap-2  " aria-label="Add to cart">
-        
-            onClick={(e) => {
-              e.stopPropagation();
-              addToCart({
-                 product_id: product?.id,
-                  quantity: 1,
-                  name: product?.name,
-                  ratti: defaultRatti,
-                  price:product.after_price || afterPrice,
-                  image:product?.image,
-              });
-            }}
-           <ShoppingBag className="text-white w-4 h-4" />
-           <h3 className="text-white text-xs"> Add</h3>
-         
-          </button> */}
 
           <button
             onClick={(e) => {

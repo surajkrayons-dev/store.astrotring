@@ -15,7 +15,7 @@ const countryCodes = [
 ];
 
 const affiliateTypes = [
-    { value: "blogger", label: "Blogger" },
+  { value: "blogger", label: "Blogger" },
   { value: "influencer", label: "Influencer" },
   { value: "agency", label: "Agency" },
   { value: "publisher", label: "Publisher" },
@@ -23,7 +23,16 @@ const affiliateTypes = [
 ];
 
 const trafficSourceOptions = [
- "SEO","Google Ads", "Facebook Ads", "Instagram", "YouTube", "WhatsApp", "Telegram","LinkedIn","Email Marketing","Other"
+  "SEO",
+  "Google Ads",
+  "Facebook Ads",
+  "Instagram",
+  "YouTube",
+  "WhatsApp",
+  "Telegram",
+  "LinkedIn",
+  "Email Marketing",
+  "Other",
 ];
 
 const expectedLeadsOptions = [
@@ -36,7 +45,9 @@ const expectedLeadsOptions = [
 const AffiliateSignup = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading } = useSelector((state) => state.affiliate || { loading: false });
+  const { loading } = useSelector(
+    (state) => state.affiliate || { loading: false },
+  );
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [registrationCode, setRegistrationCode] = useState("");
 
@@ -78,7 +89,8 @@ const AffiliateSignup = () => {
       ...prev,
       traffic_sources: [...prev.traffic_sources, value],
     }));
-    if (errors.traffic_sources) setErrors((prev) => ({ ...prev, traffic_sources: "" }));
+    if (errors.traffic_sources)
+      setErrors((prev) => ({ ...prev, traffic_sources: "" }));
   };
 
   const removeTrafficSource = (value) => {
@@ -92,36 +104,46 @@ const AffiliateSignup = () => {
     const newErrors = {};
 
     if (!form.name.trim()) newErrors.name = "Full name is required";
-   
 
     if (!form.email.trim()) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(form.email)) newErrors.email = "Enter a valid email";
+    else if (!/\S+@\S+\.\S+/.test(form.email))
+      newErrors.email = "Enter a valid email";
 
     if (!form.mobile.trim()) newErrors.mobile = "Mobile number is required";
-    else if (!/^\d{10}$/.test(form.mobile)) newErrors.mobile = "Mobile must be 10 digits";
+    else if (!/^\d{10}$/.test(form.mobile))
+      newErrors.mobile = "Mobile must be 10 digits";
 
     if (!form.username.trim()) newErrors.username = "Username is required";
-    
-    else if (!/^[a-zA-Z0-9_]+$/.test(form.username)) newErrors.username = "Only letters, numbers, underscore";
+    else if (!/^[a-zA-Z0-9_]+$/.test(form.username))
+      newErrors.username = "Only letters, numbers, underscore";
 
-    if (!form.company_name.trim()) newErrors.company_name = "Company / Brand name is required";
+    if (!form.company_name.trim())
+      newErrors.company_name = "Company / Brand name is required";
 
-    if (!form.affiliate_type) newErrors.affiliate_type = "Please select affiliate type";
+    if (!form.affiliate_type)
+      newErrors.affiliate_type = "Please select affiliate type";
 
-    if (form.traffic_sources.length === 0) newErrors.traffic_sources = "Select at least one traffic source";
+    if (form.traffic_sources.length === 0)
+      newErrors.traffic_sources = "Select at least one traffic source";
 
-    if (!form.promotion_plan.trim()) newErrors.promotion_plan = "Please describe your promotion plan";
-    else if (form.promotion_plan.trim().length < 20) newErrors.promotion_plan = "Provide at least 20 characters";
+    if (!form.promotion_plan.trim())
+      newErrors.promotion_plan = "Please describe your promotion plan";
+    else if (form.promotion_plan.trim().length < 20)
+      newErrors.promotion_plan = "Provide at least 20 characters";
 
-    if (!form.expected_leads) newErrors.expected_leads = "Please select expected leads";
+    if (!form.expected_leads)
+      newErrors.expected_leads = "Please select expected leads";
 
     if (!form.password) newErrors.password = "Password required";
-    else if (form.password.length < 6) newErrors.password = "Password min 6 characters";
+    else if (form.password.length < 6)
+      newErrors.password = "Password min 6 characters";
 
     if (!form.confirmPassword) newErrors.confirmPassword = "Confirm password";
-    else if (form.password !== form.confirmPassword) newErrors.confirmPassword = "Passwords do not match";
+    else if (form.password !== form.confirmPassword)
+      newErrors.confirmPassword = "Passwords do not match";
 
-    if (!form.terms_accepted) newErrors.terms_accepted = "You must accept Terms & Conditions";
+    if (!form.terms_accepted)
+      newErrors.terms_accepted = "You must accept Terms & Conditions";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -152,10 +174,9 @@ const AffiliateSignup = () => {
 
     try {
       const result = await dispatch(affiliateRegister(submitData)).unwrap();
-      console.log(result)
-      setShowSuccessModal(true)
+      console.log(result);
+      setShowSuccessModal(true);
       setRegistrationCode(result.employee.code || result.employee.id || "N/A");
-      
     } catch (err) {
       toast.error(err || "Registration failed");
     }
@@ -166,18 +187,26 @@ const AffiliateSignup = () => {
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           <div className="bg-gradient-to-r from-yellow-500 to-yellow-600 px-8 py-6">
-            <h2 className="text-3xl font-bold text-white">Affiliate Registration</h2>
-            <p className="text-orange-100 mt-1">Join our affiliate program and start earning</p>
+            <h2 className="text-3xl font-bold text-white">
+              Affiliate Registration
+            </h2>
+            <p className="text-orange-100 mt-1">
+              Join our affiliate program and start earning
+            </p>
           </div>
 
           <div className="p-6 md:p-8">
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Personal Information */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">Personal Information</h3>
+                <h3 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">
+                  Personal Information
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700">Full Name *</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Full Name *
+                    </label>
                     <input
                       type="text"
                       name="name"
@@ -186,10 +215,14 @@ const AffiliateSignup = () => {
                       className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${errors.name ? "border-red-500" : "border-gray-300"}`}
                       placeholder="Enter your full name"
                     />
-                    {errors.name && <p className="text-xs text-red-500">{errors.name}</p>}
+                    {errors.name && (
+                      <p className="text-xs text-red-500">{errors.name}</p>
+                    )}
                   </div>
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700">Username *</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Username *
+                    </label>
                     <input
                       type="text"
                       name="username"
@@ -198,10 +231,14 @@ const AffiliateSignup = () => {
                       className={`w-full px-3 py-2 border focus:outline-none rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${errors.username ? "border-red-500" : "border-gray-300"}`}
                       placeholder="Choose a unique username"
                     />
-                    {errors.username && <p className="text-xs text-red-500">{errors.username}</p>}
+                    {errors.username && (
+                      <p className="text-xs text-red-500">{errors.username}</p>
+                    )}
                   </div>
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700">Email Address *</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Email Address *
+                    </label>
                     <input
                       type="email"
                       name="email"
@@ -210,19 +247,27 @@ const AffiliateSignup = () => {
                       className={`w-full px-3 py-2 border focus:outline-none rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${errors.email ? "border-red-500" : "border-gray-300"}`}
                       placeholder="your@email.com"
                     />
-                    {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
+                    {errors.email && (
+                      <p className="text-xs text-red-500">{errors.email}</p>
+                    )}
                   </div>
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700">Mobile Number *</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Mobile Number *
+                    </label>
                     <div className="flex gap-2">
                       <select
                         name="country_code"
                         value={form.country_code}
-                        onChange={(e) => handleSelect("country_code", e.target.value)}
+                        onChange={(e) =>
+                          handleSelect("country_code", e.target.value)
+                        }
                         className="w-28 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500"
                       >
                         {countryCodes.map((c) => (
-                          <option key={c.code} value={c.code}>{c.code}</option>
+                          <option key={c.code} value={c.code}>
+                            {c.code}
+                          </option>
                         ))}
                       </select>
                       <input
@@ -235,10 +280,14 @@ const AffiliateSignup = () => {
                         placeholder="1234567890"
                       />
                     </div>
-                    {errors.mobile && <p className="text-xs text-red-500">{errors.mobile}</p>}
+                    {errors.mobile && (
+                      <p className="text-xs text-red-500">{errors.mobile}</p>
+                    )}
                   </div>
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700">Password *</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Password *
+                    </label>
                     <input
                       type="password"
                       name="password"
@@ -247,10 +296,14 @@ const AffiliateSignup = () => {
                       className={`w-full px-3 py-2 border focus:outline-none rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${errors.password ? "border-red-500" : "border-gray-300"}`}
                       placeholder="Min 6 characters"
                     />
-                    {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
+                    {errors.password && (
+                      <p className="text-xs text-red-500">{errors.password}</p>
+                    )}
                   </div>
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700">Confirm Password *</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Confirm Password *
+                    </label>
                     <input
                       type="password"
                       name="confirmPassword"
@@ -259,17 +312,25 @@ const AffiliateSignup = () => {
                       className={`w-full px-3 py-2 border focus:outline-none rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${errors.confirmPassword ? "border-red-500" : "border-gray-300"}`}
                       placeholder="Re-enter password"
                     />
-                    {errors.confirmPassword && <p className="text-xs text-red-500">{errors.confirmPassword}</p>}
+                    {errors.confirmPassword && (
+                      <p className="text-xs text-red-500">
+                        {errors.confirmPassword}
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
 
               {/* Affiliate Information */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">Affiliate Information</h3>
+                <h3 className="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">
+                  Affiliate Information
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700">Company / Brand Name *</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Company / Brand Name *
+                    </label>
                     <input
                       type="text"
                       name="company_name"
@@ -278,24 +339,40 @@ const AffiliateSignup = () => {
                       className={`w-full px-3 py-2 border focus:outline-none rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${errors.company_name ? "border-red-500" : "border-gray-300"}`}
                       placeholder="Your business name"
                     />
-                    {errors.company_name && <p className="text-xs text-red-500">{errors.company_name}</p>}
+                    {errors.company_name && (
+                      <p className="text-xs text-red-500">
+                        {errors.company_name}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700">Affiliate Type *</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Affiliate Type *
+                    </label>
                     <select
                       value={form.affiliate_type}
-                      onChange={(e) => handleSelect("affiliate_type", e.target.value)}
+                      onChange={(e) =>
+                        handleSelect("affiliate_type", e.target.value)
+                      }
                       className={`w-full px-3 py-2 border focus:outline-none  rounded-lg focus:ring-2 focus:ring-yellow-500 ${errors.affiliate_type ? "border-red-500" : "border-gray-300"}`}
                     >
                       <option value="">Select type</option>
                       {affiliateTypes.map((type) => (
-                        <option key={type.value} value={type.value}>{type.label}</option>
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
                       ))}
                     </select>
-                    {errors.affiliate_type && <p className="text-xs text-red-500">{errors.affiliate_type}</p>}
+                    {errors.affiliate_type && (
+                      <p className="text-xs text-red-500">
+                        {errors.affiliate_type}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-1 md:col-span-2">
-                    <label className="text-sm font-medium text-gray-700">Traffic Sources *</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Traffic Sources *
+                    </label>
                     <div className="flex flex-wrap gap-2 mb-2">
                       {trafficSourceOptions.map((src) => (
                         <button
@@ -310,30 +387,55 @@ const AffiliateSignup = () => {
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {form.traffic_sources.map((src) => (
-                        <span key={src} className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                        <span
+                          key={src}
+                          className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                        >
                           {src}
-                          <button type="button" onClick={() => removeTrafficSource(src)} className="ml-1 hover:text-red-600">✕</button>
+                          <button
+                            type="button"
+                            onClick={() => removeTrafficSource(src)}
+                            className="ml-1 hover:text-red-600"
+                          >
+                            ✕
+                          </button>
                         </span>
                       ))}
                     </div>
-                    {errors.traffic_sources && <p className="text-xs text-red-500">{errors.traffic_sources}</p>}
+                    {errors.traffic_sources && (
+                      <p className="text-xs text-red-500">
+                        {errors.traffic_sources}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700">Expected Leads per Month *</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Expected Leads per Month *
+                    </label>
                     <select
                       value={form.expected_leads}
-                      onChange={(e) => handleSelect("expected_leads", e.target.value)}
+                      onChange={(e) =>
+                        handleSelect("expected_leads", e.target.value)
+                      }
                       className={`w-full px-3 py-2 border focus:outline-none rounded-lg focus:ring-2 focus:ring-yellow-500 ${errors.expected_leads ? "border-red-500" : "border-gray-300"}`}
                     >
                       <option value="">Select range</option>
                       {expectedLeadsOptions.map((opt) => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
                       ))}
                     </select>
-                    {errors.expected_leads && <p className="text-xs text-red-500">{errors.expected_leads}</p>}
+                    {errors.expected_leads && (
+                      <p className="text-xs text-red-500">
+                        {errors.expected_leads}
+                      </p>
+                    )}
                   </div>
                   <div className="space-y-1 md:col-span-2">
-                    <label className="text-sm font-medium text-gray-700">Promotion Plan / Strategy *</label>
+                    <label className="text-sm font-medium text-gray-700">
+                      Promotion Plan / Strategy *
+                    </label>
                     <textarea
                       name="promotion_plan"
                       value={form.promotion_plan}
@@ -342,8 +444,14 @@ const AffiliateSignup = () => {
                       className={`w-full px-3 py-2 border focus:outline-none rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent ${errors.promotion_plan ? "border-red-500" : "border-gray-300"}`}
                       placeholder="Describe how you plan to promote our products (at least 20 characters)"
                     ></textarea>
-                    {errors.promotion_plan && <p className="text-xs text-red-500">{errors.promotion_plan}</p>}
-                    <p className="text-xs text-gray-500 text-right">{form.promotion_plan.length} characters</p>
+                    {errors.promotion_plan && (
+                      <p className="text-xs text-red-500">
+                        {errors.promotion_plan}
+                      </p>
+                    )}
+                    <p className="text-xs text-gray-500 text-right">
+                      {form.promotion_plan.length} characters
+                    </p>
                   </div>
                 </div>
               </div>
@@ -361,12 +469,21 @@ const AffiliateSignup = () => {
                   />
                   <label htmlFor="terms" className="text-sm text-gray-600">
                     I have read and agree to the{" "}
-                    <Link to="/terms-conditions" target="_blank" className="text-amber-600 hover:underline">
+                    <Link
+                      to="/terms-conditions"
+                      target="_blank"
+                      className="text-amber-600 hover:underline"
+                    >
                       Terms & Conditions
-                    </Link>.
+                    </Link>
+                    .
                   </label>
                 </div>
-                {errors.terms_accepted && <p className="text-xs text-red-500">{errors.terms_accepted}</p>}
+                {errors.terms_accepted && (
+                  <p className="text-xs text-red-500">
+                    {errors.terms_accepted}
+                  </p>
+                )}
               </div>
 
               {/* Submit Button */}
@@ -389,21 +506,67 @@ const AffiliateSignup = () => {
             </form>
 
             {/* Success Modal */}
-            {showSuccessModal && (
-              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-                <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 mx-4">
-                  <h3 className="text-xl font-bold text-gray-900 mb-4">Application Submitted</h3>
-                  <p className="text-gray-700 mb-2">Your application is under review. You will be notified once approved.</p>
-                  <p className="text-sm text-gray-600 mb-4">Reference ID: <span className="font-mono font-semibold text-orange-700">{registrationCode}</span></p>
-                  <div className="flex justify-end">
+            {showSuccessModal  && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 transition-all duration-300">
+                <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transition-all duration-300 scale-100">
+                  <div className="text-center">
+                   
+
+                    <h3 className="text-2xl font-bold text-green-500 mb-2">
+                      Application Submitted!
+                    </h3>
+
+                    <div className="space-y-3 text-sm text-gray-600">
+                      <p>
+                        Thank you for applying to the{" "}
+                        <span className="font-semibold">
+                          Astrotring Affiliate Program
+                        </span>
+                        .
+                      </p>
+
+                      <div className="bg-amber-50 p-4 rounded-lg text-left">
+                        <p className="text-amber-800 font-medium mb-2">
+                           What happens next?
+                        </p>
+                        <ul className="text-xs text-amber-700 space-y-1 list-disc list-inside">
+                          <li>
+                            Our team will review your application.
+                          </li>
+                          <li>
+                            You will receive an email confirmation once your
+                            account is approved
+                          </li>
+                          <li>
+                            After approval, you can access your affiliate
+                            dashboard.
+                          </li>
+                        </ul>
+                      </div>
+
+                      <p className="text-xs text-gray-500">
+                      Please check your inbox for updates
+                        from us.
+                      </p>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-gray-100">
+                      <p className="text-xs text-gray-400">
+                        Reference ID:{" "}
+                        <span className="font-mono font-semibold text-amber-600">
+                          {registrationCode}
+                        </span>
+                      </p>
+                    </div>
+
                     <button
                       onClick={() => {
                         setShowSuccessModal(false);
                         navigate("/become-an-affiliate");
                       }}
-                      className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition cursor-pointer"
+                      className="mt-5 w-full px-4 py-2 bg-gradient-to-r from-amber-400 to-amber-500 text-white  rounded-xl hover:from-amber-500 hover:to-amber-600 transition-all duration-200 shadow-md hover:shadow-lg cursor-pointer"
                     >
-                      OK
+                      Back to Affiliate Page
                     </button>
                   </div>
                 </div>
@@ -412,8 +575,12 @@ const AffiliateSignup = () => {
 
             <p className="text-center text-sm text-gray-600 mt-6 pt-6 border-t border-gray-300">
               Already have an account?{" "}
-              
-              <a href="https://backend.astrotring.shop/" className="text-orange-600 hover:underline">Login here</a>
+              <a
+                href="https://backend.astrotring.shop/"
+                className="text-orange-600 hover:underline"
+              >
+                Login here
+              </a>
             </p>
           </div>
         </div>
