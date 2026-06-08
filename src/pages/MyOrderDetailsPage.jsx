@@ -6,6 +6,7 @@ import {
   clearOrderError,
   clearCurrentOrder,
   cancelOrder,
+  cancelCodOrder,
 } from "../redux/slices/orderSlice";
 import { toast } from "react-toastify";
 import Loader from "@/components/common/Loader";
@@ -109,21 +110,6 @@ const MyOrderDetailsPage = () => {
     }
   }, [error, dispatch, cancelling]);
 
-  const handleCancelOrder = async () => {
-    if (!window.confirm("Are you sure you want to cancel this order?")) return;
-    setCancelling(true);
-    try {
-      await dispatch(cancelOrder(id)).unwrap();
-      toast.success("Order cancelled successfully");
-      // Refetch order details to get updated status
-      await dispatch(fetchOrderDetails(id)).unwrap();
-    } catch (err) {
-      toast.error(err || "Failed to cancel order");
-    } finally {
-      setCancelling(false);
-    }
-  };
-
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -142,7 +128,7 @@ const MyOrderDetailsPage = () => {
 
   const order = currentOrder;
 
-  console.log(order);
+  // console.log(order);
 
   const subtotal =
     order.subtotal ||
@@ -155,6 +141,28 @@ const MyOrderDetailsPage = () => {
   const canCancel = !isCancelled && order.status !== "delivered";
   const isCod = order.payment.mode === "cod";
   const COD_SURCHARGE = order?.pricing?.cod_charge;
+
+  const handleCancelOrder = async () => {
+    if (!window.confirm("Are you sure you want to cancel this order?")) return;
+    setCancelling(true);
+    try {
+     if (isCod) {
+       const res =await dispatch(cancelCodOrder(id)).unwrap();
+       console.log(res)
+      toast.success("Order cancelled successfully");
+      await dispatch(fetchOrderDetails(id)).unwrap();
+      } else {
+        // Online/prepaid cancellation (existing thunk)
+        await dispatch(cancelOrder(id)).unwrap();
+        toast.success("Order cancelled successfully");
+        await dispatch(fetchOrderDetails(id)).unwrap();
+      }
+    } catch (err) {
+         console.error("Cancellation error:", err);
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   return (
     <>

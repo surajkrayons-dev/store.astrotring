@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '../baseApi';
 
 // ---------- THUNKS ----------
-
+// create or place order
 export const placeOrder = createAsyncThunk(
   'order/placeOrder',
   async (orderData, { rejectWithValue, getState }) => {
@@ -18,7 +18,7 @@ export const placeOrder = createAsyncThunk(
     }
   }
 );
-
+// fetch my all orders
 export const fetchMyOrders = createAsyncThunk(
   'order/fetchMyOrders',
   async (_, { rejectWithValue, getState }) => {
@@ -33,7 +33,7 @@ export const fetchMyOrders = createAsyncThunk(
     }
   }
 );
-
+// fetch single order details
 export const fetchOrderDetails = createAsyncThunk(
   'order/fetchOrderDetails',
   async (orderId, { rejectWithValue, getState }) => {
@@ -48,7 +48,7 @@ export const fetchOrderDetails = createAsyncThunk(
     }
   }
 );
-
+// mark order delivered currently not in use
 export const markOrderDelivered = createAsyncThunk(
   'order/markOrderDelivered',
   async (orderId, { rejectWithValue, getState }) => {
@@ -63,6 +63,29 @@ export const markOrderDelivered = createAsyncThunk(
   }
 );
 
+
+// cancel cod order
+export const cancelCodOrder = createAsyncThunk(
+  'order/cancelCodOrder',
+  async (orderId, { rejectWithValue, getState }) => {
+    try {
+      const { userAuth } = getState();
+      if (!userAuth.isLoggedIn) return rejectWithValue('Please login to cancel order');
+      const response = await api.post(`/store/cod/cancel/${orderId}`);
+
+      console.log(response)
+      if (response.data.status) {
+        return { orderId, success: true };
+      } else {
+        console.log(response.data)
+        return rejectWithValue(response.data.message || 'Failed to cancel COD order');
+      }
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to cancel COD order');
+    }
+  }
+);
+// cancel online or prepaid order
 export const cancelOrder = createAsyncThunk(
   'order/cancelOrder',
   async (orderId, { rejectWithValue, getState }) => {
@@ -187,7 +210,19 @@ const orderSlice = createSlice({
       .addCase(cancelOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      });
+      })
+      .addCase(cancelCodOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(cancelCodOrder.fulfilled, (state) => {
+        state.loading = false;
+        // No state update here – we will call fetchOrderDetails separately
+      })
+      .addCase(cancelCodOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
   },
 });
 

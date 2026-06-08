@@ -300,7 +300,7 @@ const handleDownloadInvoice = async () => {
               <div>
                 <span className="text-gray-500">Payment Mode:</span>
                 <span className="ml-2 font-medium capitalize">
-                  {payment.mode || 'Online'}
+                  {payment.mode.toUpperCase() || 'Online'}
                 </span>
               </div>
               {payment.mode === "online" && <div>
