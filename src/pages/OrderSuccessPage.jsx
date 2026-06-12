@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { CheckCircle, Download, ShoppingBag, Truck } from 'lucide-react';
-import { fetchOrderDetails, clearCurrentOrder } from '../redux/slices/orderSlice';
+import { fetchOrderDetails, clearCurrentOrder, uploadInvoice  } from '../redux/slices/orderSlice';
 import Loader from '@/components/common/Loader';
 import OrderInvoice from './OrderInvoice';
  import html2canvas from 'html2canvas-pro';
@@ -15,13 +15,15 @@ const OrderSuccessPage = () => {
   const dispatch = useDispatch();
   const invoiceRef = useRef(null);
   const [downloadInvoiceLoading, setDownloadInvoiceLoading]= useState(false)
+  const [invoiceUploadAttempted, setInvoiceUploadAttempted] = useState(false);
 
 
   // Redux state se data lo
   const { currentOrder: order, loading, error } = useSelector((state) => state.order);
 
   // Navigation state se orderId lo
-  const orderId = location.state?.orderData;
+  // const orderId = 290;
+   const orderId = location.state?.orderData;
   
 
 console.log(order)
@@ -41,39 +43,82 @@ console.log(order)
       dispatch(fetchOrderDetails(orderId));
     }
 
-    // Cleanup: page leave karte time current order clear karo
+    //  page leave karte time current order clear karo
     return () => {
       dispatch(clearCurrentOrder());
     };
   }, [dispatch, orderId]);
+
+
+const generateInvoiceBase64 = async (element) => {
+  const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
+  const imgData = canvas.toDataURL('image/png');
+  const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+  const imgWidth = 210;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
+  const pdfDataUrl = pdf.output('dataurlstring');
+  return pdfDataUrl;
+};
+
+
+
+
+useEffect(() => {
+  const autoUpload = async () => {
+    //  conditions check 
+    if (!order || invoiceUploadAttempted) return;
+    
+    // Hidden div ke DOM mein aane ka wait kar
+    await new Promise(resolve => setTimeout(resolve, 300));
+    if (!invoiceRef.current) return;
+
+    //  Agar sirf online orders ke liye chahiye to 
+    // if (order.payment?.mode !== 'online' && order.status !== 'paid') return;
+
+    try {
+      const pdfBase64 = await generateInvoiceBase64(invoiceRef.current);
+      await dispatch(uploadInvoice({
+        order_id: order.order_id,   // order_id
+        pdf: pdfBase64
+      })).unwrap();
+      console.log('✅ Invoice auto-uploaded');
+      setInvoiceUploadAttempted(true);
+    } catch (err) {
+      console.error(' Auto-upload failed:', err);
+    }
+  };
+  autoUpload();
+}, [order, invoiceUploadAttempted, dispatch]);
+
+
+
+
+
+
+
+
+
 
 const handleDownloadInvoice = async () => {
   if (!order || !invoiceRef.current) {
     toast.error("Invoice data not ready.");
     return;
   }
-  const element = invoiceRef.current;
+  setDownloadInvoiceLoading(true);
   try {
-    setDownloadInvoiceLoading(true);
-    const canvas = await html2canvas(element, { scale: 2, useCORS: true, logging: false });
-    const imgData = canvas.toDataURL('image/png');
-    const pdf = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
-    const imgWidth = 210;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight, undefined, 'FAST');
-
-    //  Data URL method – works in both browser and WebView
-    const pdfDataUrl = pdf.output('dataurlstring');
+    const pdfBase64 = await generateInvoiceBase64(invoiceRef.current);
+    const pdfDataUrl = `${pdfBase64}`;
     const link = document.createElement('a');
     link.href = pdfDataUrl;
     link.download = `Invoice_${order.order_number}.pdf`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    // toast.success("Invoice downloaded!");
+    toast.success("Invoice downloaded!");
   } catch (err) {
     console.error("PDF Error:", err);
-    toast.error(`Download failed: ${err.message || "Download failed"}`);
+    toast.error(`Download failed: ${err.message}`);
   } finally {
     setDownloadInvoiceLoading(false);
   }

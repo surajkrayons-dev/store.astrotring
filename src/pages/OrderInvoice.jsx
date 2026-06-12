@@ -148,10 +148,11 @@ const OrderInvoice = ({order}) => {
     return (
       <tr key={idx} className="border-b border-black text-xs">
         <td className="border-r border-black p-1 align-middle text-center">{idx + 1}</td>
-        <td className="border-r border-black p-2 flex items-center justify-center">
-          <div>
-          <p>{item.name}</p>
-          <p className="mt-1">HSN: {hsnCode || 'N/A'}</p></div>
+        <td className="border-r border-black p-2 align-middle text-left pl-6">
+          <div className='flex flex-col items-start '>
+          <p>{item.name} {item.ratti && `(Ratti-${item.ratti})`}</p>
+          <p className="mt-1">HSN: {hsnCode || 'N/A'}</p>
+          </div>
         </td>
         <td className="border-r border-black p-1 align-middle text-center">₹{price.toFixed(2)}</td>
         <td className="border-r border-black p-1 align-middle text-center">{qty}</td>
@@ -210,7 +211,7 @@ const OrderInvoice = ({order}) => {
     shippingRow = (
       <tr className="border-b border-black text-xs">
         <td className="border-r border-black p-1 align-top text-center"> </td>
-        <td className="border-r border-black p-2 align-middle text-center">
+        <td className="border-r border-black p-2 align-middle text-left pl-6">
           <p>Shipping Charge</p>
         </td>
         <td className="border-r border-black p-1 align-middle text-center">₹{deliveryCharge.toFixed(2)}</td>
@@ -363,11 +364,11 @@ const OrderInvoice = ({order}) => {
             </tbody>
             <tfoot>
               {/* Subtotal row - optional lekin helpful */}
-              <tr className="border-b border-black">
+              {/* <tr className="border-b border-black">
                 <td colSpan="5" className="border-r border-black p-1 text-left font-semibold">Subtotal:</td>
                 <td colSpan="3" className="border-r border-black p-1 text-center">–</td>
                 <td className="p-1 text-center">₹{subtotal.toFixed(2)}</td>
-              </tr>
+              </tr> */}
 
               {/* Discount row - sirf tab dikhe jab discount > 0 */}
               {isCod && (
