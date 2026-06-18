@@ -107,7 +107,7 @@ const Footer = () => {
           </div>
 
           {/* Privacy Policy */}
-          <div className="flex flex-col gap-4" >
+          <div className="flex flex-col gap-4">
             <div>
               <h2 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
                 Corporate Info
@@ -155,22 +155,25 @@ const Footer = () => {
                 </li>
               </ul>
             </div>
-            <div>
-              <h2 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
-                Affiliate Program
-              </h2>
+          </div>
 
-              <ul className="mt-4 space-y-2">
-                <li>
-                  <Link
-                    to="/become-an-affiliate"
-                    className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
-                  >
-                    Become an Affiliate
-                  </Link>
-                </li>
-              </ul>
-            </div>
+          
+          {/* affiliate program */}
+          <div>
+            <h2 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
+              Affiliate Program
+            </h2>
+
+            <ul className="mt-4 space-y-2">
+              <li>
+                <Link
+                  to="/become-an-affiliate"
+                  className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
+                >
+                  Become an Affiliate
+                </Link>
+              </li>
+            </ul>
           </div>
 
           {/* CONTACT  */}
@@ -242,13 +245,13 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* APP */}
-          <div>
+          {/* APP google play and app store button */}
+          {/* <div>
             <h3 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
               Download Our App
             </h3>
             <div className="flex flex-col gap-3 mt-4">
-              {/* Google Play Button */}
+            
               <Link
                 to="coming-soon"
                 className="flex items-center gap-2 bg-black text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-all duration-300 hover:scale-105 shadow-md w-fit min-w-[160px]"
@@ -260,7 +263,6 @@ const Footer = () => {
                 </div>
               </Link>
 
-              {/* App Store Button */}
               <Link
                 to="coming-soon"
                 className="flex items-center gap-2 bg-black text-white rounded-lg px-4 py-2 hover:bg-gray-800 transition-all duration-300 hover:scale-105 shadow-md w-fit min-w-[160px]"
@@ -272,7 +274,7 @@ const Footer = () => {
                 </div>
               </Link>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* DISCLAIMER */}

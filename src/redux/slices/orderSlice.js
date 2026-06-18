@@ -106,6 +106,22 @@ export const cancelOrder = createAsyncThunk(
   }
 );
 
+// upload invoice to backend
+export const uploadInvoice = createAsyncThunk(
+  "order/uploadInvoice",
+  async ({ order_id, pdf }, { rejectWithValue }) => {
+    try {
+      const response = await api.post("/user/orders/upload-pdf", {
+        order_id: order_id,
+        pdf: pdf, // send without the data:application/pdf;base64, prefix
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Invoice upload failed");
+    }
+  }
+);
+
 // ---------- INITIAL STATE ----------
 const initialState = {
   orders: [],

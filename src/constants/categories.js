@@ -15,7 +15,8 @@ export const CATEGORIES = [
   { id: "gemstones", slug: "gemstones", label: "Gemstones", icon: "💎" },
   { id: "yantra", slug: "yantra", label: "Yantra", icon: "☸" },
   { id: "pyrite", slug: "pyrite", label: "Pyrite", icon: "🪙" },
+  { id: "best-combos", slug: "best-combos", label: "Best Combos", icon: "🌸" },
   { id: "frames", slug: "frames", label: "Frames", icon: "🖼️" },
-  { id: "combo-bracelets", slug: "combo-bracelets", label: "Combo Bracelet", icon: "✨" },
-  { id: "women-bracelet", slug: "women-bracelet", label: "Women Bracelet", icon: "🌸" },
+  // { id: "combo-bracelets", slug: "combo-bracelets", label: "Combo Bracelet", icon: "✨" },
+  // { id: "women-bracelet", slug: "women-bracelet", label: "Women Bracelet", icon: "🌸" },
 ];
