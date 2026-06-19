@@ -44,20 +44,6 @@ const CategoryPage = () => {
 
   const data = categoryStaticData[slug] || categoryStaticData.default;
 
-  // const handleAddToCart = async ({ product_id, quantity, name }) => {
-  //   if (!isLoggedIn) {
-  //     toast.warning("Login required");
-  //     dispatch(openLoginModal());
-  //     return;
-  //   }
-  //   try {
-  //     await dispatch(addToCart({ product_id, quantity })).unwrap();
-  //     toast.success(`${name} added`);
-  //     dispatch(fetchCart());
-  //   } catch {
-  //     toast.error("Failed to add");
-  //   }
-  // };
 
 
 const handleAddToCart = async ({ product_id, quantity, name, ratti,price ,image }) => {
@@ -66,7 +52,6 @@ const handleAddToCart = async ({ product_id, quantity, name, ratti,price ,image 
     toast.success(`${name} added to cart!`);
     dispatch(fetchCart());
     dispatch(openCartDrawer())
-    // navigate('/cart');
   } catch (err) {
     toast.error(err || 'Failed to add to cart');
   }

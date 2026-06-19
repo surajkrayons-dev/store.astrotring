@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { ArrowLeft, X, ChevronDown, ChevronUp } from 'lucide-react';
 import logo from '@/assets/logo.png';
-import MobileLoginStep from './MobileLoginStep';
+import LoginStep from './LoginStep';
 import SignupStep from './SignupStep';
 import AddressStep from './AddressStep';
 import PaymentStep from './PaymentStep';
@@ -208,7 +208,7 @@ useEffect(() => {
 
         {/* Step Content */}
         <div className="flex-1 overflow-y-auto p-5 scrollbar-hide">
-          {step === 'login' && <MobileLoginStep onLoginSuccess={handleLoginSuccess} onSignupClick={() => setStep('signup')} />}
+          {step === 'login' && <LoginStep onLoginSuccess={handleLoginSuccess} onSignupClick={() => setStep('signup')} />}
 
           {step === 'signup' && <SignupStep onSignupSuccess={handleSignupSuccess} onBackToLogin={() => setStep('login')} />}
 

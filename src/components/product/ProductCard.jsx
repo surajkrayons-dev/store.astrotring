@@ -1,18 +1,18 @@
 
 
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link} from "react-router-dom";
 import StarRating from "../common/StarRating";
 import { ShoppingBag } from "lucide-react";
 
 const ProductCard = ({ product, addToCart, compact = false }) => {
-  const navigate = useNavigate();
+
   const [hovered, setHovered] = useState(false);
 
-  console.log(product)
+  // console.log(product)
 
 
-  // ✅ Price extraction logic - handles both gemstones and regular products
+  // Price extraction logic - handles both gemstones and regular products
 let afterPrice = 0;
 let beforePrice = 0;
 

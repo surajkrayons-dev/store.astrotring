@@ -81,6 +81,7 @@ const MyOrdersPage = () => {
     if (order.pricing?.discount) return Number(order.pricing.discount);
     return order.discount || 0;
   };
+ 
 
   const getTotal = (order) => {
     if (order.pricing?.total_amount) return Number(order.pricing.total_amount);
@@ -94,6 +95,13 @@ const MyOrdersPage = () => {
 
   const getCodCharge = (order) => {
     return order?.pricing?.cod_charge ? Number(order.pricing.cod_charge) : 0;
+  };
+  const getAdvancepaid = (order) => {
+    return order?.pricing?.advance_paid_amount ? Number(order?.pricing?.advance_paid_amount) : 0;
+  };
+
+   const getRemainingCod = (order) => {
+    return order?.pricing?.remaining_cod_amount ? Number(order?.pricing?.remaining_cod_amount) : 0;
   };
 
   const isCodOrder = (order) => {
@@ -124,6 +132,9 @@ const MyOrdersPage = () => {
             const total = getTotal(order);
             const isCod = isCodOrder(order);
             const codCharge = getCodCharge(order);
+            const remainingCod = getRemainingCod(order);
+            const advancepaid = getAdvancepaid(order);
+
 
             return (
               <div
@@ -151,7 +162,7 @@ const MyOrdersPage = () => {
                       {order.status?.toUpperCase() || "PENDING"}
                     </span>
                     <span className="font-base text-xs text-gray-900">
-                      {order.payment?.mode || order.payment_method}
+                      {order.payment?.mode.toUpperCase() || order.payment_method}
                     </span>
                   </div>
                 </div>
@@ -218,9 +229,9 @@ const MyOrdersPage = () => {
 
                     {/* Price Summary - Right side */}
                     <div className="text-right">
-                      <p className="text-sm text-gray-500">
+                      {/* <p className="text-sm text-gray-500">
                         Subtotal: ₹{subtotal.toLocaleString()}
-                      </p>
+                      </p> */}
                       <p className="text-sm text-gray-500">
                         Shipping: ₹{shipping.toLocaleString()}
                       </p>
@@ -234,9 +245,17 @@ const MyOrdersPage = () => {
                           Discount: -₹{discount.toLocaleString()}
                         </p>
                       )}
-                      <p className="text-lg font-bold text-gray-900 mt-1">
+                      {advancepaid > 0 && (
+                        <p className="text-sm text-green-600">
+                          Advance Paid: -₹{advancepaid.toLocaleString()}
+                        </p>
+                      )}
+                      {remainingCod >0 && <p className="text-lg font-bold text-gray-900 mt-1">
+                        Total: ₹{remainingCod.toLocaleString()}
+                      </p>}
+                      {!isCod && <p className="text-lg font-bold text-gray-900 mt-1">
                         Total: ₹{total.toLocaleString()}
-                      </p>
+                      </p>}
                     </div>
                   </div>
                 </div>

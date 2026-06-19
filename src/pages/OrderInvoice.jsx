@@ -4,47 +4,81 @@ import logo from '../assets/logo.png';
 import { useLocation } from 'react-router-dom';
 
 // ---------- Helper: Convert number to English words (Indian system) ----------
+
 function numberToWords(amount) {
-  // Split into rupees and paise
+  // 1. JavaScript floating-point bug se bachne ke liye standard rounding
   const rupees = Math.floor(amount);
-  const paise = Math.round((amount - rupees) * 100);
+  const paise = Math.round((amount - rupees).toFixed(2) * 100);
 
-  // Helper for integer part (same as before)
-  const integerToWords = (num) => {
+  // 2. Chote numbers (1 se 999) ko words me convert karne ka aasan helper
+  const convertLessThanThousand = (num) => {
     if (num === 0) return "";
-    const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine"];
-    const teens = ["", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen"];
-    const tens = ["", "Ten", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
 
-    const convertChunk = (n) => {
-      if (n === 0) return "";
-      if (n < 10) return ones[n];
-      if (n < 20) return teens[n - 10];
-      if (n < 100) return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? " " + ones[n % 10] : "");
-      return ones[Math.floor(n / 100)] + " Hundred" + (n % 100 !== 0 ? " " + convertChunk(n % 100) : "");
+    const ones = {
+      1: "One", 2: "Two", 3: "Three", 4: "Four", 5: "Five",
+      6: "Six", 7: "Seven", 8: "Eight", 9: "Nine"
     };
 
+    const teens = {
+      10: "Ten", 11: "Eleven", 12: "Twelve", 13: "Thirteen", 14: "Fourteen",
+      15: "Fifteen", 16: "Sixteen", 17: "Seventeen", 18: "Eighteen", 19: "Nineteen"
+    };
+
+    const tens = {
+      2: "Twenty", 3: "Thirty", 4: "Forty", 5: "Fifty",
+      6: "Sixty", 7: "Seventy", 8: "Eighty", 9: "Ninety"
+    };
+
+    // Agar single digit hai (1-9)
+    if (num < 10) return ones[num];
+
+    // Agar teens hai (10-19)
+    if (num < 20) return teens[num];
+
+    // Agar double digit hai (20-99)
+    if (num < 100) {
+      const remainingOnes = num % 10;
+      return tens[Math.floor(num / 10)] + (remainingOnes !== 0 ? " " + ones[remainingOnes] : "");
+    }
+
+    // Agar triple digit hai (100-999)
+    const remainingTens = num % 100;
+    return ones[Math.floor(num / 100)] + " Hundred" + (remainingTens !== 0 ? " " + convertLessThanThousand(remainingTens) : "");
+  };
+
+  // 3. Indian Format (Crore, Lakh, Thousand) me break karne ka main logic
+  const integerToWords = (num) => {
+    if (num === 0) return "";
+
     let result = "";
+    
     const crore = Math.floor(num / 10000000);
     const lakh = Math.floor((num % 10000000) / 100000);
     const thousand = Math.floor((num % 100000) / 1000);
-    const hundred = num % 1000;
+    const remainder = num % 1000;
 
-    if (crore > 0) result += convertChunk(crore) + " Crore ";
-    if (lakh > 0) result += convertChunk(lakh) + " Lakh ";
-    if (thousand > 0) result += convertChunk(thousand) + " Thousand ";
-    if (hundred > 0) result += convertChunk(hundred);
+    if (crore > 0) result += convertLessThanThousand(crore) + " Crore ";
+    if (lakh > 0) result += convertLessThanThousand(lakh) + " Lakh ";
+    if (thousand > 0) result += convertLessThanThousand(thousand) + " Thousand ";
+    if (remainder > 0) result += convertLessThanThousand(remainder);
+
     return result.trim();
   };
 
+  // 4. Final Output Formatting (Rupees and Paise rules)
   const rupeesWords = rupees === 0 ? "" : integerToWords(rupees) + " Rupee" + (rupees > 1 ? "s" : "");
-  const paiseWords = paise === 0 ? "" : integerToWords(paise) + " Paise";
+  const paiseWords = paise === 0 ? "" : convertLessThanThousand(paise) + " Paise";
 
   if (rupees === 0 && paise === 0) return "Zero Rupees Only";
   if (rupees === 0) return `${paiseWords} Only`;
   if (paise === 0) return `${rupeesWords} Only`;
+  
   return `${rupeesWords} and ${paiseWords} Only`;
 }
+
+
+
+
 
 const OrderInvoice = ({order}) => {
 
@@ -100,11 +134,13 @@ const OrderInvoice = ({order}) => {
   const isCgstSgst = rawTaxType === 'cgst_sgst';
   const taxTypeDisplay = isCgstSgst ? 'CGST+SGST' : 'IGST';
   const deliveryCharge = parseFloat(pricing.delivery_charge) || 0;
-  const grandTotal = parseFloat(pricing.total_amount) || 0;
   const discount = parseFloat(pricing.discount) || 0;
   const isCod = order.payment.mode === "cod";
   const COD_SURCHARGE =parseFloat(pricing.cod_charge)  ;
-
+  const advancePaid = parseFloat(pricing?.advance_paid_amount)
+  const remainingCod = parseFloat(pricing?.remaining_cod_amount)
+  const grandTotal = remainingCod > 0 ? remainingCod : parseFloat(pricing.total_amount) || 0;
+  
   // Payment
   const transactionId = order.payment?.transaction_id || '-';
   const paidAt = order.payment?.paid_at
@@ -370,7 +406,7 @@ const OrderInvoice = ({order}) => {
                 <td className="p-1 text-center">₹{subtotal.toFixed(2)}</td>
               </tr> */}
 
-              {/* Discount row - sirf tab dikhe jab discount > 0 */}
+              {/* cod charge row if cod charge avilable*/}
               {isCod && (
                 <tr className="border-b border-black ">
                   <td colSpan="5" className="border-r border-black p-1 text-left font-semibold">COD Charge:</td>
@@ -379,6 +415,14 @@ const OrderInvoice = ({order}) => {
                 </tr>
               )}
 
+              {/* advance paid  row - sirf tab dikhe jab advancePaid > 0 */}
+              {advancePaid > 0 && (
+                <tr className="border-b border-black ">
+                  <td colSpan="5" className="border-r border-black p-1 text-left font-semibold">Advance Paid:</td>
+                  <td colSpan="3" className="border-r border-black p-1 text-center ">–</td>
+                  <td className="p-1 text-center">-₹{advancePaid.toFixed(2)}</td>
+                </tr>
+              )}
               {/* Discount row - sirf tab dikhe jab discount > 0 */}
               {discount > 0 && (
                 <tr className="border-b border-black ">
@@ -387,8 +431,10 @@ const OrderInvoice = ({order}) => {
                   <td className="p-1 text-center">-₹{discount.toFixed(2)}</td>
                 </tr>
               )}
+              
 
               {/* Original TOTAL row */}
+             {/* Original TOTAL row */}
               <tr className="border-b border-black font-bold">
                 <td colSpan="8" className="border-r border-black p-1 text-left">TOTAL:</td>
                 <td className="p-1 text-center">₹{grandTotal.toFixed(2)}</td>

@@ -80,7 +80,7 @@ const initialState = {
   selectedProduct: null, // single product for details page
   productCategories: [],
   selectedProductCategory: null,
-  loading: false,
+  loading: true,
   error: null,
   filters: {
     category: "",

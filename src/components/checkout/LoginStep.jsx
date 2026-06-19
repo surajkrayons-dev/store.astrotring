@@ -1,11 +1,11 @@
-// src/components/checkout/MobileLoginStep.jsx
+// src/components/checkout/LoginStep.jsx
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { userLogin, userProfile, userVerifyLoginOtp } from '../../redux/slices/userAuthSlice';
 import { toast } from 'react-toastify';
 import { mergeGuestCart, fetchCart } from '../../redux/slices/cartSlice';
 
-const MobileLoginStep = ({ onLoginSuccess, onSignupClick }) => {
+const LoginStep = ({ onLoginSuccess, onSignupClick }) => {
   const dispatch = useDispatch();
   const [step, setStep] = useState('mobile');
   const [mobile, setMobile] = useState('');
@@ -120,4 +120,4 @@ const MobileLoginStep = ({ onLoginSuccess, onSignupClick }) => {
   );
 };
 
-export default MobileLoginStep;
+export default LoginStep;

@@ -141,6 +141,9 @@ const MyOrderDetailsPage = () => {
   const canCancel = !isCancelled && order.status !== "delivered";
   const isCod = order.payment.mode === "cod";
   const COD_SURCHARGE = order?.pricing?.cod_charge;
+  const advancePaid = order?.pricing?.advance_paid_amount
+  const remainingCod = order?.pricing?.remaining_cod_amount
+  
 
   const handleCancelOrder = async () => {
     if (!window.confirm("Are you sure you want to cancel this order?")) return;
@@ -148,7 +151,7 @@ const MyOrderDetailsPage = () => {
     try {
      if (isCod) {
        const res =await dispatch(cancelCodOrder(id)).unwrap();
-       console.log(res)
+      //  console.log(res)
       toast.success("Order cancelled successfully");
       await dispatch(fetchOrderDetails(id)).unwrap();
       } else {
@@ -323,17 +326,17 @@ const MyOrderDetailsPage = () => {
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-gray-500">
+                  {/* <p className="text-sm text-gray-500">
                     Subtotal: ₹{subtotal.toLocaleString()}
-                  </p>
-                  {isCod && (
-                    <p className="text-sm text-gray-500">
-                      COD Charge: ₹{COD_SURCHARGE.toLocaleString()}
-                    </p>
-                  )}
+                  </p> */}
                   {shipping > 0 && (
                     <p className="text-sm text-gray-500">
                       Shipping Charge: ₹{shipping.toLocaleString()}
+                    </p>
+                  )}
+                  {isCod && (
+                    <p className="text-sm text-gray-500">
+                      COD Charge: ₹{COD_SURCHARGE.toLocaleString()}
                     </p>
                   )}
 
@@ -342,9 +345,18 @@ const MyOrderDetailsPage = () => {
                       Discount: -₹{discount.toLocaleString()}
                     </p>
                   )}
-                  <p className="text-lg font-bold text-gray-900 mt-1">
+                  {advancePaid > 0 && (
+                    <p className="text-sm text-green-600">
+                      Advance Paid: -₹{advancePaid.toLocaleString()}
+                    </p>
+                  )}
+                  
+                  {remainingCod >0 && <p className="text-lg font-bold text-gray-900 mt-1">
+                    Total: ₹{remainingCod.toLocaleString()}
+                  </p>}
+                  {!isCod  && <p className="text-lg font-bold text-gray-900 mt-1">
                     Total: ₹{total.toLocaleString()}
-                  </p>
+                  </p>}
                 </div>
               </div>
             </div>
@@ -395,7 +407,7 @@ const MyOrderDetailsPage = () => {
                 <CreditCard className="w-5 h-5" /> Payment
               </h2>
               <p className="text-gray-600">
-                Mode: {order?.payment?.mode || "Online"}
+                Mode: {order?.payment?.mode.toUpperCase() || "Online"}
               </p>
               {!isCod && (
                 <p className="text-gray-600">

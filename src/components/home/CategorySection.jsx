@@ -3,11 +3,11 @@ import React, { forwardRef, useRef } from 'react';
 import ProductCard from '../product/ProductCard';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const CategorySection = forwardRef(({ category, products, onAddToCart }, ref) => {
+const CategorySection = ({ category, products, onAddToCart }) => {
   const scrollContainerRef = useRef(null);
 
 
-  // console.log("catProduct", products)
+  // console.log("catProduct", category)
 
   if (!products.length) return null;
 
@@ -19,11 +19,11 @@ const CategorySection = forwardRef(({ category, products, onAddToCart }, ref) =>
   };
 
   return (
-    <div ref={ref} id={`category-${category.id}`} className="scroll-mt-[110px]">
+    <div  id={`category-${category.slug}`} className="scroll-mt-[110px]">
       {/* Header with category icon, name, count, and navigation arrows */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="text-xl sm:text-2xl">{category.icon}</span>
+          {/* <span className="text-xl sm:text-2xl">{category.icon}</span> */}
           <h3 className="text-base sm:text-lg font-bold whitespace-nowrap text-stone-900">
             {category.label}
           </h3>
@@ -64,7 +64,7 @@ const CategorySection = forwardRef(({ category, products, onAddToCart }, ref) =>
       </div>
     </div>
   );
-});
+};
 
 CategorySection.displayName = 'CategorySection';
 

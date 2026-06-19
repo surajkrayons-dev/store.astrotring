@@ -22,8 +22,8 @@ const OrderSuccessPage = () => {
   const { currentOrder: order, loading, error } = useSelector((state) => state.order);
 
   // Navigation state se orderId lo
-  // const orderId = 290;
-   const orderId = location.state?.orderData;
+  const orderId = 302;
+  //  const orderId = location.state?.orderData;
   
 
 console.log(order)
@@ -195,6 +195,10 @@ const handleDownloadInvoice = async () => {
   const address = order.address?.snapshot || order.address || {};
   const payment = order.payment || {};
   const COD_SURCHARGE = order?.pricing?.cod_charge;
+  const advancePaid = order?.pricing?.advance_paid_amount
+  const remainingCod = order?.pricing?.remaining_cod_amount
+;
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
@@ -232,7 +236,7 @@ const handleDownloadInvoice = async () => {
           {/* Status Badge */}
           <div className="bg-green-50 px-5 py-3 border-b border-gray-200">
             <div className="flex items-center gap-2">
-              <span className="text-sm text-green-600 font-medium">✓ Payment Successful</span>
+              <span className="text-sm text-green-600 font-medium">✓ Order Successful</span>
               <span className="text-gray-300">|</span>
               <span className="text-sm text-gray-600">
                 Order Status:
@@ -300,10 +304,10 @@ const handleDownloadInvoice = async () => {
                   ))}
                 </tbody>
                 <tfoot className="border-t border-gray-200">
-                  <tr className="text-gray-600">
-                    <td colSpan="3" className="pt-3 text-right">Subtotal:</td>
+                  {/* <tr className="text-gray-600">
+                    <td colSpan="3" className="pt-3 text-right">subtotal:</td>
                     <td className="pt-3 text-right font-medium">₹{parseFloat(subtotal).toLocaleString()}</td>
-                  </tr>
+                  </tr> */}
                    {/* cod payment charge */}
                   {order.payment.mode === "cod" && (
                     <tr className="text-gray-600">
@@ -324,16 +328,28 @@ const handleDownloadInvoice = async () => {
                       <td className="pt-1 text-right">-₹{parseFloat(discount).toLocaleString()}</td>
                     </tr>
                   )}
+                  {advancePaid > 0 && (
+                    <tr className="text-green-600">
+                      <td colSpan="3" className="pt-1 text-right">Advance Paid:</td>
+                      <td className="pt-1 text-right">-₹{parseFloat(advancePaid).toLocaleString()}</td>
+                    </tr>
+                  )}
+
+
                   {walletUsed > 0 && (
                     <tr className="text-amber-600">
                       <td colSpan="3" className="pt-1 text-right">Wallet Used:</td>
                       <td className="pt-1 text-right">-₹{parseFloat(walletUsed).toLocaleString()}</td>
                     </tr>
                   )}
-                  <tr className="border-t-2 border-gray-300">
-                    <td colSpan="3" className="pt-2 text-right font-bold text-gray-800">Total Paid:</td>
+                 {remainingCod > 0 && <tr className="border-t-2 border-gray-300">
+                    <td colSpan="3" className="pt-2 text-right font-bold text-gray-800">Total:</td>
+                    <td className="pt-2 text-right font-bold text-gray-800 text-lg">₹{parseFloat(remainingCod).toLocaleString()}</td>
+                  </tr>}
+                 {order.payment.mode !== "cod" && <tr className="border-t-2 border-gray-300">
+                    <td colSpan="3" className="pt-2 text-right font-bold text-gray-800">Total:</td>
                     <td className="pt-2 text-right font-bold text-gray-800 text-lg">₹{parseFloat(totalPaid).toLocaleString()}</td>
-                  </tr>
+                  </tr>}
                 </tfoot>
               </table>
             </div>

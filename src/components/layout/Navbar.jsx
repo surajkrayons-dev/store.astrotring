@@ -98,7 +98,7 @@ const handleLogout = async () => {
         scrolled ? "shadow-md" : ""
       } ${isNavHidden ? "-translate-y-full" : "translate-y-0"}`}
     >
-      <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-4">
+      <div className=" mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-4">
         {/* Logo */}
         <Link to="/" className="flex-shrink-0">
           <img src={logo} alt="Logo" className="h-6 sm:h-8" />

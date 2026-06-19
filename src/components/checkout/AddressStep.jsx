@@ -18,7 +18,7 @@ const AddressStep = ({ selectedAddressId, onSelectAddress }) => {
     pincode: '',
     country_code: '+91',
     country: 'India',
-    state_code: '',      // ✅ added
+    state_code: '',      //  added
     by_default: false,
   });
   const [adding, setAdding] = useState(false);

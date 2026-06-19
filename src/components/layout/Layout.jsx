@@ -7,14 +7,18 @@ import TopPromoSlider from "../common/TopPromoSlider";
 import WhatsAppButton from "../common/WhatsAppButton";
 import CartDrawer from "../cart/CartDrawer";
 import CheckoutPopupWrapper from "../checkout/CheckoutPopupWrapper";
+import { Suspense } from "react";
+import Loader from "../common/Loader";
 
 const Layout = () => {
   return (
     <div className="min-h-screen bg-stone-50">
       <TopPromoSlider /> 
       <Navbar />
-      <main className="container mx-auto">
+      <main className="mx-auto">
+        <Suspense fallback={<Loader data="Loading..." />}>
         <Outlet />
+         </Suspense>
       </main>
       <Footer />
       <UserLogin />

@@ -1,8 +1,8 @@
 import { Routes, Route, useLocation } from "react-router-dom";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { userProfile } from "./redux/slices/userAuthSlice";
-import Loader from "./components/common/Loader";
+// import Loader from "./components/common/Loader";
 import Layout from "./components/layout/Layout";
 import HomePage from "./pages/HomePage";
 import CategoryPage from "./pages/CategoryPage";
@@ -21,7 +21,6 @@ import CategoryPage from "./pages/CategoryPage";
 // import TrackMyOrderPage from "./pages/TrackMyOrderPage";
 // import ComingSoon from "./components/common/ComingSoon";
 import GoogleTagManager from "./components/common/GoogleTagManager";
-import OrderInvoice from "./pages/OrderInvoice";
 // import OrderInvoice from "./pages/OrderInvoice";
 // import BecomeAnAffiliate from "./components/affiliate/BecomeAnAffiliate";
 // import AffiliateSignup from "./components/affiliate/AffiliateSignup";
@@ -59,6 +58,9 @@ const ComingSoon = lazy(() => import("./components/common/ComingSoon"));
 const BecomeAnAffiliate = lazy(() => import("./components/affiliate/BecomeAnAffiliate"));
 const AffiliateSignup = lazy(() => import("./components/affiliate/AffiliateSignup"));
 const AffiliateLayout = lazy(() => import("./components/layout/affiliatelayout/AffiliateLayout"));
+const OrderInvoice = lazy(() => import("./pages/OrderInvoice"));
+
+
 
 
 
@@ -78,7 +80,7 @@ function App() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [path]);
   return (
-    <Suspense fallback={<Loader data="Loading..." />}>
+    <>
       <GoogleTagManager />
       <Routes>
         <Route path="/" element={<Layout />}>
@@ -142,7 +144,7 @@ function App() {
       </Routes>
 
       
-    </Suspense>
+    </>
   );
 }
 

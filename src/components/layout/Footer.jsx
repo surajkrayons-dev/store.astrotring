@@ -1,15 +1,38 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Mail } from "lucide-react";
 import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import { SlSocialInstagram } from "react-icons/sl";
 import { FaGooglePlay, FaApple } from "react-icons/fa";
 import logo from "../../assets/logo.png";
-import { CATEGORIES } from "../../constants/categories";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllProductCategories } from "@/redux/slices/productSlice";
 
 const Footer = () => {
-  // Filter out "all" from categories for collections
-  const collectionCategories = CATEGORIES.filter((cat) => cat.id !== "all");
+
+
+    const dispatch = useDispatch();
+  const { productCategories, loading } = useSelector((state) => state.product);
+
+  // console.log(productCategories)
+
+  // Fetch categories on mount if not already loaded
+  useEffect(() => {
+    if (productCategories.length === 0) {
+      dispatch(fetchAllProductCategories());
+    }
+  }, [dispatch, productCategories.length]);
+
+  // Map API categories to { id, label } format
+  const categories = productCategories.map((cat) => ({
+    id: cat.id,
+    label: cat.name ,
+    slug:cat.slug // adjust based on API response
+  }));
+
+  // Filter out "all" if needed (or keep as is)
+  const collectionCategories = categories.filter((cat) => cat.slug !== "all");
+
 
   return (
     <footer className="footer bg-[#f7f5f2] border-t border-gray-300 mt-8 pt-8">
@@ -30,7 +53,7 @@ const Footer = () => {
         <br />
         {/* Main Footer Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 pb-8">
-          {/* COLLECTIONS - Dynamic from CATEGORIES */}
+          {/* COLLECTIONS - Dynamic from productCategories */}
           <div>
             <h2 className="text-gray-900 border-b-2 border-amber-500 inline-block pb-1 font-semibold text-lg">
               Collections
@@ -39,7 +62,7 @@ const Footer = () => {
               {collectionCategories.map((cat) => (
                 <li key={cat.id}>
                   <Link
-                    to={`/#category-${cat.id}`} // 👈 hash link
+                    to={`/category/${cat.slug}`} // 👈 hash link
                     className="flex items-center gap-2 text-sm text-gray-700 transition-all duration-300 hover:text-amber-600 hover:translate-x-1"
                   >
                     {cat.label}

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+
 import { toast } from "react-toastify";
 
 // Components
@@ -10,11 +10,11 @@ import CategorySection from "../components/home/CategorySection";
 import FilterSidebar from "../components/features/FilterSidebar";
 import HeroBanner from "../components/features/HeroBanner";
 import Loader from "@/components/common/Loader";
-
-// Constants & Helpers
-import { CATEGORIES } from "../constants/categories";
 import { addToCart, fetchCart } from "../redux/slices/cartSlice";
-import { fetchAllProducts } from "../redux/slices/productSlice";
+import {
+  fetchAllProductCategories,
+  fetchAllProducts,
+} from "../redux/slices/productSlice";
 import { openCartDrawer } from "@/redux/slices/uiSlice";
 
 // ----- Helper Functions (for new API structure) -----
@@ -79,24 +79,22 @@ const filterProductsInCategory = (products, filters) => {
   });
 };
 
-const groupedCategories = CATEGORIES.filter((c) => c.id !== "all");
-
-// ----- Main Component -----
+//  Main Component ======================
 const HomePage = () => {
   const dispatch = useDispatch();
-  const location = useLocation();
-  const navigate = useNavigate();
+  // const location = useLocation();
+  // const navigate = useNavigate();
   const {
     items: products,
+    productCategories,
     loading,
     error,
   } = useSelector((state) => state.product);
 
-  console.log(products);
+  // console.log(products);
 
   // Filtering & UI state
   const [filterCategory, setFilterCategory] = useState("all"); // selected in sidebar
-  const [activeCategory, setActiveCategory] = useState("all"); // scroll‑tracked (optional)
   const [filters, setFilters] = useState({
     search: "",
     minPrice: "",
@@ -111,25 +109,31 @@ const HomePage = () => {
   });
 
   // Refs & Scroll behaviour
-  const sectionRefs = useRef({});
+  // const sectionRefs = useRef({});
   const [navbarHeight, setNavbarHeight] = useState(64);
   const [isNavbarVisible, setIsNavbarVisible] = useState(true);
   const lastScrollY = useRef(0);
 
-  // ----- Effects -----
-  useEffect(() => {
-    // Jab tak products load nahi hote, return karo
-    if (!products.length) return;
+  const groupedCategories = useMemo(() => {
+    if (!productCategories.length) return [];
+    return productCategories
+      .map((cat) => ({
+        id: String(cat.id),
+        slug: cat.slug,
+        label: cat.name,
+      }))
+      .sort((a, b) => {
+        const countA = products.filter(
+          (p) => p.category?.slug === a.slug,
+        ).length;
+        const countB = products.filter(
+          (p) => p.category?.slug === b.slug,
+        ).length;
+        return countB - countA;
+      });
+  }, [productCategories, products]);
 
-    const hash = location.hash;
-    if (hash && hash.startsWith("#category-")) {
-      const catId = hash.replace("#category-", "");
-      if (groupedCategories.some((cat) => cat.id === catId)) {
-        // Thoda delay do taaki sections render ho jayen
-        setTimeout(() => scrollToCategory(catId), 300);
-      }
-    }
-  }, [location.hash, products]); // 👈 products par bhi depend karo
+
 
   useEffect(() => {
     const measureNavbar = () => {
@@ -160,39 +164,29 @@ const HomePage = () => {
 
   useEffect(() => {
     dispatch(fetchAllProducts());
-  }, [dispatch]);
+    if (productCategories.length === 0) {
+      dispatch(fetchAllProductCategories());
+    }
+  }, [dispatch, productCategories.length]);
 
-  // IntersectionObserver to track which category is in view (for activeCategory)
-  useEffect(() => {
-    const observers = [];
-    groupedCategories.forEach((cat) => {
-      const el = sectionRefs.current[cat.id];
-      if (!el) return;
-      const obs = new IntersectionObserver(([entry]) => {
-        if (entry.isIntersecting) setActiveCategory(cat.id);
-      });
-      obs.observe(el);
-      observers.push(obs);
-    });
-    return () => observers.forEach((o) => o.disconnect());
-  }, [products]);
+
 
   // ----- Memoized filtered products per category -----
   const categoryFilteredProducts = useMemo(() => {
     const result = {};
     groupedCategories.forEach((cat) => {
-      const catProducts = products.filter((p) => p.category?.slug === cat.id);
-      // Pehle filter karo, phir sort karo
+      const catProducts = products.filter((p) => p.category?.slug === cat.slug);
+      // first filter then sort
       const filtered = filterProductsInCategory(catProducts, filters);
       result[cat.id] = sortProducts(filtered, filters.sort);
     });
-    // "all" category ke liye bhi (agar chaho to)
+    // "all" category ke liye bhi (optional)
     result.all = sortProducts(
       filterProductsInCategory(products, filters),
       filters.sort,
     );
     return result;
-  }, [products, filters, filters.sort]); // filters.sort dependency add karo
+  }, [products, filters, filters.sort]); // filters.sort dependency add 
 
   // Total filtered products count (sum over all categories)
   const totalFilteredProducts = useMemo(() => {
@@ -222,17 +216,6 @@ const HomePage = () => {
     }
   };
 
-  const scrollToCategory = (catId) => {
-    setFilterCategory(catId);
-    if (catId !== "all" && sectionRefs.current[catId]) {
-      sectionRefs.current[catId].scrollIntoView({
-        behavior: "smooth",
-        block: "center",
-      });
-    } else if (catId === "all") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  };
 
   const clearFilters = () => {
     setFilters({
@@ -299,7 +282,6 @@ const HomePage = () => {
               >
                 <FilterSidebar
                   selected={filterCategory}
-                  onSelect={scrollToCategory}
                   filters={filters}
                   setFilters={setFilters}
                   onClearFilters={clearFilters}
@@ -329,7 +311,7 @@ const HomePage = () => {
                       category={cat}
                       products={catProducts}
                       onAddToCart={handleAddToCart}
-                      ref={(el) => (sectionRefs.current[cat.id] = el)}
+                      // ref={(el) => (sectionRefs.current[cat.id] = el)}
                     />
                   );
                 })}
@@ -344,7 +326,7 @@ const HomePage = () => {
                       category={cat}
                       products={catProducts}
                       onAddToCart={handleAddToCart}
-                      ref={(el) => (sectionRefs.current[cat.id] = el)}
+                      // ref={(el) => (sectionRefs.current[cat.id] = el)}
                     />
                   );
                 })}
@@ -359,7 +341,7 @@ const HomePage = () => {
                       category={cat}
                       products={catProducts}
                       onAddToCart={handleAddToCart}
-                      ref={(el) => (sectionRefs.current[cat.id] = el)}
+                      // ref={(el) => (sectionRefs.current[cat.id] = el)}
                     />
                   );
                 })}
@@ -374,7 +356,7 @@ const HomePage = () => {
                       category={cat}
                       products={catProducts}
                       onAddToCart={handleAddToCart}
-                      ref={(el) => (sectionRefs.current[cat.id] = el)}
+                      // ref={(el) => (sectionRefs.current[cat.id] = el)}
                     />
                   );
                 })}

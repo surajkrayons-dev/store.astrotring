@@ -1,21 +1,45 @@
 // components/features/FilterSidebar.jsx
-import { useState } from "react";
-import { useSelector } from "react-redux";
-import { CATEGORIES } from "../../constants/categories";
+import { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import StarRating from "../common/StarRating";
 import { useNavigate } from "react-router-dom";
+import { fetchAllProductCategories } from "@/redux/slices/productSlice";
 
 const FilterSidebar = ({
   selected,
-  onSelect,
   filters,
   setFilters,
   onClearFilters,
   className = "",
 }) => {
-  const { items: products } = useSelector((state) => state.product);
+  const dispatch = useDispatch();
+  const {
+    items: products,
+    productCategories,
+    loading,
+  } = useSelector((state) => state.product);
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (productCategories.length === 0) {
+      dispatch(fetchAllProductCategories());
+    }
+  }, [dispatch, productCategories.length]);
+
+  const categoriesList = [
+    { id: "all", slug: "all", label: "All" },
+    ...productCategories
+      .map((cat) => ({ id: String(cat.id), slug: cat.slug, label: cat.name }))
+      .sort((a, b) => {
+        const countA = products.filter(
+          (p) => p.category?.slug === a.slug,
+        ).length;
+        const countB = products.filter(
+          (p) => p.category?.slug === b.slug,
+        ).length;
+        return countB - countA;
+      }),
+  ];
 
   const [expandedSections, setExpandedSections] = useState({
     categories: true,
@@ -31,8 +55,9 @@ const FilterSidebar = ({
   const SectionHeader = ({ title, section }) => (
     <div
       onClick={() => toggleSection(section)}
-      className={`flex items-center justify-between py-2 sm:py-2.5 cursor-pointer select-none border-b border-gray-100 ${expandedSections[section] ? 'mb-2 sm:mb-3' : 'mb-0'
-        }`}
+      className={`flex items-center justify-between py-2 sm:py-2.5 cursor-pointer select-none border-b border-gray-100 ${
+        expandedSections[section] ? "mb-2 sm:mb-3" : "mb-0"
+      }`}
     >
       <span className="text-xs sm:text-sm font-semibold text-stone-800 tracking-wide uppercase">
         {title}
@@ -46,8 +71,9 @@ const FilterSidebar = ({
         strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"
-        className={`transition-transform duration-200 w-3 h-3 sm:w-4 sm:h-4 ${expandedSections[section] ? 'rotate-180' : 'rotate-0'
-          }`}
+        className={`transition-transform duration-200 w-3 h-3 sm:w-4 sm:h-4 ${
+          expandedSections[section] ? "rotate-180" : "rotate-0"
+        }`}
       >
         <polyline points="6 9 12 15 18 9" />
       </svg>
@@ -55,7 +81,9 @@ const FilterSidebar = ({
   );
 
   return (
-    <div className={`bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-md p-3 sm:p-4 md:p-5 overflow-y-auto scrollbar-hide ${className}`}>
+    <div
+      className={`bg-white rounded-xl sm:rounded-2xl border border-gray-100 shadow-md p-3 sm:p-4 md:p-5 overflow-y-auto scrollbar-hide ${className}`}
+    >
       {/* Header */}
       <div className="flex items-center justify-between mb-3 sm:mb-4 pb-2 sm:pb-3 border-b-2 border-gray-100">
         <div className="text-sm sm:text-base font-bold text-stone-900 tracking-tight">
@@ -74,34 +102,43 @@ const FilterSidebar = ({
         <SectionHeader title="Categories" section="categories" />
         {expandedSections.categories && (
           <div className="space-y-1">
-            {CATEGORIES.map((cat) => {
-              const active = selected === cat.id;
-              const count = cat.id === "all"
-                ? products.length
-                : products.filter((p) => p.category?.slug === cat.id).length;
+            {loading ? (
+              <div className="text-xs text-stone-400">
+                Loading categories...
+              </div>
+            ) : (
+              categoriesList.map((cat) => {
+                const active = selected === cat.slug;
+                const count =
+                  cat.id === "all"
+                    ? products.length
+                    : products.filter((p) => p.category?.slug === cat.slug)
+                        .length;
 
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => {
-                    onSelect(cat.id)
-                    if (cat.id === "all") {
-                      navigate("/");
-                    } else {
-                      navigate(`/category/${cat.slug}`);
-                    }
-                  }}
-                  className={`w-full flex items-center gap-2 sm:gap-2.5 text-left px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-[9px] border-none cursor-pointer text-xs sm:text-sm transition-all ${active
-                      ? "bg-gradient-to-br from-amber-100 to-amber-200 text-amber-900 font-semibold shadow-[inset_0_0_0_1.5px_#fcd34d]"
-                      : "bg-transparent text-stone-600 font-normal hover:bg-stone-50"
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => {
+                      if (cat.id === "all") {
+                        navigate("/");
+                      } else {
+                        navigate(`/category/${cat.slug}`);
+                      }
+                    }}
+                    className={`w-full flex items-center gap-2 sm:gap-2.5 text-left px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg sm:rounded-[9px] border-none cursor-pointer text-xs sm:text-sm transition-all ${
+                      active
+                        ? "bg-gradient-to-br from-amber-100 to-amber-200 text-amber-900 font-semibold shadow-[inset_0_0_0_1.5px_#fcd34d]"
+                        : "bg-transparent text-stone-600 font-normal hover:bg-amber-200"
                     }`}
-                >
-                  <span className="text-base sm:text-lg">{cat.icon}</span>
-                  <span className="flex-1 truncate">{cat.label}</span>
-                  <span className="text-[11px] sm:text-xs text-stone-400 font-normal">{count}</span>
-                </button>
-              );
-            })}
+                  >
+                    <span className="flex-1 truncate">{cat.label}</span>
+                    <span className="text-[11px] sm:text-xs text-stone-400 font-normal">
+                      {count}
+                    </span>
+                  </button>
+                );
+              })
+            )}
           </div>
         )}
       </div>
@@ -117,7 +154,9 @@ const FilterSidebar = ({
                 <input
                   type="number"
                   value={filters.minPrice}
-                  onChange={e => setFilters(f => ({ ...f, minPrice: e.target.value }))}
+                  onChange={(e) =>
+                    setFilters((f) => ({ ...f, minPrice: e.target.value }))
+                  }
                   placeholder="Min"
                   className="w-full px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-lg border border-gray-200 text-xs sm:text-sm outline-none focus:border-amber-600"
                 />
@@ -127,7 +166,9 @@ const FilterSidebar = ({
                 <input
                   type="number"
                   value={filters.maxPrice}
-                  onChange={e => setFilters(f => ({ ...f, maxPrice: e.target.value }))}
+                  onChange={(e) =>
+                    setFilters((f) => ({ ...f, maxPrice: e.target.value }))
+                  }
                   placeholder="Max"
                   className="w-full px-2 sm:px-2.5 py-1.5 sm:py-2 rounded-lg border border-gray-200 text-xs sm:text-sm outline-none focus:border-amber-600"
                 />
@@ -151,11 +192,12 @@ const FilterSidebar = ({
                       maxPrice: range.max,
                     }))
                   }
-                  className={`px-2.5 py-1.5 rounded-md border text-xs font-medium cursor-pointer transition-all ${filters.minPrice === range.min &&
-                      filters.maxPrice === range.max
+                  className={`px-2.5 py-1.5 rounded-md border text-xs font-medium cursor-pointer transition-all ${
+                    filters.minPrice === range.min &&
+                    filters.maxPrice === range.max
                       ? "border-amber-300 bg-amber-100 text-amber-900"
                       : "border-gray-200 bg-white text-stone-600 hover:bg-gray-50"
-                    }`}
+                  }`}
                 >
                   {range.label}
                 </button>
@@ -170,7 +212,7 @@ const FilterSidebar = ({
         <SectionHeader title="Customer Rating" section="rating" />
         {expandedSections.rating && (
           <div className="space-y-1.5 sm:space-y-2">
-            {[4, 3, 2, 1].map(rating => (
+            {[4, 3, 2, 1].map((rating) => (
               <label
                 key={rating}
                 className="flex items-center gap-2 sm:gap-2.5 cursor-pointer px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-lg transition-colors hover:bg-stone-50"
@@ -179,11 +221,15 @@ const FilterSidebar = ({
                   type="radio"
                   name="rating"
                   checked={filters.minRating === String(rating)}
-                  onChange={() => setFilters(f => ({ ...f, minRating: String(rating) }))}
+                  onChange={() =>
+                    setFilters((f) => ({ ...f, minRating: String(rating) }))
+                  }
                   className="cursor-pointer w-3 h-3 sm:w-4 sm:h-4"
                 />
                 <StarRating value={rating} size={12} />
-                <span className="text-[11px] sm:text-xs text-stone-500 font-medium">& Up</span>
+                <span className="text-[11px] sm:text-xs text-stone-500 font-medium">
+                  & Up
+                </span>
               </label>
             ))}
             <label className="flex items-center gap-2 sm:gap-2.5 cursor-pointer px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-lg transition-colors hover:bg-stone-50">
@@ -191,10 +237,12 @@ const FilterSidebar = ({
                 type="radio"
                 name="rating"
                 checked={filters.minRating === ""}
-                onChange={() => setFilters(f => ({ ...f, minRating: "" }))}
+                onChange={() => setFilters((f) => ({ ...f, minRating: "" }))}
                 className="cursor-pointer w-3 h-3 sm:w-4 sm:h-4"
               />
-              <span className="text-[11px] sm:text-xs text-stone-500 font-medium">All Ratings</span>
+              <span className="text-[11px] sm:text-xs text-stone-500 font-medium">
+                All Ratings
+              </span>
             </label>
           </div>
         )}
@@ -206,17 +254,19 @@ const FilterSidebar = ({
         <SectionHeader title="Discount" section="discount" />
         {expandedSections.discount && (
           <div className="space-y-1.5 sm:space-y-2">
-            {["50", "40", "30", "20", "10"].map(discount => (
+            {["50", "40", "30", "20", "10"].map((discount) => (
               <label
                 key={discount}
                 className="flex items-center gap-2 sm:gap-2.5 cursor-pointer px-1.5 sm:px-2 py-1 sm:py-1.5 rounded-lg transition-colors hover:bg-stone-50"
               >
                 <input
-                  type="radio"   // 👈 radio button (single select)
+                  type="radio" // 👈 radio button (single select)
                   name="discount"
                   value={discount}
                   checked={filters.minDiscount === discount}
-                  onChange={() => setFilters(f => ({ ...f, minDiscount: discount }))}
+                  onChange={() =>
+                    setFilters((f) => ({ ...f, minDiscount: discount }))
+                  }
                   className="cursor-pointer w-3 h-3 sm:w-4 sm:h-4"
                 />
                 <span className="text-[11px] sm:text-xs text-stone-600 font-medium">
@@ -230,10 +280,12 @@ const FilterSidebar = ({
                 type="radio"
                 name="discount"
                 checked={filters.minDiscount === ""}
-                onChange={() => setFilters(f => ({ ...f, minDiscount: "" }))}
+                onChange={() => setFilters((f) => ({ ...f, minDiscount: "" }))}
                 className="cursor-pointer w-3 h-3 sm:w-4 sm:h-4"
               />
-              <span className="text-[11px] sm:text-xs text-stone-600 font-medium">All Discounts</span>
+              <span className="text-[11px] sm:text-xs text-stone-600 font-medium">
+                All Discounts
+              </span>
             </label>
           </div>
         )}
