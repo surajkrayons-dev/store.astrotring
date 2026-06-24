@@ -83,10 +83,10 @@ useEffect(() => {
   const subtotal = cartItems.reduce((sum, i) => sum + (i.price * i.quantity),
     0);
 
-  console.log(subtotal)
+  // console.log(subtotal)
   const shipping = subtotal >= MIN_FREE_SHIPPING ? 0 : apiDeliveryCharge;
-  console.log(MIN_FREE_SHIPPING)
-  console.log(shipping)
+  // console.log(MIN_FREE_SHIPPING)
+  // console.log(shipping)
 
 
   const grandTotal = subtotal + shipping - couponDiscount;

@@ -19,13 +19,14 @@ import { toast } from 'react-toastify';
 // import CheckoutHeader from '@/components/checkout/CheckoutHeader';
 // import CheckoutPopup from '@/components/checkout/CheckoutPopup';
 import { closeCartDrawer, closeCheckout, openCheckout } from '@/redux/slices/uiSlice';
-// import { openLoginModal } from '../redux/slices/uiSlice'; // no longer needed
-// import CheckoutModal from '../components/checkout/CheckoutModal'; // removed – using inline modal
+
 
 const CartPage = () => {
   const navigate = useNavigate();
   const { items: cartItems, loading, error, appliedCoupon, couponDiscount } = useSelector((state) => state.cart);
-  // const { isLoggedIn } = useSelector((state) => state.userAuth); // no longer needed
+
+  console.log("cartItems",cartItems)
+
   const dispatch = useDispatch();
 
   const [couponCode, setCouponCode] = useState('WELCOMEOFFER');
@@ -55,6 +56,25 @@ const CartPage = () => {
 
 
   }, [cartItems])
+
+
+  // ---------- add dataLayer for gtm tracking ----------
+useEffect(() => {
+  if (cartItems && cartItems.length > 0) {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "view_cart",
+      ecommerce: {
+        currency: "INR",
+        items: cartItems.map(item => ({
+          item_id: String(item.product_id), 
+          price: Number(item.price),
+          quantity: Number(item.quantity)
+        }))
+      }
+    });
+  }
+}, [cartItems]); 
 
 
   const handleRemoveItem = (id) => {

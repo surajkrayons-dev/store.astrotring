@@ -54,12 +54,12 @@ const BestSellers = () => {
             <Link
               key={product.id}
               to={`/product/${product?.slug}`} 
-              className="bg-white md:rounded-lg border border-gray-100 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
+              className="bg-white md:rounded-sm border border-gray-100 shadow-md cursor-pointer hover:shadow-lg transition-shadow"
             >
               <img
                 src={imageUrl}
                 alt={product.name}
-                className="w-full h-[150px] object-cover rounded-sm md:rounded-lg mb-2"
+                className="w-full h-[150px] object-cover rounded-sm md:rounded-sm mb-2"
               />
               <div className="text-xs font-bold truncate">{product.name}</div>
 
