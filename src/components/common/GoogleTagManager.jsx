@@ -6,7 +6,7 @@ const GoogleTagManager = () => {
   const location = useLocation();
 
   useEffect(() => {
-    // Jab bhi route change ho, GTM ko naya page view bhejo
+    // Jab bhi route change hoto ye GTM ko naya page view send karega
     if (window.dataLayer) {
       window.dataLayer.push({
         event: 'pageview',

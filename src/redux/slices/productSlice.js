@@ -143,15 +143,15 @@ const productSlice = createSlice({
       })
       // ----------PRODUCT CATEGORIES ----------
       .addCase(fetchAllProductCategories.pending, (state) => {
-        state.loading = true;
+      
         state.error = null;
       })
       .addCase(fetchAllProductCategories.fulfilled, (state, action) => {
-        state.loading = false;
+       
         state.productCategories = action.payload;
       })
       .addCase(fetchAllProductCategories.rejected, (state, action) => {
-        state.loading = false;
+        
         state.error = action.payload;
       })
       .addCase(fetchProductCategoryById.pending, (state) => {

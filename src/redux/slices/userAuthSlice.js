@@ -143,8 +143,6 @@ export const userResetPassword = createAsyncThunk(
 );
 
 // delete account
-// userAuthSlice.js – add this with your other thunks
-
 export const userDeleteAccount = createAsyncThunk(
   "user/deleteAccount",
   async (_, { rejectWithValue }) => {

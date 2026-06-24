@@ -130,6 +130,13 @@ const OrderInvoice = ({order}) => {
   const cgstAmount = parseFloat(pricing.cgst_amount) || 0;
   const sgstAmount = parseFloat(pricing.sgst_amount) || 0;
   const gstRate = parseFloat(pricing.gst_rate) || 0;
+  // ---------- Shipping GST (alag se) ----------
+const shippingGstRate = parseFloat(pricing.shipping_gst_rate) || 0;
+const shippingGstTotal = parseFloat(pricing.shipping_gst_amount) || 0;
+
+// ---------- COD GST (alag se) ----------
+const codGstRate = parseFloat(pricing.cod_gst_rate) || 0;
+const codGstTotal = parseFloat(pricing.cod_gst_amount) || 0;
   const rawTaxType = pricing.tax_type; // 'igst' or 'cgst_sgst'
   const isCgstSgst = rawTaxType === 'cgst_sgst';
   const taxTypeDisplay = isCgstSgst ? 'CGST+SGST' : 'IGST';
@@ -167,6 +174,25 @@ const OrderInvoice = ({order}) => {
       return { igst: totalTax };
     }
   };
+  // Shipping ke liye alag function
+const getShippingTaxSplit = () => {
+  const totalTax = shippingGstTotal; // backend se aayi value
+  if (isCgstSgst) {
+    return { cgst: totalTax / 2, sgst: totalTax / 2 };
+  } else {
+    return { igst: totalTax };
+  }
+};
+
+// COD ke liye alag function
+const getCodTaxSplit = () => {
+  const totalTax = codGstTotal; // backend se aayi value
+  if (isCgstSgst) {
+    return { cgst: totalTax / 2, sgst: totalTax / 2 };
+  } else {
+    return { igst: totalTax };
+  }
+};
 
   // Build item rows with all 9 columns (stacked for CGST+SGST)
   const itemRows = items.map((item, idx) => {
@@ -239,23 +265,23 @@ const OrderInvoice = ({order}) => {
   let shippingRow = null;
   if (deliveryCharge > 0) {
     const shippingNet = deliveryCharge;
-    const taxSplit = getItemTaxSplit(shippingNet);
+    const taxSplit = getShippingTaxSplit(shippingNet);
     const taxAmountTotal = isCgstSgst ? taxSplit.cgst + taxSplit.sgst : taxSplit.igst;
     const shippingTotal = shippingNet;
-    const halfRate = isCgstSgst ? (gstRate / 2).toFixed(2) : null;
+    const halfRate = isCgstSgst ? (shippingGstRate / 2).toFixed(2) : null;
 
     shippingRow = (
-      <tr className="border-b border-black text-xs">
-        <td className="border-r border-black p-1 align-top text-center"> </td>
-        <td className="border-r border-black p-2 align-middle text-left pl-6">
+      <tr className="text-xs last:border-b last:border-black">
+        <td className="border-r  border-black p-1 align-top text-center"> </td>
+        <td className="border-r border-b border-black p-2 align-middle text-left pl-6">
           <p>Shipping Charge</p>
         </td>
-        <td className="border-r border-black p-1 align-middle text-center">₹{deliveryCharge.toFixed(2)}</td>
-        <td className="border-r border-black p-1 align-middle text-center">1</td>
-        <td className="border-r border-black p-1 align-middle text-center">₹{shippingNet.toFixed(2)}</td>
+        <td className="border-r border-b border-black p-1 align-middle text-center">₹{deliveryCharge.toFixed(2)}</td>
+        <td className="border-r border-b border-black p-1 align-middle text-center">1</td>
+        <td className="border-r border-b border-black p-1 align-middle text-center">₹{shippingNet.toFixed(2)}</td>
 
         {/* Tax Rate column - stacked for CGST/SGST */}
-        <td className="border-r border-black p-1 align-middle text-center">
+        <td className="border-r border-b border-black p-1 align-middle text-center">
           {isCgstSgst ? (
             <>
               <div>{halfRate}%</div>
@@ -267,7 +293,7 @@ const OrderInvoice = ({order}) => {
         </td>
 
         {/* Tax Type column - stacked for CGST/SGST */}
-        <td className="border-r border-black p-1 align-middle text-center">
+        <td className="border-r border-b border-black p-1 align-middle text-center">
           {isCgstSgst ? (
             <>
               <div>CGST</div>
@@ -279,7 +305,7 @@ const OrderInvoice = ({order}) => {
         </td>
 
         {/* Tax Amount column - stacked for CGST/SGST */}
-        <td className="border-r border-black p-1 align-middle text-center">
+        <td className="border-r border-b border-black p-1 align-middle text-center">
           {isCgstSgst ? (
             <>
               <div>₹{taxSplit.cgst.toFixed(2)}</div>
@@ -290,10 +316,83 @@ const OrderInvoice = ({order}) => {
           )}
         </td>
 
-        <td className="p-1 align-middle text-center">₹{shippingTotal.toFixed(2)}</td>
+        <td className="p-1 border-b border-black align-middle text-center">₹{shippingTotal.toFixed(2)}</td>
       </tr>
     );
   }
+
+
+  
+
+  // ---------- COD Charge Row (similar to shipping) ----------
+let codRow = null;
+if (isCod && COD_SURCHARGE > 0) {
+  const codNet = COD_SURCHARGE;
+  const taxSplit = getCodTaxSplit(codNet);
+  const codTotal = codNet; // Total amount column mein Net amount hi dikhega (tax alag column mein hai)
+
+  const halfRate = isCgstSgst ? (codGstRate / 2).toFixed(2) : null;
+
+  codRow = (
+    <tr className="border-b  border-black text-xs">
+      {/* Sl.No - blank */}
+      <td className="border-r border-black p-1 align-top text-center"> </td>
+
+      {/* Description */}
+      <td className="border-r border-black p-2 align-middle text-left pl-6">
+        <p>COD Charge</p>
+      </td>
+
+      {/* Unit Price */}
+      <td className="border-r border-black p-1 align-middle text-center">₹{codNet.toFixed(2)}</td>
+
+      {/* Qty */}
+      <td className="border-r border-black p-1 align-middle text-center">1</td>
+
+      {/* Net Amount */}
+      <td className="border-r border-black p-1 align-middle text-center">₹{codNet.toFixed(2)}</td>
+
+      {/* Tax Rate - stacked for CGST/SGST */}
+      <td className="border-r border-black p-1 align-middle text-center">
+        {isCgstSgst ? (
+          <>
+            <div>{halfRate}%</div>
+            <div>{halfRate}%</div>
+          </>
+        ) : (
+          <div>{gstRate}%</div>
+        )}
+      </td>
+
+      {/* Tax Type - stacked for CGST/SGST */}
+      <td className="border-r border-black p-1 align-middle text-center">
+        {isCgstSgst ? (
+          <>
+            <div>CGST</div>
+            <div>SGST</div>
+          </>
+        ) : (
+          <div>IGST</div>
+        )}
+      </td>
+
+      {/* Tax Amount - stacked for CGST/SGST */}
+      <td className="border-r border-black p-1 align-middle text-center">
+        {isCgstSgst ? (
+          <>
+            <div>₹{taxSplit.cgst.toFixed(2)}</div>
+            <div>₹{taxSplit.sgst.toFixed(2)}</div>
+          </>
+        ) : (
+          <div>₹{taxSplit.igst.toFixed(2)}</div>
+        )}
+      </td>
+
+      {/* Total Amount */}
+      <td className="p-1 align-middle text-center">₹{codTotal.toFixed(2)}</td>
+    </tr>
+  );
+}
 
 
 
@@ -397,6 +496,7 @@ const OrderInvoice = ({order}) => {
             <tbody>
               {itemRows}
               {shippingRow}
+              {codRow}
             </tbody>
             <tfoot>
               {/* Subtotal row - optional lekin helpful */}
@@ -406,19 +506,11 @@ const OrderInvoice = ({order}) => {
                 <td className="p-1 text-center">₹{subtotal.toFixed(2)}</td>
               </tr> */}
 
-              {/* cod charge row if cod charge avilable*/}
-              {isCod && (
-                <tr className="border-b border-black ">
-                  <td colSpan="5" className="border-r border-black p-1 text-left font-semibold">COD Charge:</td>
-                  <td colSpan="3" className="border-r border-black p-1 text-center ">–</td>
-                  <td className="p-1 text-center">₹{COD_SURCHARGE.toFixed(2)}</td>
-                </tr>
-              )}
 
               {/* advance paid  row - sirf tab dikhe jab advancePaid > 0 */}
               {advancePaid > 0 && (
                 <tr className="border-b border-black ">
-                  <td colSpan="5" className="border-r border-black p-1 text-left font-semibold">Advance Paid:</td>
+                  <td colSpan="5" className="border-r border-black p-1 text-left font-semibold">Convenience Charge:</td>
                   <td colSpan="3" className="border-r border-black p-1 text-center ">–</td>
                   <td className="p-1 text-center">-₹{advancePaid.toFixed(2)}</td>
                 </tr>

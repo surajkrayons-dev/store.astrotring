@@ -133,7 +133,14 @@ const HomePage = () => {
       });
   }, [productCategories, products]);
 
-
+// ---------- Gtm View Homepage ----------
+useEffect(() => {
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({
+    event: 'view_home',
+    
+  });
+}, []); 
 
   useEffect(() => {
     const measureNavbar = () => {
@@ -162,12 +169,17 @@ const HomePage = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [navbarHeight]);
 
-  useEffect(() => {
-    dispatch(fetchAllProducts());
-    if (productCategories.length === 0) {
-      dispatch(fetchAllProductCategories());
-    }
-  }, [dispatch, productCategories.length]);
+// products fetch 
+useEffect(() => {
+  dispatch(fetchAllProducts());
+}, [dispatch]);
+
+// Categories fetch 
+useEffect(() => {
+  if (productCategories.length === 0) {
+    dispatch(fetchAllProductCategories());
+  }
+}, [dispatch, productCategories.length]);
 
 
 

@@ -167,6 +167,32 @@ const ProductDetailsPage = () => {
     return () => footerObserver.disconnect();
   }, []);
 
+
+
+// ---------- add dataLayer for gtm tracking ----------
+useEffect(() => {
+  if (product?.id) {
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+      event: "view_item",
+      ecommerce: {
+        currency: "INR",
+        items: [{
+          item_id: String(product.id),
+          item_name: product.name || "",
+          price: Number(product.after_price),
+          
+        }]
+      }
+    });
+  }
+}, [product]);
+
+
+
+
+
+
   // --- Related products (only from API, no fallback) ---
   const suggestedProducts = useMemo(() => {
     if (!allProducts.length || !product) return [];

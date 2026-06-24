@@ -343,40 +343,45 @@ const PaymentStep = forwardRef(
             </div>
           </label>
 
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="radio"
-              name="paymentMethod"
-              value="cod"
-              checked={selectedPaymentMethod === "cod"}
-              onChange={() => onPaymentMethodChange("cod")}
-              className="w-4 h-4 text-amber-600 accent-amber-600"
-            />
-            <span className="font-medium text-sm text-gray-800">COD</span>
-
-            <details className="relative inline-flex">
-              <summary className="list-none inline-flex cursor-pointer">
-                <Info className="w-4 h-4 text-gray-400 hover:text-amber-500 transition-colors" />
-              </summary>
-              <div className="absolute z-10 bottom-full left-2 w-64 p-3 bg-gray-800 text-white text-[10px] rounded-tl-2xl rounded-br-2xl shadow-lg">
-                <ul className="list-disc pl-4">
-                  <li>
-                    A convenience / handling fee is applicable on Cash on
-                    Delivery.
-                  </li>
-                  <li>
-                    For COD orders, a non-refundable advance of Rs. 199 is
-                    payable, which will be adjusted against the final product
-                    price.
-                  </li>
-                  <li>
-                    Cash on Delivery isn't yet available for all pin codes.
-                  </li>
-                  <li>COD charges will not be refundable.</li>
-                </ul>
-              </div>
-            </details>
-          </label>
+          <div
+            className="flex flex-col gap-1 cursor-pointer"
+            onClick={() => onPaymentMethodChange("cod")}
+          >
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="cod"
+                checked={selectedPaymentMethod === "cod"}
+                onChange={() => onPaymentMethodChange("cod")}
+                className="w-4 h-4 text-amber-600 accent-amber-600"
+              />
+              <span className="font-medium text-sm text-gray-800">COD</span>
+              <details className="relative inline-flex">
+                <summary className="list-none inline-flex cursor-pointer">
+                  <Info className="w-4 h-4 text-gray-400 hover:text-amber-500 transition-colors" />
+                </summary>
+                <div className="absolute z-10 bottom-full left-2 w-64 p-3 bg-gray-800 text-white text-[10px] rounded-tl-2xl rounded-br-2xl shadow-lg">
+                  <ul className="list-disc pl-4">
+                    <li>
+                      Cash on Delivery is available only for select pin codes
+                      and incurs a non‑refundable handling fee.
+                    </li>
+                    <li>
+                      A non‑refundable advance of Rs. 199 is required, which is
+                      adjusted against the final product price.
+                    </li>
+                  </ul>
+                </div>
+              </details>
+            </label>
+            {selectedPaymentMethod === "cod" && (
+              <p className="text-xs text-gray-500 ml-6">
+                A non‑refundable advance of Rs. 199 is required, which is
+                adjusted against the final product price.
+              </p>
+            )}
+          </div>
         </div>
       </div>
     );
