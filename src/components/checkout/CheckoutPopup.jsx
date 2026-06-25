@@ -34,7 +34,7 @@ const CheckoutPopup = ({ isOpen, onClose }) => {
           const { data } = await api.get('/store/cod-charge', {
             address_id: selectedAddressId,
           });
-          console.log("codcharge", data)
+          // console.log("codcharge", data)
           if (data.status) setCodCharge(data.cod_charge);
         } catch (err) {
           console.error('Failed to fetch COD charge', err);
@@ -68,7 +68,7 @@ const CheckoutPopup = ({ isOpen, onClose }) => {
 
   // Add this after your existing useEffects
 useEffect(() => {
-  if (!isLoggedIn && step !== 'login') {
+  if (!isLoggedIn && step !== 'login' && step !== 'signup') {
     setStep('login');
   } else if (isLoggedIn && step === 'login') {
     setStep('address');

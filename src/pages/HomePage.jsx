@@ -133,13 +133,15 @@ const HomePage = () => {
       });
   }, [productCategories, products]);
 
-// ---------- Gtm View Homepage ----------
+// ---------- add dataLayer for gtm tracking ----------
 useEffect(() => {
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({
-    event: 'view_home',
+    event: 'viewHome',
     
   });
+
+  console.log("viewHome datalayer", window.dataLayer);
 }, []); 
 
   useEffect(() => {
@@ -171,12 +173,17 @@ useEffect(() => {
 
 // products fetch 
 useEffect(() => {
-  dispatch(fetchAllProducts());
-}, [dispatch]);
+   if (products.length === 0) {   // <-- YEH CONDITION DAALO
+    dispatch(fetchAllProducts());
+  }
+}, [dispatch,products.length]);
 
 // Categories fetch 
 useEffect(() => {
+
+    
   if (productCategories.length === 0) {
+   
     dispatch(fetchAllProductCategories());
   }
 }, [dispatch, productCategories.length]);

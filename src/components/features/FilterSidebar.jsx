@@ -1,9 +1,8 @@
 // components/features/FilterSidebar.jsx
 import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import StarRating from "../common/StarRating";
 import { useNavigate } from "react-router-dom";
-import { fetchAllProductCategories } from "@/redux/slices/productSlice";
 
 const FilterSidebar = ({
   selected,
@@ -12,7 +11,7 @@ const FilterSidebar = ({
   onClearFilters,
   className = "",
 }) => {
-  const dispatch = useDispatch();
+
   const {
     items: products,
     productCategories,
@@ -20,11 +19,7 @@ const FilterSidebar = ({
   } = useSelector((state) => state.product);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (productCategories.length === 0) {
-      dispatch(fetchAllProductCategories());
-    }
-  }, [dispatch, productCategories.length]);
+
 
   const categoriesList = [
     { id: "all", slug: "all", label: "All" },

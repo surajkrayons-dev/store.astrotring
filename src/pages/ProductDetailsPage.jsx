@@ -174,9 +174,9 @@ useEffect(() => {
   if (product?.id) {
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
-      event: "view_item",
+      event: "viewItem",
       ecommerce: {
-        currency: "INR",
+        
         items: [{
           item_id: String(product.id),
           item_name: product.name || "",
@@ -185,6 +185,7 @@ useEffect(() => {
         }]
       }
     });
+    console.log("viewItem datalayer", window.dataLayer);
   }
 }, [product]);
 

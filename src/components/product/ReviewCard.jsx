@@ -12,7 +12,7 @@ const ReviewCard = ({ review }) => {
     displayedText = reviewText.slice(0, MAX_LENGTH) + '...';
   }
 
-  console.log(review)
+  // console.log(review)
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString(undefined, {

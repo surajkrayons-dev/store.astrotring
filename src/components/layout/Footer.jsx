@@ -5,23 +5,17 @@ import { FaFacebook, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import { SlSocialInstagram } from "react-icons/sl";
 import { FaGooglePlay, FaApple } from "react-icons/fa";
 import logo from "../../assets/logo.png";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchAllProductCategories } from "@/redux/slices/productSlice";
+import { useSelector } from "react-redux";
 
 const Footer = () => {
 
 
-    const dispatch = useDispatch();
+
   const { productCategories, loading } = useSelector((state) => state.product);
 
   // console.log(productCategories)
 
-  // Fetch categories on mount if not already loaded
-  useEffect(() => {
-    if (productCategories.length === 0) {
-      dispatch(fetchAllProductCategories());
-    }
-  }, [dispatch, productCategories.length]);
+
 
   // Map API categories to { id, label } format
   const categories = productCategories.map((cat) => ({

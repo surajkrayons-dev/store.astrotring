@@ -28,10 +28,10 @@ const OrderSuccessPage = () => {
   } = useSelector((state) => state.order);
 
   // Navigation state se orderId lo
-  // const orderId = 306;
+  // const orderId = 314;
    const orderId = location.state?.orderData;
 
-  console.log(order);
+  // console.log(order);
 
   useEffect(() => {
     if (orderId) {
@@ -53,14 +53,19 @@ useEffect(() => {
     const transactionId = String(order?.payment?.transaction_id);
     const totalValue = parseFloat(order.pricing?.total_amount) || 0;
     const items = order.items || order.order_items || [];
+     const discount = order.pricing?.discount || 0;
+
+    console.log(discount)
 
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
-      event: 'purchase',
+      event: 'trackTransaction',
       ecommerce: {
         transaction_id: transactionId,
         currency: 'INR',
-        value: totalValue,
+        order_value: totalValue,
+        order_id: orderId,
+        coupan_discount:discount,
         items: items.map(item => ({
           item_id: String(item.product_id || item.product.id),
           name: String(item.name || item.product.name ),
@@ -69,6 +74,8 @@ useEffect(() => {
         }))
       }
     });
+
+    console.log("trackTransaction datalayer", window.dataLayer);
   }
 }, [order]); 
 
@@ -111,7 +118,7 @@ useEffect(() => {
             pdf: pdfBase64,
           }),
         ).unwrap();
-        console.log(" Invoice auto-uploaded");
+        // console.log(" Invoice auto-uploaded");
         setInvoiceUploadAttempted(true);
       } catch (err) {
         console.error(" Auto-upload failed:", err);
@@ -437,7 +444,7 @@ useEffect(() => {
                   {advancePaid > 0 && (
                     <tr className="text-green-600">
                       <td colSpan="3" className="pt-1 text-right">
-                        Advance Paid:
+                        Convenience Charge:
                       </td>
                       <td className="pt-1 text-right">
                         -₹{parseFloat(advancePaid).toLocaleString()}

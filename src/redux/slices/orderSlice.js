@@ -73,11 +73,11 @@ export const cancelCodOrder = createAsyncThunk(
       if (!userAuth.isLoggedIn) return rejectWithValue('Please login to cancel order');
       const response = await api.post(`/store/cod/cancel/${orderId}`);
 
-      console.log(response)
+      // console.log(response)
       if (response.data.status) {
         return { orderId, success: true };
       } else {
-        console.log(response.data)
+        // console.log(response.data)
         return rejectWithValue(response.data.message || 'Failed to cancel COD order');
       }
     } catch (error) {

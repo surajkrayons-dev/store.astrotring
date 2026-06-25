@@ -5,7 +5,7 @@ import { userProfile } from "./redux/slices/userAuthSlice";
 // import Loader from "./components/common/Loader";
 import Layout from "./components/layout/Layout";
 import HomePage from "./pages/HomePage";
-import CategoryPage from "./pages/CategoryPage";
+// import CategoryPage from "./pages/CategoryPage";
 // import ProfilePage from "./pages/ProfilePage";
 
 // import AddressesPage from "./pages/AddressesPage";
@@ -29,7 +29,7 @@ import GoogleTagManager from "./components/common/GoogleTagManager";
 // Lazy load all pages
 
 const ProductDetailsPage = lazy(() => import("./pages/ProductDetailsPage"));
-const CartPage = lazy(() => import("./pages/CartPage"));
+// const CartPage = lazy(() => import("./pages/CartPage"));
 const DisclaimerPage = lazy(() => import("./pages/legal/DisclaimerPage"));
 const PrivacyPolicyPage = lazy(() => import("./pages/legal/PrivacyPolicyPage"));
 const RefundPolicyPage = lazy(() => import("./pages/legal/RefundPolicyPage"));
@@ -58,7 +58,8 @@ const ComingSoon = lazy(() => import("./components/common/ComingSoon"));
 const BecomeAnAffiliate = lazy(() => import("./components/affiliate/BecomeAnAffiliate"));
 const AffiliateSignup = lazy(() => import("./components/affiliate/AffiliateSignup"));
 const AffiliateLayout = lazy(() => import("./components/layout/affiliatelayout/AffiliateLayout"));
-const OrderInvoice = lazy(() => import("./pages/OrderInvoice"));
+// const OrderInvoice = lazy(() => import("./pages/OrderInvoice"));
+const CategoryPage = lazy(() => import("./pages/CategoryPage"));
 
 
 
@@ -134,7 +135,7 @@ function App() {
         {/* <Route path="/cart" element={<CartPage />} /> */}
 
         {/* not in use the invoice will download directely from now */}
-        <Route path="/invoice" element={<OrderInvoice />} />
+        {/* <Route path="/invoice" element={<OrderInvoice />} /> */}
 
         {/* Affiliate routes – separate layout with new childrens */}
       <Route path="/become-an-affiliate" element={<AffiliateLayout />}>

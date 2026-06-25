@@ -129,7 +129,6 @@ const OrderInvoice = ({order}) => {
   const igstAmount = parseFloat(pricing.igst_amount) || 0;
   const cgstAmount = parseFloat(pricing.cgst_amount) || 0;
   const sgstAmount = parseFloat(pricing.sgst_amount) || 0;
-  const gstRate = parseFloat(pricing.gst_rate) || 0;
   // ---------- Shipping GST (alag se) ----------
 const shippingGstRate = parseFloat(pricing.shipping_gst_rate) || 0;
 const shippingGstTotal = parseFloat(pricing.shipping_gst_amount) || 0;
@@ -165,15 +164,6 @@ const codGstTotal = parseFloat(pricing.cod_gst_amount) || 0;
   // Convert amount to words
   const amountInWords = numberToWords(invoiceValue);
 
-  // Helper to calculate tax per item (based on gstRate) and split if needed
-  const getItemTaxSplit = (netAmount) => {
-    const totalTax = (netAmount * gstRate) / 100;
-    if (isCgstSgst) {
-      return { cgst: totalTax / 2, sgst: totalTax / 2 };
-    } else {
-      return { igst: totalTax };
-    }
-  };
   // Shipping ke liye alag function
 const getShippingTaxSplit = () => {
   const totalTax = shippingGstTotal; // backend se aayi value
@@ -199,13 +189,17 @@ const getCodTaxSplit = () => {
     const price = parseFloat(item.price) || 0;
     const qty = item.quantity || 1;
     const net = price * qty;
-    const taxSplit = getItemTaxSplit(net);
-    const taxAmountTotal = isCgstSgst ? taxSplit.cgst + taxSplit.sgst : taxSplit.igst;
-    const total = net;
     const hsnCode = order.hsn_code;
 
+    // Per-item GST
+  const itemTaxType = item.tax_type || 'cgst_sgst';
+  const isItemCgstSgst = itemTaxType === 'cgst_sgst';
+  const totalGst = parseFloat(item.gst_amount) || 0;
+  const itemGstRate = parseFloat(item.gst_rate) || 0;
+
     // For CGST+SGST, we show two lines in Tax Rate, Tax Type, Tax Amount cells
-    const halfRate = isCgstSgst ? (gstRate / 2).toFixed(2) : null;
+   const displayGstAmount = isItemCgstSgst ? (totalGst / 2) : totalGst;
+  const displayGstRate = isItemCgstSgst ? (itemGstRate / 2).toFixed(2) : null;
 
     return (
       <tr key={idx} className="border-b border-black text-xs">
@@ -222,19 +216,19 @@ const getCodTaxSplit = () => {
 
         {/* Tax Rate column - stacked for CGST/SGST */}
         <td className="border-r border-black p-1 align-middle text-center">
-          {isCgstSgst ? (
+          {isItemCgstSgst ? (
             <>
-              <div>{halfRate}%</div>
-              <div>{halfRate}%</div>
+              <div>{displayGstRate}%</div>
+              <div>{displayGstRate}%</div>
             </>
           ) : (
-            <div>{gstRate}%</div>
+            <div>{itemGstRate}%</div>
           )}
         </td>
 
         {/* Tax Type column - stacked for CGST/SGST */}
         <td className="border-r border-black p-1 align-middle text-center">
-          {isCgstSgst ? (
+          {isItemCgstSgst ? (
             <>
               <div>CGST</div>
               <div>SGST</div>
@@ -246,17 +240,17 @@ const getCodTaxSplit = () => {
 
         {/* Tax Amount column - stacked for CGST/SGST */}
         <td className="border-r border-black p-1 align-middle text-center">
-          {isCgstSgst ? (
+          {isItemCgstSgst ? (
             <>
-              <div>₹{taxSplit.cgst.toFixed(2)}</div>
-              <div>₹{taxSplit.sgst.toFixed(2)}</div>
+              <div>₹{displayGstAmount.toFixed(2)}</div>
+              <div>₹{displayGstAmount.toFixed(2)}</div>
             </>
           ) : (
-            <div>₹{taxSplit.igst.toFixed(2)}</div>
+            <div>₹{displayGstAmount.toFixed(2)}</div>
           )}
         </td>
 
-        <td className="p-1 align-middle text-center">₹{total.toFixed(2)}</td>
+        <td className="p-1 align-middle text-center">₹{net.toFixed(2)}</td>
       </tr>
     );
   });

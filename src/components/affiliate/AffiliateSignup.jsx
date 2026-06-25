@@ -174,7 +174,7 @@ const AffiliateSignup = () => {
 
     try {
       const result = await dispatch(affiliateRegister(submitData)).unwrap();
-      console.log(result);
+      // console.log(result);
       setShowSuccessModal(true);
       setRegistrationCode(result.employee.code || result.employee.id || "N/A");
     } catch (err) {

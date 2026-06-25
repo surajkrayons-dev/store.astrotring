@@ -32,4 +32,8 @@ export const store = configureStore({
     payment: paymentReducer,
     affiliate: affiliateReducer,
   },
+  devTools: {
+    trace: true,        // <-- YEH LINE DAALO
+    traceLimit: 25      // kitni lines ka stack trace dikhana hai (optional)
+  }
 });

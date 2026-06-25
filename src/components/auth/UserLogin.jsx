@@ -112,7 +112,7 @@ const handleSendOtp = async (e) => {
       await dispatch(fetchCart());
       toast.success("Logged in successfully");
     } catch (err) {
-      console.log("error", err);
+      // console.log("error", err);
       toast.error(err || 'Failed to merge cart');
     } finally {
       setLoadingBtn(false);
