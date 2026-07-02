@@ -49,7 +49,7 @@ const CartPage = () => {
 
   const dispatch = useDispatch();
 
-  const [couponCode, setCouponCode] = useState("WELCOMEOFFER");
+  const [couponCode, setCouponCode] = useState("");
   const [couponStatus, setCouponStatus] = useState(null);
   const [couponValidating, setCouponValidating] = useState(false);
   const [removingId, setRemovingId] = useState(null);

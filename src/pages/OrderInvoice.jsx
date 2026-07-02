@@ -282,7 +282,7 @@ const getCodTaxSplit = () => {
               <div>{halfRate}%</div>
             </>
           ) : (
-            <div>{gstRate}%</div>
+            <div>{shippingGstRate}%</div>
           )}
         </td>
 
@@ -354,7 +354,7 @@ if (isCod && COD_SURCHARGE > 0) {
             <div>{halfRate}%</div>
           </>
         ) : (
-          <div>{gstRate}%</div>
+          <div>{codGstRate}%</div>
         )}
       </td>
 

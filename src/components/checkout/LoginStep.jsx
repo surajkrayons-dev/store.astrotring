@@ -48,7 +48,7 @@ const LoginStep = ({ onLoginSuccess, onSignupClick }) => {
       await dispatch(fetchCart());
     } catch (err) {
       // console.log('error', err);
-      // toast.error(err || 'Failed to merge cart');
+      toast.error(err || 'Failed to merge cart');
     } finally {
       setLoading(false);
     }

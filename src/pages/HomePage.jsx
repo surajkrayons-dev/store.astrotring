@@ -222,7 +222,9 @@ useEffect(() => {
     ratti,
     price,
     image,
+    stockQty,
   }) => {
+      if(stockQty < quantity) return toast.info(`${stockQty} stock avilable only `)
     try {
       await dispatch(
         addToCart({ product_id, quantity, name, ratti, price, image }),
