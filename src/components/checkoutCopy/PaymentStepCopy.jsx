@@ -75,32 +75,36 @@ const PaymentStep = forwardRef(
       setLoading(true);
       try {
         // --- COD flow ---
-        // if (selectedPaymentMethod === 'cod') {
-        //   const { data } = await api.post('/store/create-order', {
-        //     amount: grandTotal + codCharge,
-        //     coupon_code: appliedCoupon?.code || null,
-        //     delivery_charge: deliveryCharge,
-        //     wallet_amount: useWallet ? walletAmount : 0,
-        //     address_id: selectedAddressId,
-        //   });
+        if (selectedPaymentMethod === "cod") {
+          const { data } = await api.post("/store/cod/create-order", {
+            amount: grandTotal + codCharge,
+            coupon_code: appliedCoupon?.code || null,
+            delivery_charge: deliveryCharge,
+            wallet_amount: useWallet ? walletAmount : 0,
+            address_id: selectedAddressId,
+          });
 
-        //   // console.log(data)
+          console.log("cod order",data)
 
-        //   if (data.status) {
-        //     toast.success('Order placed successfully!');
-        //     navigate('/order-success', { state: { orderData: data.data.order_id } });
-        //     dispatch(clearCart());
-        //     dispatch(closeCartDrawer());
-        //     onOrderComplete();
-        //   } else {
-        //     toast.error(data.message || 'COD order failed');
-        //   }
-        //   setLoading(false);
-        //   return;
-        // }
+          if (data.status) {
+            toast.success(data?.message || "Order placed successfully!");
+            dispatch(closeCartDrawer());
+            onOrderComplete();
+            dispatch(clearCart());
+            navigate("/order-success", {
+              state: { orderData: data.data.order_id },
+            });
+          } else {
+
+            console.log("erreodata",data)
+            toast.error(data.message || "COD order failed");
+          }
+          setLoading(false);
+          return;
+        }
 
         // --- COD with advance payment ---
-        if (selectedPaymentMethod === "cod") {
+        if (selectedPaymentMethod === "coddd") {
           if (!selectedAddressId) return toast.error("Select delivery address");
           setLoading(true);
 
@@ -119,6 +123,7 @@ const PaymentStep = forwardRef(
 
             const { razorpay_order_id, pricing } = advanceRes.data;
             const advanceAmount = parseFloat(pricing.advance_amount);
+            console.log(advanceAmount);
 
             // Step 2: Open Razorpay for advance payment
             const options = {
@@ -151,14 +156,14 @@ const PaymentStep = forwardRef(
                   }
 
                   toast.success("Advance payment successful! Order placed.");
+                  dispatch(clearCart());
+                  dispatch(closeCartDrawer());
+                  onOrderComplete();
                   navigate("/order-success", {
                     state: {
                       orderData: verifyRes.data.data?.order_id,
                     },
                   });
-                  dispatch(clearCart());
-                  dispatch(closeCartDrawer());
-                  onOrderComplete();
                 } catch (err) {
                   console.log("err", { err });
                   toast.error(
@@ -181,6 +186,7 @@ const PaymentStep = forwardRef(
             const razorpay = new window.Razorpay(options);
             razorpay.open();
           } catch (err) {
+            
             toast.error(err.message || "Failed to initiate advance payment");
             setLoading(false);
           }
@@ -212,11 +218,12 @@ const PaymentStep = forwardRef(
           });
           if (verify.data.status) {
             toast.success("Order placed!");
+            dispatch(clearCart());
+            dispatch(closeCartDrawer());
+            onOrderComplete();
             navigate("/order-success", {
               state: { orderData: verify.data.order.order_id },
             });
-            dispatch(clearCart());
-            onOrderComplete();
           } else toast.error("Verification failed");
           setLoading(false);
           return;
@@ -244,12 +251,12 @@ const PaymentStep = forwardRef(
               if (verify.data.status) {
                 toast.success("Payment successful!");
 
-                navigate("/order-success", {
-                  state: { orderData: verify.data.order.order_id },
-                });
                 dispatch(clearCart());
                 dispatch(closeCartDrawer());
                 onOrderComplete();
+                navigate("/order-success", {
+                  state: { orderData: verify.data.order.order_id },
+                });
               } else toast.error("Verification failed");
             } catch (err) {
               toast.error("Verification error");
@@ -262,6 +269,7 @@ const PaymentStep = forwardRef(
         const razorpay = new window.Razorpay(options);
         razorpay.open();
       } catch (err) {
+        console.log(err)
         toast.error(err?.response?.data?.message || "Order creation failed");
         setLoading(false);
       }
@@ -367,18 +375,22 @@ const PaymentStep = forwardRef(
                       Cash on Delivery is available only for select pin codes
                       and incurs a non‑refundable handling fee.
                     </li>
-                    <li>
+                    <li>A non‑refundable COD charge of Rs.49 is required.</li>
+                    {/* <li>
                       A non‑refundable advance of Rs. 199 is required, which is
                       adjusted against the final product price.
-                    </li>
+                    </li> */}
                   </ul>
                 </div>
               </details>
             </label>
             {selectedPaymentMethod === "cod" && (
+              // <p className="text-xs text-gray-500 ml-6">
+              //   A non‑refundable advance of Rs. 199 is required, which is
+              //   adjusted against the final product price.
+              // </p>
               <p className="text-xs text-gray-500 ml-6">
-                A non‑refundable advance of Rs. 199 is required, which is
-                adjusted against the final product price.
+                A non‑refundable COD charge of Rs.49 is required.
               </p>
             )}
           </div>

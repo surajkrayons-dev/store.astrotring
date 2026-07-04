@@ -4,10 +4,10 @@ import { useLocation, useMatch } from "react-router-dom";
 
 const WhatsAppButton = () => {
   
- const isProductPage = useMatch("/product/:id");
+ const isHomepage = useMatch("/");
 
-  // Agar product page hai to button mat dikhao
-  if (isProductPage) return null;
+  // Agar home page hai to button mat dikhao
+  if (!isHomepage) return null;
   return (
     <a
       href="https://wa.me/919485628238?text=Hi"

@@ -172,11 +172,11 @@ useEffect(() => {
   }, [navbarHeight]);
 
 // products fetch 
-useEffect(() => {
-   if (products.length === 0) {   // <-- YEH CONDITION DAALO
-    dispatch(fetchAllProducts());
-  }
-}, [dispatch,products.length]);
+  useEffect(() => {
+    if (!products.length) {
+      dispatch(fetchAllProducts());
+    }
+  }, [dispatch, products.length]);
 
 // Categories fetch 
 useEffect(() => {
@@ -222,7 +222,9 @@ useEffect(() => {
     ratti,
     price,
     image,
+    stockQty,
   }) => {
+      if(stockQty < quantity) return toast.info(`${stockQty} stock avilable only `)
     try {
       await dispatch(
         addToCart({ product_id, quantity, name, ratti, price, image }),

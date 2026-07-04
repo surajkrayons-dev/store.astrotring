@@ -9,8 +9,6 @@ import HomePage from "./pages/HomePage";
 // import ProfilePage from "./pages/ProfilePage";
 
 // import AddressesPage from "./pages/AddressesPage";
-
-// import CheckoutPage from "./pages/CheckoutPage";
 // import MyOrderDetailsPage from "./pages/MyOrderDetailsPage";
 // import MyOrdersPage from "./pages/MyOrdersPage";
 // import WalletPage from "./pages/WalletPage";
@@ -128,8 +126,6 @@ function App() {
         </Route>
 
         {/* =============================================================== */}
-        {/* checkout currently not in use  */}
-        {/* <Route path="/checkout" element={<CheckoutPage />} /> */}
 
         {/* now cart is not used the cart page showing in the drawer not on route */}
         {/* <Route path="/cart" element={<CartPage />} /> */}

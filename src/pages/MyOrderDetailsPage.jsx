@@ -354,9 +354,12 @@ const MyOrderDetailsPage = () => {
                   {remainingCod >0 && <p className="text-lg font-bold text-gray-900 mt-1">
                     Total: ₹{remainingCod.toLocaleString()}
                   </p>}
-                  {!isCod  && <p className="text-lg font-bold text-gray-900 mt-1">
+                  {/* {!isCod  && <p className="text-lg font-bold text-gray-900 mt-1">
                     Total: ₹{total.toLocaleString()}
-                  </p>}
+                  </p>} */}
+                  <p className="text-lg font-bold text-gray-900 mt-1">
+                    Total: ₹{total.toLocaleString()}
+                  </p>
                 </div>
               </div>
             </div>

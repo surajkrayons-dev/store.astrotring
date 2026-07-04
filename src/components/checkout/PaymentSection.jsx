@@ -1,0 +1,350 @@
+// src/components/checkout/PaymentSection.jsx
+import React, { useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { ArrowRight, CreditCard, Info, Loader2 } from "lucide-react";
+
+// Importing the verified production thunks and sync actions
+import {
+  setPaymentMethod,
+  createStandardCodOrder,
+  createOnlineOrder,
+  verifyOnlinePayment,
+  resetPaymentState,
+} from "@/redux/slices/paymentSlice";
+
+// Explicit fallback to make sure clearCart action works from your cart architecture
+import { clearCart } from "@/redux/slices/cartSlice";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import { closeCartDrawer, closeCheckout } from "@/redux/slices/uiSlice";
+import {
+  calculateDeliveryCharge,
+  calculateCodCharge,
+} from "@/redux/slices/extraCheckoutChargeSlice";
+
+const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID;
+
+/**
+ * PaymentSection Component
+ * Manages order processing paths for both Cash on Delivery (COD)
+ * and online payments using the integrated payment slice engine.
+ */
+const PaymentSection = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // Mapped global states from user auth, cart, and payment slice
+  const { isLoggedIn, user } = useSelector((state) => state.userAuth);
+  const { items } = useSelector((state) => state.cart);
+  let { appliedCoupon, couponDiscount } = useSelector((state) => state.coupon);
+  const { selectedAddressId } = useSelector((state) => state.address);
+  const { deliveryCharge, codCharge, isDeliveryLoading, isCodLoading } =
+    useSelector((state) => state.extraCheckoutCharge);
+  const {
+    selectedPaymentMethod,
+    loading: globalPaymentLoading,
+  } = useSelector((state) => state.payment);
+
+  console.log(user)
+
+  const cartTotal = items.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0,
+  );
+  if (appliedCoupon?.discount_type == "percentage") {
+    couponDiscount = (cartTotal * couponDiscount) / 100;
+  } else if (appliedCoupon?.discount_type === "flat") {
+    couponDiscount = couponDiscount;
+  }
+  const finalPayableAmount =
+    selectedPaymentMethod === "cod"
+      ? cartTotal + deliveryCharge + codCharge - couponDiscount
+      : cartTotal + deliveryCharge - couponDiscount; // Online में COD charge नहीं
+
+  console.log(selectedAddressId);
+
+  useEffect(() => {
+    if (selectedAddressId || selectedPaymentMethod) {
+      dispatch(calculateDeliveryCharge({ address_id: selectedAddressId,coupon_code:appliedCoupon?.code }));
+      dispatch(calculateCodCharge({ address_id: selectedAddressId }));
+    }
+  }, [selectedAddressId, dispatch, selectedPaymentMethod]);
+
+  // Fallback to safety if address selection hasn't pre-populated grandTotal yet
+  // const rawTotal = grandTotal || 0;
+  // const finalPayableAmount =
+  //   selectedPaymentMethod === "cod" ? rawTotal + codCharge : rawTotal;
+
+  /**
+   * Evaluates operational checks and routes order processing to matching transactional handlers
+   */
+  const handleCheckoutProcess = async () => {
+    // 1. Edge-case form protection rules
+    if (!isLoggedIn) {
+      toast.error("Please log in!");
+      return;
+    }
+    if (!items || items.length === 0) {
+      toast.error("Your shopping cart is empty.");
+      return;
+    }
+    if (!selectedAddressId) {
+      toast.error("Please select or add a delivery address.");
+      return;
+    }
+
+    /* --- PATHWAY A: CASH ON DELIVERY ORDER GENERATION --- */
+    if (selectedPaymentMethod === "cod") {
+      try {
+        console.log("Processing Cash on Delivery transaction lifecycle...");
+
+        const data = await dispatch(
+          createStandardCodOrder({
+            amount: finalPayableAmount,
+            coupon_code: appliedCoupon?.code || appliedCoupon || null,
+            delivery_charge: deliveryCharge || 0,
+            wallet_amount: 0, // Defaulted to zero for standard forms
+            address_id: selectedAddressId,
+          }),
+        ).unwrap();
+
+        console.log(data);
+
+        if (data.status || data.success) {
+          toast.success(data?.message || "Order placed successfully!");
+          dispatch(closeCartDrawer());
+          dispatch(clearCart());
+          dispatch(closeCheckout());
+
+          navigate("/order-success", {
+            state: { orderData: data.data.order_id },
+          });
+        } else {
+          console.log("erreodata", data);
+          toast.error(data.message || "COD order failed");
+        }
+      } catch (err) {
+        console.error("COD submission crash details:", err);
+        toast.error(
+          err ||
+            "An error occurred while placing your COD order. Please try again.",
+        );
+      }
+      return;
+    }
+
+    /* --- PATHWAY A: CASH ON DELIVERY ORDER GENERATION --- */
+    if (selectedPaymentMethod === "online") {
+      if (typeof window.Razorpay === "undefined") {
+        toast.error("Payment gateway not loaded. Refresh and try again.");
+        return;
+      }
+
+      try {
+        console.log("🟢 [ONLINE] Step 1: Creating order...");
+        const orderData = await dispatch(
+          createOnlineOrder({
+            amount: finalPayableAmount,
+            coupon_code: appliedCoupon?.code || appliedCoupon || null,
+            delivery_charge: deliveryCharge || 0,
+            wallet_amount: 0,
+            address_id: selectedAddressId,
+          }),
+        ).unwrap();
+        console.log("✅ Order created:", orderData);
+
+        if (!orderData.order_id) {
+          toast.error(orderData.message || "Failed to create order.");
+          return;
+        }
+
+        const options = {
+          key: RAZORPAY_KEY,
+          amount: orderData.amount || Math.round(finalPayableAmount * 100),
+          currency: orderData.currency || "INR",
+          name: "Astrotring Store",
+          description: appliedCoupon ? "Coupon Applied" : "Order Payment",
+          order_id: orderData.order_id,
+          prefill: {
+            name: user?.name || "Customer",
+            contact: user?.mobile , // 👈 यहाँ mobile prefill
+            email: user?.email || "customer@example.com",
+          },
+          theme: { color: "#f59e0b" },
+          modal: {
+            ondismiss: () => {
+              console.log("🔴 Modal closed by user.");
+              toast.info("Payment cancelled.");
+            },
+          },
+          handler: async (response) => {
+            console.log("🟢 Payment success. Response:", response);
+            try {
+              const payload = {
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                coupon_code: appliedCoupon?.code || appliedCoupon || null,
+                delivery_charge: deliveryCharge || 0,
+                address_id: selectedAddressId,
+                wallet_amount: 0,
+                amount: finalPayableAmount,
+              };
+              console.log("🟡 Verifying payment...", payload);
+              const verifyRes = await dispatch(
+                verifyOnlinePayment(payload),
+              ).unwrap();
+              console.log("✅ Verification response:", verifyRes);
+
+              if (verifyRes.status || verifyRes.data.status) {
+                toast.success(" Payment successful!");
+                dispatch(clearCart());
+                dispatch(resetPaymentState());
+                dispatch(closeCartDrawer());
+                dispatch(closeCheckout());
+                navigate("/order-success", {
+                  state: { orderData: verifyRes.data?.order?.order_id },
+                });
+              } else {
+                toast.error(verifyRes.message || "Verification failed.");
+              }
+            } catch (err) {
+              console.error(" Verification error:", err);
+              toast.error(err?.message || "Verification error.");
+            }
+          },
+        };
+
+        console.log("🟢 Opening Razorpay...");
+        const razorpay = new window.Razorpay(options);
+        razorpay.on("payment.failed", (response) => {
+          console.error("❌ Payment failed:", response.error);
+          toast.error(response.error?.description || "Payment failed.");
+        });
+        razorpay.open();
+      } catch (err) {
+        console.error(" Online payment error:", err);
+        toast.error(err?.message || "Could not initiate payment.");
+      }
+      return;
+    }
+  };
+
+  return (
+    <div className="w-full bg-white border border-gray-100 rounded-xl p-4 sm:p-5 shadow-sm space-y-5 text-left">
+      {/* Module Navigation Branding Headers */}
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-amber-500/10 text-amber-500 rounded-lg shrink-0">
+          <CreditCard size={20} />
+        </div>
+        <div>
+          <h3 className="text-sm font-extrabold text-gray-900 tracking-tight">
+            Payment Method
+          </h3>
+          <p className="text-xs text-gray-500 font-medium">
+            Select a secure payment option to finalize your purchase
+          </p>
+        </div>
+      </div>
+
+      {/* Online Options vs COD Form Grid Selectors */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Pathway 1: Online Channels */}
+        <label
+          className={`flex items-center gap-3 p-3.5 border rounded-xl cursor-pointer transition-all ${selectedPaymentMethod === "online" ? "border-amber-500 bg-amber-500/5 ring-1 ring-amber-500" : "border-gray-200 bg-white hover:border-gray-300"}`}
+        >
+          <input
+            type="radio"
+            name="payment_type"
+            checked={selectedPaymentMethod === "online"}
+            onChange={() => dispatch(setPaymentMethod("online"))}
+            className="h-4 w-4 text-amber-500 accent-amber-600 focus:ring-amber-500 border-gray-300 cursor-pointer"
+          />
+          <div className="text-left">
+            <p className="text-xs font-extrabold text-gray-800">
+              Online Payment
+            </p>
+            <p className="text-[10px] text-gray-400 font-medium">
+              Cards, UPI, NetBanking, Wallets
+            </p>
+          </div>
+        </label>
+
+        {/* Pathway 2: Cash on Delivery Channel */}
+        <label
+          className={`flex items-center gap-3 p-3.5 border rounded-xl cursor-pointer transition-all ${selectedPaymentMethod === "cod" ? "border-amber-500 bg-amber-500/5 ring-1 ring-amber-500" : "border-gray-200 bg-white hover:border-gray-300"}`}
+        >
+          <input
+            type="radio"
+            name="payment_type"
+            checked={selectedPaymentMethod === "cod"}
+            onChange={() => dispatch(setPaymentMethod("cod"))}
+            className="h-4 w-4 text-amber-500 accent-amber-600 focus:ring-amber-500 border-gray-300 cursor-pointer"
+          />
+          <div className="text-left">
+            <p className="text-xs font-extrabold text-gray-800">
+              Cash on Delivery
+            </p>
+            <p className="text-[10px] text-gray-400 font-medium">
+              A non‑refundable COD charge of Rs.49 is required.
+            </p>
+          </div>
+        </label>
+      </div>
+
+      {/* Structured Billing Calculation Display Box */}
+      <div className="p-4 bg-gray-50/50 rounded-xl border border-gray-200/60 text-xs space-y-1.5">
+        {/* {selectedPaymentMethod === "cod" && (
+          <div className="flex justify-between items-center text-gray-500 text-[11px] font-medium transition-all">
+            <span className="flex items-center gap-1">
+              COD Handling Surcharge
+              <Info
+                size={12}
+                className="text-gray-400"
+                title="Processing fee added for manual cash courier collections."
+              />
+            </span>
+            <span>+ ₹{codCharge}</span>
+          </div>
+        )} */}
+        <div className="flex justify-between items-center text-sm font-extrabold text-gray-900 pt-0.5">
+          <span>Payable Amount:</span>
+          <span className="text-amber-500 text-base tracking-wide">
+            ₹
+            {finalPayableAmount.toLocaleString("en-IN", {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </span>
+        </div>
+      </div>
+
+      {/* Primary Conversion Submission CTA Anchor */}
+      <button
+        onClick={handleCheckoutProcess}
+        disabled={globalPaymentLoading || isDeliveryLoading || isCodLoading}
+        className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-100 disabled:text-gray-400 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 transform active:scale-[0.99] cursor-pointer"
+      >
+        {globalPaymentLoading ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+            <span className="animate-pulse normal-case tracking-normal font-bold text-gray-400">
+              Processing Transaction...
+            </span>
+          </>
+        ) : (
+          <>
+            <span>
+              {selectedPaymentMethod === "online"
+                ? "Proceed to Payment"
+                : "Confirm Order Placement"}
+            </span>
+            <ArrowRight size={20} />
+          </>
+        )}
+      </button>
+    </div>
+  );
+};
+
+export default PaymentSection;

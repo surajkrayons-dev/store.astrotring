@@ -1,83 +1,202 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { api } from '../baseApi';
+// src/redux/slices/paymentSlice.js
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { api } from "../baseApi";
 
-// ---------- THUNKS ----------
-export const initiatePayment = createAsyncThunk(
-  'payment/initiate',
-  async ({ order_id, method = 'online' }, { rejectWithValue }) => {
-    // console.log("initiate payment order_id ",order_id)     
-      // console.log("initiate payment method ",method) 
+// ==========================================
+// ---------- ASYNC THUNKS (PAYMENT) ----------
+// ==========================================
+
+// 1. Standard COD Order Creation
+export const createStandardCodOrder = createAsyncThunk(
+  "payment/createStandardCodOrder",
+  async (payload, { rejectWithValue }) => {
     try {
-      const response = await api.post('/user/payment/initiate', { order_id, method });
-
-          
-      
-      return response.data.data; // expects { key_id, amount, currency, razorpay_order_id, ... }
+      const { data } = await api.post("/store/cod/create-order", payload);
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Failed to initiate payment');
+      return rejectWithValue(error.response?.data?.message || "COD order failed");
     }
   }
 );
 
-export const verifyPayment = createAsyncThunk(
-  'payment/verify',
-  async ({ razorpay_order_id, razorpay_payment_id, razorpay_signature }, { rejectWithValue }) => {
+// 2. COD with Advance Payment Setup (coddd)
+export const createAdvanceCodOrder = createAsyncThunk(
+  "payment/createAdvanceCodOrder",
+  async (payload, { rejectWithValue }) => {
     try {
-      const response = await api.post('/user/payment/verify', {
-        razorpay_order_id,
-        razorpay_payment_id,
-        razorpay_signature,
-      });
-
-      // console.log("razopar-pay verification",response.data)
-      return response.data; // expects { success: true, ... }
+      const { data } = await api.post("/store/cod/create-order", payload);
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Payment verification failed');
+      return rejectWithValue(error.response?.data?.message || "Advance order creation failed");
     }
   }
 );
 
+// 3. Verify COD Advance Payment
+export const verifyAdvanceCodPayment = createAsyncThunk(
+  "payment/verifyAdvanceCodPayment",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const { data } = await api.post("/store/cod/verify-payment", payload);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Advance payment verification failed");
+    }
+  }
+);
+
+// 4. Standard Online Order Initiation
+export const createOnlineOrder = createAsyncThunk(
+  "payment/createOnlineOrder",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const { data } = await api.post("/store/create-order", payload);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Online order initiation failed");
+    }
+  }
+);
+
+// 5. Verify Online Gateway Payment (Handles regular & wallet-only cases)
+export const verifyOnlinePayment = createAsyncThunk(
+  "payment/verifyOnlinePayment",
+  async (payload, { rejectWithValue }) => {
+    try {
+      const { data } = await api.post("/store/verify-payment", payload);
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Online payment verification failed");
+    }
+  }
+);
+
+// ==========================================
 // ---------- INITIAL STATE ----------
+// ==========================================
 const initialState = {
+  // Zero-Props Checkout Architecture
+  selectedPaymentMethod: "online", 
+  deliveryCharge: 0,
+  codCharge: 49,
+  grandTotal: 0,
+  
   loading: false,
   error: null,
+  paymentSuccess: false,
 };
 
-// ---------- SLICE ----------
+// ==========================================
+// ---------- SLICE CONFIGURATION ----------
+// ==========================================
 const paymentSlice = createSlice({
-  name: 'payment',
+  name: "payment",
   initialState,
   reducers: {
+    setPaymentMethod: (state, action) => {
+      state.selectedPaymentMethod = action.payload;
+    },
+
+    updateCheckoutAmounts: (state, action) => {
+      const { grandTotal, deliveryCharge, codCharge } = action.payload;
+      if (grandTotal !== undefined) state.grandTotal = grandTotal;
+      if (deliveryCharge !== undefined) state.deliveryCharge = deliveryCharge;
+      if (codCharge !== undefined) state.codCharge = codCharge;
+    },
     clearPaymentError: (state) => {
       state.error = null;
     },
+    resetPaymentState: (state) => {
+      state.selectedPaymentMethod = "online";
+      state.loading = false;
+      state.error = null;
+      state.paymentSuccess = false;
+    }
   },
   extraReducers: (builder) => {
     builder
-      .addCase(initiatePayment.pending, (state) => {
+      // 1. Create Standard COD Order
+      .addCase(createStandardCodOrder.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.paymentSuccess = false;
+      })
+      .addCase(createStandardCodOrder.fulfilled, (state) => {
+        state.loading = false;
+        state.paymentSuccess = true;
+      })
+      .addCase(createStandardCodOrder.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.paymentSuccess = false;
+      })
+
+      // 2. Create Advance COD Order (coddd)
+      .addCase(createAdvanceCodOrder.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(initiatePayment.fulfilled, (state) => {
+      .addCase(createAdvanceCodOrder.fulfilled, (state) => {
         state.loading = false;
       })
-      .addCase(initiatePayment.rejected, (state, action) => {
+      .addCase(createAdvanceCodOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      .addCase(verifyPayment.pending, (state) => {
+
+      // 3. Verify COD Advance Payment
+      .addCase(verifyAdvanceCodPayment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.paymentSuccess = false;
+      })
+      .addCase(verifyAdvanceCodPayment.fulfilled, (state) => {
+        state.loading = false;
+        state.paymentSuccess = true;
+      })
+      .addCase(verifyAdvanceCodPayment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.paymentSuccess = false;
+      })
+
+      // 4. Create Online Order
+      .addCase(createOnlineOrder.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(verifyPayment.fulfilled, (state) => {
+      .addCase(createOnlineOrder.fulfilled, (state) => {
         state.loading = false;
       })
-      .addCase(verifyPayment.rejected, (state, action) => {
+      .addCase(createOnlineOrder.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // 5. Verify Online Payment
+      .addCase(verifyOnlinePayment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.paymentSuccess = false;
+      })
+      .addCase(verifyOnlinePayment.fulfilled, (state) => {
+        state.loading = false;
+        state.paymentSuccess = true;
+      })
+      .addCase(verifyOnlinePayment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.paymentSuccess = false;
       });
   },
 });
 
-export const { clearPaymentError } = paymentSlice.actions;
+export const { 
+  setPaymentMethod, 
+  setCheckoutAddress, 
+  updateCheckoutAmounts, 
+  clearPaymentError, 
+  resetPaymentState 
+} = paymentSlice.actions;
+
 export default paymentSlice.reducer;

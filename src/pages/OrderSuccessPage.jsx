@@ -31,7 +31,7 @@ const OrderSuccessPage = () => {
   // const orderId = 314;
    const orderId = location.state?.orderData;
 
-  // console.log(order);
+  console.log(order);
 
   useEffect(() => {
     if (orderId) {
@@ -59,7 +59,7 @@ useEffect(() => {
 
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
-      event: 'trackTransaction',
+      event: 'purchase',
       ecommerce: {
         transaction_id: transactionId,
         currency: 'INR',
@@ -153,7 +153,7 @@ useEffect(() => {
 
   // Loading state
   if (loading) {
-    return <Loader data="Loading order details..." />;
+    return <Loader data="Please do not refresh, Loading order details..." />;
   }
 
   // Error state - No orderId
@@ -475,7 +475,7 @@ useEffect(() => {
                       </td>
                     </tr>
                   )}
-                  {order.payment.mode !== "cod" && (
+                  {/* {order.payment.mode !== "cod" && (
                     <tr className="border-t-2 border-gray-300">
                       <td
                         colSpan="3"
@@ -487,7 +487,19 @@ useEffect(() => {
                         ₹{parseFloat(totalPaid).toLocaleString()}
                       </td>
                     </tr>
-                  )}
+                  )} */}
+
+                    <tr className="border-t-2 border-gray-300">
+                      <td
+                        colSpan="3"
+                        className="pt-2 text-right font-bold text-gray-800"
+                      >
+                        Total:
+                      </td>
+                      <td className="pt-2 text-right font-bold text-gray-800 text-sm">
+                        ₹{parseFloat(totalPaid).toLocaleString()}
+                      </td>
+                    </tr>
                 </tfoot>
               </table>
             </div>

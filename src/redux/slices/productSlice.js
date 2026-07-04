@@ -80,6 +80,7 @@ const initialState = {
   selectedProduct: null, // single product for details page
   productCategories: [],
   selectedProductCategory: null,
+  
   loading: true,
   error: null,
   filters: {
@@ -121,7 +122,9 @@ const productSlice = createSlice({
       })
       .addCase(fetchAllProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
+         if (action.payload && action.payload.length > 0) {
+    state.items = action.payload;
+  }
       })
       .addCase(fetchAllProducts.rejected, (state, action) => {
         state.loading = false;
