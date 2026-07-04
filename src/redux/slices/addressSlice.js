@@ -85,16 +85,21 @@ export const fetchPincodeDetails = createAsyncThunk(
 
 const initialState = {
   addresses: [],
+  selectedAddressId: null,
   loading: false,
   error: null,
 };
 
 const addressSlice = createSlice({
+  
   name: "address",
   initialState,
   reducers: {
     clearAddressError: (state) => {
       state.error = null;
+    },
+    setSelectedAddress: (state, action) => {
+      state.selectedAddressId = action.payload; // payload = address id
     },
   },
   extraReducers: (builder) => {
@@ -173,5 +178,5 @@ const addressSlice = createSlice({
   },
 });
 
-export const { clearAddressError } = addressSlice.actions;
+export const { clearAddressError ,setSelectedAddress} = addressSlice.actions;
 export default addressSlice.reducer;

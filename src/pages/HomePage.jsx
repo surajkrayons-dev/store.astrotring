@@ -172,11 +172,11 @@ useEffect(() => {
   }, [navbarHeight]);
 
 // products fetch 
-useEffect(() => {
-   if (products.length === 0) {   // <-- YEH CONDITION DAALO
-    dispatch(fetchAllProducts());
-  }
-}, [dispatch,products.length]);
+  useEffect(() => {
+    if (!products.length) {
+      dispatch(fetchAllProducts());
+    }
+  }, [dispatch, products.length]);
 
 // Categories fetch 
 useEffect(() => {

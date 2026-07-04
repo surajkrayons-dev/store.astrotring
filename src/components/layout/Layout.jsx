@@ -6,11 +6,15 @@ import UserLogin from "../auth/UserLogin";
 import TopPromoSlider from "../common/TopPromoSlider";
 import WhatsAppButton from "../common/WhatsAppButton";
 import CartDrawer from "../cart/CartDrawer";
-import CheckoutPopupWrapper from "../checkout/CheckoutPopupWrapper";
+// import CheckoutPopupWrapper from "../checkout/CheckoutPopupWrapper";
 import { Suspense } from "react";
 import Loader from "../common/Loader";
+import CheckoutPopup from "../checkout/CheckoutPopup";
+
 
 const Layout = () => {
+
+
   return (
     <div className="min-h-screen bg-stone-50">
       <TopPromoSlider /> 
@@ -23,7 +27,11 @@ const Layout = () => {
       <Footer />
       <UserLogin />
       <CartDrawer />
-      <CheckoutPopupWrapper /> 
+      {/* <CheckoutPopupWrapper />  */}
+
+      <CheckoutPopup 
+     
+      />
       <WhatsAppButton />
     </div>
   );

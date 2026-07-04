@@ -6,7 +6,7 @@ import { ShoppingBag } from "lucide-react";
 const ProductCard = ({ product, addToCart, compact = false }) => {
   const [hovered, setHovered] = useState(false);
 
-  console.log(product);
+  // console.log(product);
 
   // Price extraction logic - handles both gemstones and regular products
   let afterPrice = 0;
