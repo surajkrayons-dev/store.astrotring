@@ -10,6 +10,7 @@ import walletReducer from "./slices/walletSlice";
 import reviewReducer from "./slices/reviewSlice";
 import wishlistReducer from "./slices/wishlistSlice";
 import paymentReducer from "./slices/paymentSlice";
+import extraCheckoutChargeReducer from "./slices/extraCheckoutChargeSlice";
 import affiliateReducer from "./slices/affiliateSlice";
 
 // import cartApiReducer from './slices/cartSlice';
@@ -30,10 +31,12 @@ export const store = configureStore({
     review: reviewReducer,
     wishlist: wishlistReducer,
     payment: paymentReducer,
+    extraCheckoutCharge: extraCheckoutChargeReducer,
     affiliate: affiliateReducer,
   },
+  // for reduxdevtools
   devTools: {
-    trace: true,        // <-- YEH LINE DAALO
-    traceLimit: 25      // kitni lines ka stack trace dikhana hai (optional)
+    trace: true,        
+    traceLimit: 25    
   }
 });

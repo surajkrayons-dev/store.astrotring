@@ -297,8 +297,7 @@ const initialState = {
   loading: false, // Loading state for async operations
   error: null, // Error message if any
   isGuestCart: false, // Flag to indicate if current cart is from guest user
-  appliedCoupon: null, // Currently applied coupon
-  couponDiscount: 0, // Discount amount from applied coupon
+ 
 };
 
 // ==================== SLICE ====================
@@ -314,14 +313,7 @@ const cartSlice = createSlice({
       state.items = [];
       clearGuestCart(); // Also clear guest cart from localStorage
     },
-    setAppliedCoupon: (state, action) => {
-      state.appliedCoupon = action.payload.coupon;
-      state.couponDiscount = action.payload.discount;
-    },
-    clearAppliedCoupon: (state) => {
-      state.appliedCoupon = null;
-      state.couponDiscount = 0;
-    },
+   
   },
   extraReducers: (builder) => {
     builder
@@ -430,8 +422,7 @@ export const {
   clearCartError,
   resetCart,
   clearCart,
-  setAppliedCoupon,
-  clearAppliedCoupon,
+
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

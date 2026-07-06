@@ -167,32 +167,25 @@ const ProductDetailsPage = () => {
     return () => footerObserver.disconnect();
   }, []);
 
-
-
-// ---------- add dataLayer for gtm tracking ----------
-useEffect(() => {
-  if (product?.id) {
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      event: "viewItem",
-      ecommerce: {
-        
-        items: [{
-          item_id: String(product.id),
-          item_name: product.name || "",
-          price: Number(product.after_price),
-          
-        }]
-      }
-    });
-    console.log("viewItem datalayer", window.dataLayer);
-  }
-}, [product]);
-
-
-
-
-
+  // ---------- add dataLayer for gtm tracking ----------
+  useEffect(() => {
+    if (product?.id) {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "viewItem",
+        ecommerce: {
+          items: [
+            {
+              item_id: String(product.id),
+              item_name: product.name || "",
+              price: Number(product.after_price),
+            },
+          ],
+        },
+      });
+      console.log("viewItem datalayer", window.dataLayer);
+    }
+  }, [product]);
 
   // --- Related products (only from API, no fallback) ---
   const suggestedProducts = useMemo(() => {
@@ -343,6 +336,8 @@ useEffect(() => {
   };
 
   const handleAddToCart = async () => {
+    if (product?.stock_qty < quantity)
+      return toast.info(`${product?.stock_qty} stock avilable only `);
     try {
       await dispatch(
         addToCart({
@@ -363,6 +358,8 @@ useEffect(() => {
   };
 
   const handleBuyNow = async () => {
+    if (product?.stock_qty < quantity)
+      return toast.info(`${product?.stock_qty} stock avilable only `);
     try {
       await dispatch(
         addToCart({
@@ -371,7 +368,7 @@ useEffect(() => {
           ratti: selectedRatti,
           name: product.name,
           price: displayAfterPrice,
-          image: product.image,
+          image: product?.image,
         }),
       ).unwrap();
       toast.success(`${product?.name} added to cart!`);
@@ -790,7 +787,9 @@ useEffect(() => {
             </section> */}
 
             {/* Accordion Sections – Product details */}
-            {(benefitsParagraphs.length > 0 || howToUseSteps.length > 0 || product?.description ) && (
+            {(benefitsParagraphs.length > 0 ||
+              howToUseSteps.length > 0 ||
+              product?.description) && (
               <ProductAccordionSections
                 description={product?.description}
                 benefitsParagraphs={benefitsParagraphs}
