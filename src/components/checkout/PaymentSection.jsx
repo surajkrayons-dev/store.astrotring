@@ -114,7 +114,7 @@ useEffect(() => {
     /* --- PATHWAY A: CASH ON DELIVERY ORDER GENERATION --- */
     if (selectedPaymentMethod === "cod") {
       try {
-        console.log("Processing Cash on Delivery transaction lifecycle...");
+        
 
         const data = await dispatch(
           createStandardCodOrder({
@@ -126,7 +126,7 @@ useEffect(() => {
           }),
         ).unwrap();
 
-        console.log(data);
+        // console.log(data);
 
         if (data.status || data.success) {
           toast.success(data?.message || "Order placed successfully!");
@@ -138,11 +138,11 @@ useEffect(() => {
             state: { orderData: data.data.order_id },
           });
         } else {
-          console.log("erreodata", data);
+          // console.log("erreodata", data);
           toast.error(data.message || "COD order failed");
         }
       } catch (err) {
-        console.error("COD submission crash details:", err);
+      
         toast.error(
           err ||
             "An error occurred while placing your COD order. Please try again.",
@@ -159,7 +159,7 @@ useEffect(() => {
       }
 
       try {
-        console.log("🟢 [ONLINE] Step 1: Creating order...");
+      
         const orderData = await dispatch(
           createOnlineOrder({
             amount: finalPayableAmount,
@@ -169,7 +169,7 @@ useEffect(() => {
             address_id: selectedAddressId,
           }),
         ).unwrap();
-        console.log("✅ Order created:", orderData);
+  
 
         if (!orderData.order_id) {
           toast.error(orderData.message || "Failed to create order.");
@@ -191,12 +191,12 @@ useEffect(() => {
           theme: { color: "#f59e0b" },
           modal: {
             ondismiss: () => {
-              console.log("🔴 Modal closed by user.");
+             
               toast.info("Payment cancelled.");
             },
           },
           handler: async (response) => {
-            console.log("🟢 Payment success. Response:", response);
+            // console.log("Payment success. Response:", response);
             try {
               const payload = {
                 razorpay_order_id: response.razorpay_order_id,
@@ -208,11 +208,11 @@ useEffect(() => {
                 wallet_amount: 0,
                 amount: finalPayableAmount,
               };
-              console.log("🟡 Verifying payment...", payload);
+              // console.log(" Verifying payment...", payload);
               const verifyRes = await dispatch(
                 verifyOnlinePayment(payload),
               ).unwrap();
-              console.log("✅ Verification response:", verifyRes);
+              // console.log(" Verification response:", verifyRes);
 
               if (verifyRes.status || verifyRes.data.status) {
                 toast.success(" Payment successful!");
@@ -221,22 +221,22 @@ useEffect(() => {
                 dispatch(closeCartDrawer());
                 dispatch(closeCheckout());
                 navigate("/order-success", {
-                  state: { orderData: verifyRes.data?.order?.order_id },
+                  state: { orderData: verifyRes?.order?.order_id || verifyRes.data?.order?.order_id },
                 });
               } else {
                 toast.error(verifyRes.message || "Verification failed.");
               }
             } catch (err) {
-              console.error(" Verification error:", err);
+              // console.error(" Verification error:", err);
               toast.error(err?.message || "Verification error.");
             }
           },
         };
 
-        console.log("🟢 Opening Razorpay...");
+      
         const razorpay = new window.Razorpay(options);
         razorpay.on("payment.failed", (response) => {
-          console.error("❌ Payment failed:", response.error);
+          console.error(" Payment failed:", response.error);
           toast.error(response.error?.description || "Payment failed.");
         });
         razorpay.open();

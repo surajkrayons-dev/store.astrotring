@@ -88,7 +88,7 @@ export const fetchCart = createAsyncThunk(
 export const addToCart = createAsyncThunk(
   "cart/addToCart",
   async (
-    { product_id, quantity = 1, ratti = null, name, price, image },
+    { product_id, quantity = 1, ratti = null, name, price, image,stockAvilable },
     { rejectWithValue, getState },
   ) => {
     const { userAuth } = getState();
@@ -115,6 +115,7 @@ export const addToCart = createAsyncThunk(
             name,
             price,
             image,
+            stockAvilable,
             item_id: `guest_${product_id}_${ratti || ""}`,
             addedAt: Date.now(),
           });

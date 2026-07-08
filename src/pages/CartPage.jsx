@@ -61,6 +61,8 @@ const CartPage = () => {
   };
 
   const handleIncreaseQuantity = (item) => {
+    if (item.stockAvilable < item.quantity + 1)
+      return toast.info(`${item?.stockAvilable} stock avilable only `);
     dispatch(
       updateCartItem({
         item_id: item.item_id,
@@ -85,6 +87,7 @@ const CartPage = () => {
   };
 
   const handleCheckout = () => {
+    // ---------- add dataLayer for gtm tracking ----------
     if (cartItems && cartItems.length > 0) {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
@@ -97,8 +100,10 @@ const CartPage = () => {
           })),
         },
       });
-      dispatch(openCheckout());
+      console.log("proceedToCheckout datalayer", window.dataLayer);
     }
+    // ORIGINAL CHECKOUT OPEN
+    dispatch(openCheckout());
   };
 
   // total calculation on api data
@@ -257,25 +262,7 @@ const CartPage = () => {
           {/*"BUY NOW" Button with Arrow */}
           <button
             className="w-full py-4 bg-gray-900 text-white font-bold text-[13px] tracking-widest flex items-center justify-center gap-1.5 hover:bg-gray-800 transition-colors duration-200 uppercase cursor-pointer"
-            onClick={() => {
-              // ---------- add dataLayer for gtm tracking ----------
-              if (cartItems && cartItems.length > 0) {
-                window.dataLayer = window.dataLayer || [];
-                window.dataLayer.push({
-                  event: "proceedToCheckout",
-                  ecommerce: {
-                    items: cartItems.map((item) => ({
-                      item_id: String(item.product_id),
-                      price: Number(item.price),
-                      quantity: Number(item.quantity),
-                    })),
-                  },
-                });
-                console.log("proceedToCheckout datalayer", window.dataLayer);
-              }
-              // ORIGINAL CHECKOUT OPEN
-              dispatch(openCheckout());
-            }}
+            onClick={handleCheckout}
           >
             <span>Buy Now</span>
             <span className="text-xs font-bold  ml-1">

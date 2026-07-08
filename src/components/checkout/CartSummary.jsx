@@ -18,9 +18,9 @@ const CartSummary = () => {
   );
   const { selectedPaymentMethod } = useSelector((state) => state.payment);
 
-  console.log(items);
-  console.log("deliveryCharge", deliveryCharge);
-  console.log("codCharge",codCharge);
+  // console.log(items);
+  // console.log("deliveryCharge", deliveryCharge);
+  // console.log("codCharge",codCharge);
 
   // Compute total dynamic item count inside active state array
   const totalItemsCount =

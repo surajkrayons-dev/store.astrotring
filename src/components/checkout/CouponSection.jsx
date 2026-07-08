@@ -57,7 +57,7 @@ const CouponSection = () => {
     try {
       const result = await dispatch(validateCoupon(code.trim())).unwrap();
 
-      console.log(result)
+      // console.log(result)
       dispatch(
         setAppliedCoupon({
           coupon: result,

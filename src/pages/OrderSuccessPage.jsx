@@ -31,7 +31,7 @@ const OrderSuccessPage = () => {
   // const orderId = 314;
    const orderId = location.state?.orderData;
 
-  console.log(order);
+  // console.log(order);
 
   useEffect(() => {
     if (orderId) {
@@ -55,7 +55,7 @@ useEffect(() => {
     const items = order.items || order.order_items || [];
      const discount = order.pricing?.discount || 0;
 
-    console.log(discount)
+    // console.log(discount)
 
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({

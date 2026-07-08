@@ -216,7 +216,7 @@ useEffect(() => {
     );
   }, [categoryFilteredProducts,products,groupedCategories]);
 
-  console.log("totalFilteredProducts",totalFilteredProducts)
+  // console.log("totalFilteredProducts",totalFilteredProducts)
 
   const handleAddToCart = async ({
     product_id,
@@ -230,7 +230,7 @@ useEffect(() => {
       if(stockQty < quantity) return toast.info(`${stockQty} stock avilable only `)
     try {
       await dispatch(
-        addToCart({ product_id, quantity, name, ratti, price, image }),
+        addToCart({ product_id, quantity, name, ratti, price, image, stockAvilable: stockQty}),
       ).unwrap();
       toast.success(`${name} added to cart!`);
       dispatch(fetchCart());
@@ -265,7 +265,7 @@ useEffect(() => {
   if (error)
     return <div className="text-center py-10 text-red-500">Error: {error}</div>;
   if (!products.length){
-    console.log(products)
+    // console.log(products)
     return <div className="text-center py-10">No products found</div>};
 
   // Sticky positioning calculations
