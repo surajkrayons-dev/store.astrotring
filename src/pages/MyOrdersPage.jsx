@@ -81,7 +81,7 @@ const MyOrdersPage = () => {
     if (order.pricing?.discount) return Number(order.pricing.discount);
     return order.discount || 0;
   };
- 
+
 
   const getTotal = (order) => {
     if (order.pricing?.total_amount) return Number(order.pricing.total_amount);
@@ -100,7 +100,7 @@ const MyOrdersPage = () => {
     return order?.pricing?.advance_paid_amount ? Number(order?.pricing?.advance_paid_amount) : 0;
   };
 
-   const getRemainingCod = (order) => {
+  const getRemainingCod = (order) => {
     return order?.pricing?.remaining_cod_amount ? Number(order?.pricing?.remaining_cod_amount) : 0;
   };
 
@@ -250,7 +250,7 @@ const MyOrdersPage = () => {
                           Advance Paid: -₹{advancepaid.toLocaleString()}
                         </p>
                       )}
-                      {remainingCod >0 && <p className="text-lg font-bold text-gray-900 mt-1">
+                      {remainingCod > 0 && <p className="text-lg font-bold text-gray-900 mt-1">
                         Total: ₹{remainingCod.toLocaleString()}
                       </p>}
                       {/* {!isCod && <p className="text-lg font-bold text-gray-900 mt-1">

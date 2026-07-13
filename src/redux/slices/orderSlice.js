@@ -67,11 +67,15 @@ export const markOrderDelivered = createAsyncThunk(
 // cancel cod order
 export const cancelCodOrder = createAsyncThunk(
   'order/cancelCodOrder',
-  async (orderId, { rejectWithValue, getState }) => {
+  async ({ orderId, cancel_reason }, { rejectWithValue, getState }) => {
     try {
       const { userAuth } = getState();
       if (!userAuth.isLoggedIn) return rejectWithValue('Please login to cancel order');
-      const response = await api.post(`/store/cod/cancel/${orderId}`);
+      const response = await api.post(`/store/cod/cancel/${orderId}`, { cancel_reason },  {
+          headers: {
+            'Content-Type': 'application/json', // Force JSON
+          },
+        });
 
       // console.log(response)
       if (response.data.status) {
@@ -88,11 +92,15 @@ export const cancelCodOrder = createAsyncThunk(
 // cancel online or prepaid order
 export const cancelOrder = createAsyncThunk(
   'order/cancelOrder',
-  async (orderId, { rejectWithValue, getState }) => {
+  async ({ orderId, cancel_reason }, { rejectWithValue, getState }) => {
     try {
       const { userAuth } = getState();
       if (!userAuth.isLoggedIn) return rejectWithValue('Please login to cancel order');
-      const response = await api.post(`/store/order/cancel/${orderId}`);
+      const response = await api.post(`/store/order/cancel/${orderId}`, { cancel_reason },  {
+          headers: {
+            'Content-Type': 'application/json', // Force JSON
+          },
+        });
       // Backend only returns { status: true, message, refund, pricing }
       if (response.data.status) {
         // Return just the orderId – we will refetch details later

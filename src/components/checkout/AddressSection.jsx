@@ -30,15 +30,16 @@ const AddressSection = () => {
   // EXACTLY 10 FIELDS
   const [formData, setFormData] = useState({
     name: "",           // 1. Name / Tag
-    country_code: "+91",// 2. Country Code
-    mobile: "",         // 3. Mobile Number
-    pincode: "",        // 4. Pincode
-    address: "",        // 5. Full Address Line
-    city: "",           // 6. City
-    state: "",          // 7. State
-    state_code: "",     // 8. State Code
-    country: "India",   // 9. Country
-    by_default: false,  // 10. Default Checklist Flag
+    email: "",         // 2. Email (mandatory)
+    country_code: "+91",// 3. Country Code
+    mobile: "",         // 4. Mobile Number
+    pincode: "",        // 5. Pincode
+    address: "",        // 6. Full Address Line
+    city: "",           // 7. City
+    state: "",          // 8. State
+    state_code: "",     // 9. State Code
+    country: "India",   // 10. Country
+    by_default: false,  // 11. Default Checklist Flag
   });
 
   // Fetch saved addresses on mount
@@ -150,6 +151,7 @@ useEffect(() => {
       // Reset Form State perfectly
       setFormData({
         name: "",
+        email: "",
         country_code: "+91",
         mobile: "",
         pincode: "",
@@ -255,18 +257,31 @@ useEffect(() => {
         /* --- MODE 2: HIGHLY OPTIMIZED 10-FIELD INTUITIVE GRID FORM --- */
         <form onSubmit={handleSaveAddress} className="grid grid-cols-12 gap-3 p-4 bg-gray-50/50 rounded-xl border border-gray-200/60 transition-all">
           
-          {/* 1. Name / Address Tag */}
+          {/*  Name / Address Tag */}
           <input
             type="text"
             name="name"
             required
             value={formData.name}
             onChange={handleInputChange}
-            placeholder="e.g., Home, Office, John Doe *"
+            placeholder="Enter Your Name *"
             className="col-span-12 sm:col-span-6 px-3 py-2 text-xs font-semibold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400/10 focus:border-amber-400 bg-white text-gray-800 transition-all placeholder:font-medium placeholder:text-gray-400"
           />
 
-          {/* 2. Country Code */}
+          {/* Email */}
+          <div className="col-span-12 sm:col-span-6">
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              placeholder="Enter Your Email*"
+              required
+              className="w-full px-3 py-2 text-xs font-semibold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400/10 focus:border-amber-400 bg-white text-gray-800 transition-all placeholder:font-medium placeholder:text-gray-400"
+            />
+          </div>
+
+          {/*  Country Code */}
           <input
             type="text"
             name="country_code"
@@ -277,18 +292,18 @@ useEffect(() => {
             className="col-span-3 sm:col-span-2 px-2 py-2 text-xs font-semibold text-center border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400/10 focus:border-amber-400 bg-white text-gray-800 transition-all placeholder:font-medium placeholder:text-gray-400"
           />
 
-          {/* 3. Mobile Number */}
+          {/*  Mobile Number */}
           <input
             type="tel"
             name="mobile"
             maxLength={10}
             value={formData.mobile}
             onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value.replace(/\D/g, "") }))}
-            placeholder="Alternate Mobile Number *"
+            placeholder="Mobile Number *"
             className="col-span-9 sm:col-span-4 px-3 py-2 text-xs font-semibold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400/10 focus:border-amber-400 bg-white text-gray-800 transition-all placeholder:font-medium placeholder:text-gray-400"
           />
 
-          {/* 4. Pincode Input (Compact with absolute loading text) */}
+          {/*  Pincode Input (Compact with absolute loading text) */}
           <div className="col-span-5 sm:col-span-4 relative">
             <input
               type="text"
@@ -304,7 +319,7 @@ useEffect(() => {
             {pincodeError && <p className="text-[9px] text-amber-600 font-bold mt-0.5 pl-1 absolute bg-gray-50 px-1 rounded border border-gray-100 z-10">{pincodeError}</p>}
           </div>
 
-          {/* 6. City Input */}
+          {/*  City Input */}
           <input
             type="text"
             name="city"
@@ -315,7 +330,7 @@ useEffect(() => {
             className="col-span-7 sm:col-span-8 px-3 py-2 text-xs font-semibold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400/10 focus:border-amber-400 bg-white text-gray-800 transition-all placeholder:font-medium placeholder:text-gray-400"
           />
 
-          {/* 5. Full Address Line */}
+          {/*  Full Address Line */}
           <input
             type="text"
             name="address"
@@ -326,7 +341,7 @@ useEffect(() => {
             className="col-span-12 px-3 py-2 text-xs font-semibold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400/10 focus:border-amber-400 bg-white text-gray-800 transition-all placeholder:font-medium placeholder:text-gray-400"
           />
 
-          {/* 7. State Input */}
+          {/*  State Input */}
           <input
             type="text"
             name="state"
@@ -337,7 +352,7 @@ useEffect(() => {
             className="col-span-12 sm:col-span-5 px-3 py-2 text-xs font-semibold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400/10 focus:border-amber-400 bg-white text-gray-800 transition-all placeholder:font-medium placeholder:text-gray-400"
           />
 
-          {/* 8. State Code Input (Compact width) */}
+          {/*  State Code Input (Compact width) */}
           <input
             type="text"
             name="state_code"
@@ -348,7 +363,7 @@ useEffect(() => {
             className="col-span-4 sm:col-span-3 px-3 py-2 text-xs font-semibold text-center border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400/10 focus:border-amber-400 bg-white text-gray-800 transition-all placeholder:font-medium placeholder:text-gray-400"
           />
 
-          {/* 9. Country Input */}
+          {/*  Country Input */}
           <input
             type="text"
             name="country"
@@ -359,7 +374,7 @@ useEffect(() => {
             className="col-span-8 sm:col-span-4 px-3 py-2 text-xs font-semibold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400/10 focus:border-amber-400 bg-white text-gray-800 transition-all placeholder:font-medium placeholder:text-gray-400"
           />
 
-          {/* 10. Default Checklist Option */}
+          {/*  Default Checklist Option */}
           <label className="col-span-12 flex items-center gap-2 text-xs text-gray-600 font-semibold select-none py-1 pl-1 cursor-pointer">
             <input
               type="checkbox"
