@@ -11,7 +11,7 @@ import {
   fetchPincodeDetails,
 } from '../../redux/slices/addressSlice';
 import { toast } from 'react-toastify';
-import { MapPin, Home, Phone, Plus, Edit, Trash2, Star, X, Globe, ArrowLeft } from 'lucide-react';
+import { MapPin, Home, Phone, Plus, Edit, Trash2, Star, X, Globe, ArrowLeft, Mail } from 'lucide-react';
 import { useCountryCodes } from '../../hooks/useCountryCodes';
 import { useNavigate } from 'react-router-dom';
 
@@ -149,6 +149,7 @@ const AddressManager = () => {
 
     if (
       !formData.name ||
+      !formData.email ||
       !formData.mobile ||
       !formData.address ||
       !formData.pincode ||
@@ -248,7 +249,20 @@ const AddressManager = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="Home / Office / etc."
+                placeholder="Enter Your Name*"
+                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+              />
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email <span className="text-amber-600">*</span></label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="care@astrotring.com*"
                 className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
               />
             </div>
@@ -288,6 +302,7 @@ const AddressManager = () => {
                 <Select
                   name="country_code"
                   options={countryOptions}
+                  defaultInputValue='+91'
                   value={countryOptions.find((opt) => opt.value === formData.country_code)}
                   onChange={(selected) =>
                     setFormData({ ...formData, country_code: selected ? selected.value : '' })
@@ -442,22 +457,22 @@ const AddressManager = () => {
               {addresses.map((addr) => (
                 <div
                   key={addr.id}
-                  className={`border rounded-lg p-4 transition-all hover:shadow-md ${
-                    addr.by_default ? 'border-amber-300 bg-amber-50' : 'border-gray-200 bg-white'
-                  }`}
+                  className={`border rounded-lg p-4 transition-all hover:shadow-md ${addr.by_default ? 'border-amber-300 bg-amber-50' : 'border-gray-200 bg-white'
+                    }`}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
                       <Home className="w-4 h-4 text-amber-600" />
                       <span className="font-medium text-gray-800">{addr.name}</span>
                       
-                      {Number(addr.by_default) === 1 && ( 
+
+                      {Number(addr.by_default) === 1 && (
                         <span className="inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">
                           <Star className="w-3 h-3 fill-amber-500" /> Default
                         </span>
                       )}
                     </div>
-                    
+
                     <div className="flex gap-2">
                       <button onClick={() => handleEdit(addr)} className="text-blue-600 hover:text-blue-800 p-1" title="Edit">
                         <Edit className="w-4 h-4" />
@@ -468,7 +483,12 @@ const AddressManager = () => {
                     </div>
                   </div>
                   <div className="space-y-1 text-sm text-gray-600">
-                    <p className="flex items-center gap-2"><Phone className="w-4 h-4" /> {addr.country_code} {addr.mobile}</p>
+                      {addr.email && (
+                      <p className="flex items-center gap-2"><Mail className="w-4 h-4" /> {addr.email}</p>
+                    )}
+                    
+                    <p className="flex items-center gap-2">
+                      <Phone className="w-4 h-4" /> {addr.country_code} {addr.mobile}</p>
                     {addr.alternative_mobile && (
                       <p className="flex items-center gap-2"><Phone className="w-4 h-4" /> {addr.alternative_mobile}</p>
                     )}

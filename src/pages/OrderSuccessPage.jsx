@@ -28,7 +28,7 @@ const OrderSuccessPage = () => {
   } = useSelector((state) => state.order);
 
   // Navigation state se orderId lo
-  // const orderId = 314;
+  // const orderId = 366;
    const orderId = location.state?.orderData;
 
   // console.log(order);
@@ -49,6 +49,7 @@ const OrderSuccessPage = () => {
 
     // ---------- add dataLayer for gtm tracking ----------
 useEffect(() => {
+
   if (order && items.length > 0) {
     const transactionId = String(order?.payment?.transaction_id);
     const totalValue = parseFloat(order.pricing?.total_amount) || 0;
@@ -80,6 +81,16 @@ useEffect(() => {
 }, [order]); 
 
   const generateInvoiceBase64 = async (element) => {
+
+     //wait for loading fonts
+  await document.fonts.ready;
+
+  //  some extra time for sefty
+  await new Promise((resolve) => setTimeout(resolve, 300));
+
+  // 3 Force reflow – important for hidden element
+  // (for element paint )
+  element.scrollHeight;
     const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
@@ -335,6 +346,9 @@ useEffect(() => {
               </h3>
               <p className="font-sm text-gray-800">
                 {order.address.snapshot.name},
+              </p>
+              <p className="font-sm text-gray-800">
+                {order.address.snapshot.email},
               </p>
               <p className="text-sm text-gray-600">
                 {order.address.snapshot.address},

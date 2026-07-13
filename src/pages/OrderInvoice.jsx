@@ -113,7 +113,7 @@ const OrderInvoice = ({order}) => {
 
   // Address
   const addr = order.address?.snapshot || {};
-  const billingAddress = `${addr.name || ''}, ${addr.address || ''}, ${addr.city || ''}, ${addr.state || ''}, ${addr.country || ''} - ${addr.pincode || ''}, Mob - ${addr.mobile || ''}`.replace(/,\s*,/g, ',').replace(/,\s*$/, '');
+  const billingAddress = `${addr.name || ''}, ${addr.email || ''}, ${addr.address || ''}, ${addr.city || ''}, ${addr.state || ''}, ${addr.country || ''} - ${addr.pincode || ''}, Mob - ${addr.mobile || ''}`.replace(/,\s*,/g, ',').replace(/,\s*$/, '');
   const shippingAddress = billingAddress;
   const stateCode = addr.state_code || null;
   const placeOfSupply = addr.state || '-';
