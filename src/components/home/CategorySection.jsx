@@ -7,7 +7,7 @@ const CategorySection = ({ category, products, onAddToCart }) => {
   const scrollContainerRef = useRef(null);
 
 
-  // console.log("catProduct", category)
+  // console.log("catProduct", products)
 
   if (!products.length) return null;
 

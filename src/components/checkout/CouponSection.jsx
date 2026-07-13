@@ -57,7 +57,7 @@ const CouponSection = () => {
     try {
       const result = await dispatch(validateCoupon(code.trim())).unwrap();
 
-      console.log(result)
+      // console.log(result)
       dispatch(
         setAppliedCoupon({
           coupon: result,
@@ -82,6 +82,7 @@ const CouponSection = () => {
 
   // Find the recommended coupon and active applied coupon details
   const defaultRecommendedCoupon = coupons?.[0];
+
   const appliedCouponDetails = coupons?.find(cp => cp.code === appliedCoupon?.code);
 
   return (
@@ -108,12 +109,12 @@ const CouponSection = () => {
                   
                   {/* Recommended Type Badge */}
                   {defaultRecommendedCoupon?.discount_type === "percentage" ? (
-                    <span className="bg-blue-50 text-blue-600 text-[10px] font-bold px-1.5 py-0.5 rounded-md">
-                      % Off
+                    <span className="bg-blue-50 text-green-600 text-[10px] font-bold px-1.5 py-0.5 rounded-md">
+                      % OFF
                     </span>
                   ) : (
                     <span className="bg-purple-50 text-purple-600 text-[10px] font-bold px-1.5 py-0.5 rounded-md">
-                      Flat ₹
+                      FLAT
                     </span>
                   )}
                 </div>
@@ -293,7 +294,7 @@ const CouponSection = () => {
                           </span>
 
                           {/* List Type Badges */}
-                          {cp.discount_type === "percentage" ? (
+                          {/* {cp.discount_type === "percentage" ? (
                             <span className="bg-blue-50 text-blue-600 text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0">
                               Percentage
                             </span>
@@ -301,7 +302,7 @@ const CouponSection = () => {
                             <span className="bg-purple-50 text-purple-600 text-[9px] font-extrabold px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0">
                               Flat Discount
                             </span>
-                          )}
+                          )} */}
                         </div>
 
                         <button

@@ -1,13 +1,16 @@
 import React from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import { useLocation, useMatch } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const WhatsAppButton = () => {
-  
- const isHomepage = useMatch("/");
+  const isHomepage = useMatch("/");
+
+  const { isLoginModalOpen, isCartDrawerOpen, isCheckoutOpen} = useSelector((state)=>state.ui)
 
   // Agar home page hai to button mat dikhao
-  if (!isHomepage) return null;
+  if (!isHomepage || isLoginModalOpen || isCartDrawerOpen || isCheckoutOpen)
+    return null;
   return (
     <a
       href="https://wa.me/919485628238?text=Hi"

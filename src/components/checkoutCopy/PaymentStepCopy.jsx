@@ -84,7 +84,7 @@ const PaymentStep = forwardRef(
             address_id: selectedAddressId,
           });
 
-          console.log("cod order",data)
+          // console.log("cod order",data)
 
           if (data.status) {
             toast.success(data?.message || "Order placed successfully!");
@@ -96,7 +96,7 @@ const PaymentStep = forwardRef(
             });
           } else {
 
-            console.log("erreodata",data)
+            // console.log("erreodata",data)
             toast.error(data.message || "COD order failed");
           }
           setLoading(false);
@@ -114,7 +114,7 @@ const PaymentStep = forwardRef(
               address_id: selectedAddressId,
               coupon_code: appliedCoupon?.code || null,
             });
-            console.log("advanceRes", advanceRes);
+            // console.log("advanceRes", advanceRes);
             if (!advanceRes.data.status) {
               throw new Error(
                 advanceRes.data.message || "Failed to create advance order",
@@ -123,7 +123,7 @@ const PaymentStep = forwardRef(
 
             const { razorpay_order_id, pricing } = advanceRes.data;
             const advanceAmount = parseFloat(pricing.advance_amount);
-            console.log(advanceAmount);
+            // console.log(advanceAmount);
 
             // Step 2: Open Razorpay for advance payment
             const options = {
@@ -133,7 +133,7 @@ const PaymentStep = forwardRef(
               name: "Astrotring Store",
               order_id: razorpay_order_id,
               handler: async (response) => {
-                console.log("codresponse", response);
+                // console.log("codresponse", response);
                 try {
                   // Step 3: Verify advance payment
                   const verifyRes = await api.post(
@@ -165,7 +165,7 @@ const PaymentStep = forwardRef(
                     },
                   });
                 } catch (err) {
-                  console.log("err", { err });
+                  // console.log("err", { err });
                   toast.error(
                     err.response.data.message ||
                       err.message ||
@@ -269,7 +269,7 @@ const PaymentStep = forwardRef(
         const razorpay = new window.Razorpay(options);
         razorpay.open();
       } catch (err) {
-        console.log(err)
+        // console.log(err)
         toast.error(err?.response?.data?.message || "Order creation failed");
         setLoading(false);
       }

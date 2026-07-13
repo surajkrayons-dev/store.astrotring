@@ -91,7 +91,6 @@ const initialState = {
 };
 
 const addressSlice = createSlice({
-  
   name: "address",
   initialState,
   reducers: {
@@ -116,6 +115,9 @@ const addressSlice = createSlice({
       .addCase(fetchAddresses.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        if (action.payload.length === 0) {
+          state.selectedAddressId = null;
+        }
       })
       // Add
       .addCase(addAddress.pending, (state) => {
@@ -153,9 +155,13 @@ const addressSlice = createSlice({
       })
       .addCase(deleteAddress.fulfilled, (state, action) => {
         state.loading = false;
+        const deletedId = action.payload;
         state.addresses = state.addresses.filter(
           (addr) => addr.id !== action.payload,
         );
+        if (state.selectedAddressId === deletedId) {
+          state.selectedAddressId = null;
+        }
       })
       .addCase(deleteAddress.rejected, (state, action) => {
         state.loading = false;
@@ -178,5 +184,5 @@ const addressSlice = createSlice({
   },
 });
 
-export const { clearAddressError ,setSelectedAddress} = addressSlice.actions;
+export const { clearAddressError, setSelectedAddress } = addressSlice.actions;
 export default addressSlice.reducer;

@@ -18,7 +18,9 @@ const CartSummary = () => {
   );
   const { selectedPaymentMethod } = useSelector((state) => state.payment);
 
-  console.log(appliedCoupon);
+  // console.log(items);
+  // console.log("deliveryCharge", deliveryCharge);
+  // console.log("codCharge",codCharge);
 
   // Compute total dynamic item count inside active state array
   const totalItemsCount =
@@ -27,7 +29,7 @@ const CartSummary = () => {
   // Calculate dynamic sub-total based on original/old price if available, otherwise fallback to standard price
   const subTotalAmount =
     items?.reduce((sum, item) => {
-      const basePrice = Number(item.old_price || item.mrp || item.price || 0);
+      const basePrice = Number( item?.price || 0);
       return sum + basePrice * (Number(item.quantity) || 1);
     }, 0) || 0;
 

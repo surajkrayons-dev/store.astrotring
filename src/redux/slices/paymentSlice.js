@@ -51,6 +51,7 @@ export const createOnlineOrder = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const { data } = await api.post("/store/create-order", payload);
+      // console.log("create-order ",data)
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Online order initiation failed");
@@ -64,6 +65,7 @@ export const verifyOnlinePayment = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       const { data } = await api.post("/store/verify-payment", payload);
+      // console.log("verify-payment",data)
       return data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Online payment verification failed");

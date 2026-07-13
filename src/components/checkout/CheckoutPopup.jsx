@@ -8,6 +8,7 @@ import AuthSection from "./AuthSection";
 import AddressSection from "./AddressSection";
 import PaymentSection from "./PaymentSection";
 import { closeCheckout } from "@/redux/slices/uiSlice";
+import { Link } from "react-router-dom";
 
 /**
  * CheckoutPopup Component
@@ -15,7 +16,7 @@ import { closeCheckout } from "@/redux/slices/uiSlice";
  */
 const CheckoutPopup = () => {
   const dispatch = useDispatch();
-   const [showConfirm, setShowConfirm] = useState(true);
+  const [showConfirm, setShowConfirm] = useState(false);
   const { isLoggedIn } = useSelector((state) => state.userAuth);
   const isOpen = useSelector((state) => state.ui.isCheckoutOpen);
 
@@ -24,19 +25,18 @@ const CheckoutPopup = () => {
     if (isOpen) {
       // Pull fresh data directly from server endpoints to sync active pricing matrices
       dispatch(fetchCart());
-      
+
       // Lock viewport scrolling positions to avoid secondary movement conflicts behind modal panels
       document.body.style.overflow = "hidden";
     }
-    
-    // Component unmount/dismiss cleanup function sequence 
+
+    // Component unmount/dismiss cleanup function sequence
     return () => {
       document.body.style.overflow = "unset";
     };
   }, [isOpen, dispatch]);
 
-
-    // ✅ Handler – जब Header का Back बटन click हो
+  // ✅ Handler – जब Header का Back बटन click हो
   const handleBackClick = () => {
     setShowConfirm(true);
   };
@@ -57,16 +57,13 @@ const CheckoutPopup = () => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2  bg-black/60 backdrop-blur-sm transition-opacity duration-300">
-      
       {/* Main Structural Layout Container Card Profile */}
       <div className="relative flex flex-col w-full max-w-xl h-[100vh]  bg-white shadow-2xl overflow-hidden border border-gray-100 transition-all transform scale-100">
-        
         {/* Step-Sticky Anchor Block: Header Identity and Interactive Exit Nodes */}
         <CheckoutHeader onBackClick={handleBackClick} />
 
         {/* Scrollable Workflow Management Sub-Form Panels */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-5 custom-scrollbar bg-white">
-          
           {/* Module 1: Order Summary Items Breakdown & Accumulation calculations */}
           <CartSummary />
 
@@ -81,7 +78,10 @@ const CheckoutPopup = () => {
               <span className="flex items-center justify-center w-4 h-4 rounded-full bg-emerald-600 text-white text-[10px]">
                 ✓
               </span>
-              <span>You are successfully verified and logged in with your account details.</span>
+              <span>
+                You are successfully verified and logged in with your account
+                details.
+              </span>
             </div>
           )}
 
@@ -89,15 +89,40 @@ const CheckoutPopup = () => {
           <AddressSection />
 
           {/* Module 5: Payment Gateway triggers (Razorpay integrations / COD routes) */}
-          <PaymentSection  />
+          <PaymentSection />
 
+          <div className="text-center">
+            <label htmlFor="terms" className="text-xs text-gray-400">
+              I accept that I have read & understood {" "}
+
+              <Link
+                to="/privacy-policy"
+                target="_blank"
+                className="text-amber-500 hover:underline"
+              >
+                Privacy Policy
+              </Link>
+               {" "}and{" "}
+              <Link
+                to="/terms-conditions"
+                target="_blank"
+                className="text-amber-500 hover:underline"
+              >
+                T&Cs.
+              </Link>
+             
+  
+            </label>
+          </div>
         </div>
       </div>
 
-          {showConfirm && (
+      {showConfirm && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">Close Checkout?</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
+              Close Checkout?
+            </h3>
             <p className="text-sm text-gray-600 mb-6">
               Are you sure you want to cancel the checkout proccess?
             </p>

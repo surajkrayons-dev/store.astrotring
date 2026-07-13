@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchBanners } from '../../redux/slices/bannerSlice';
+import { Link } from 'react-router-dom';
 
 const HeroBanner = () => {
   const dispatch = useDispatch();
@@ -12,20 +13,30 @@ const HeroBanner = () => {
     dispatch(fetchBanners());
   }, [dispatch]);
 
-  // Auto-slide only for images (exactly like Banner component)
-  useEffect(() => {
-    if (banners.length === 0) return;
-    const currentItem = banners[currentIndex];
-    if (currentItem?.media_type === 'image') {
-      const timer = setTimeout(() => {
-        setCurrentIndex((prev) => (prev + 1) % banners.length);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [currentIndex, banners]);
 
-  // Sort banners by sort_order
+
+   // Sort banners by sort_order
   const sortedBanners = [...banners].sort((a, b) => a.sort_order - b.sort_order);
+  // Auto-slide only for images (exactly like Banner component)
+
+
+  useEffect(() => {
+  if (banners.length === 0) return;
+  const currentItem = sortedBanners[currentIndex];
+  if (!currentItem) return;
+
+
+  if (currentItem.media_type === 'image') {
+  
+    const duration = (currentItem.display_duration || 3) * 1000;
+    const timer = setTimeout(() => {
+      setCurrentIndex((prev) => (prev + 1) % sortedBanners.length);
+    }, duration);
+    return () => clearTimeout(timer);
+  }
+}, [currentIndex, sortedBanners, banners.length]);
+
+ 
 
   // Loading and error states with fixed heights (as per original HeroBanner)
   if (loading) return <div className="w-full h-[180px] md:h-[220px] lg:h-[260px] bg-gray-200 animate-pulse rounded-[18px]" />;
@@ -53,11 +64,14 @@ const HeroBanner = () => {
                   }
                 />
               ) : (
+                <Link to={item?.url} >
                 <img
                   src={item.media_url}
                   alt={`Banner ${item.id}`}
                   className="w-full h-full object-cover"
                 />
+                </Link>
+                
               )}
             </div>
           ))}

@@ -29,9 +29,9 @@ api.interceptors.response.use(
       localStorage.removeItem("role_id");
       const { store } = await import("./store");  // dynamic import
       store.dispatch(logout());
-      if (window.location.pathname !== "/") {
-        window.location.href = "/";
-      }
+      // if (window.location.pathname !== "/") {
+      //   window.location.href = "/";
+      // }
     }
     return Promise.reject(error);
   }

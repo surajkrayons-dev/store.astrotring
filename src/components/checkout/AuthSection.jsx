@@ -1,9 +1,12 @@
 import { fetchCart, mergeGuestCart } from "@/redux/slices/cartSlice";
-import { userLogin, userProfile, userVerifyLoginOtp } from "@/redux/slices/userAuthSlice";
+import {
+  userLogin,
+  userProfile,
+  userVerifyLoginOtp,
+} from "@/redux/slices/userAuthSlice";
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
-
 
 /**
  * AuthSection Component
@@ -18,6 +21,10 @@ const AuthSection = () => {
   const [otp, setOtp] = useState("");
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
+  // const { isLoggedIn, user } = useSelector((state) => state.userAuth);
+   const { selectedAddressId } = useSelector((state) => state.address);
+
+  console.log(selectedAddressId);
 
   /**
    * Submits mobile verification request to server endpoints to dispatch OTP token
@@ -71,9 +78,18 @@ const AuthSection = () => {
         toast.success("Cart synced successfully");
       }
       await dispatch(fetchCart());
+
+      if (selectedAddressId) {
+        await dispatch(
+          calculateDeliveryCharge({
+            address_id: selectedAddressId,
+            
+          }),
+        );
+      }
     } catch (err) {
       // console.log('error', err);
-            toast.error(err || 'Failed to merge cart');
+      toast.error(err || "Failed to merge cart");
     } finally {
       setLoading(false);
     }

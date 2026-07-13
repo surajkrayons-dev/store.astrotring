@@ -2,16 +2,12 @@ import React from "react";
 import logo from "@/assets/logo.png"
 import { ArrowLeft, ChevronLeft } from "lucide-react";
 
-import { useDispatch } from "react-redux";  
-import { closeCheckout } from "@/redux/slices/uiSlice"; 
-
 /**
  * CheckoutHeader Component
  * Renders the top navigation bar, logo layout, and discount status banner
  * matching the visual interface from image_7a088a.jpg.
  */
 const CheckoutHeader = ({onBackClick}) => {
-   const dispatch = useDispatch(); 
   return (
     <div className="flex flex-col w-full shrink-0 bg-white">
       {/* Top Navigation Strip */}

@@ -91,6 +91,7 @@ const extraCheckoutChargeSlice = createSlice({
       .addCase(calculateDeliveryCharge.rejected, (state, action) => {
         state.isDeliveryLoading = false;
         state.error = action.payload;
+        state.deliveryCharge = 0;
       })
       
       // --- COD Charge Handlers ---
@@ -106,6 +107,7 @@ const extraCheckoutChargeSlice = createSlice({
       .addCase(calculateCodCharge.rejected, (state, action) => {
         state.isCodLoading = false;
         state.error = action.payload;
+        state.deliveryCharge = 0;
       });
   },
 });

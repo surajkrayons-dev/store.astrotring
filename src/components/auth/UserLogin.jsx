@@ -63,6 +63,8 @@ const UserLogin = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    
     setForm((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({
       ...prev,
@@ -184,9 +186,9 @@ const handleSendOtp = async (e) => {
               </button>
             </div>
 
-            {(errors.form || error) && (
+            {(errors.form) && (
               <p className="text-red-600 text-sm text-center mb-4">
-                {errors.form || error}
+                {errors.form}
               </p>
             )}
 
@@ -291,6 +293,7 @@ const handleSendOtp = async (e) => {
                   </select>
                   <input
                     name="mobile"
+                    maxLength={10}
                     placeholder="Mobile *"
                     value={form.mobile}
                     onChange={handleChange}

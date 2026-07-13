@@ -47,7 +47,7 @@ const CategoryPage = () => {
 
 
 const handleAddToCart = async ({ product_id, quantity, name, ratti,price ,image,stockQty }) => {
-  console.log(stockQty, quantity)
+  // console.log(stockQty, quantity)
   if(stockQty < quantity) return toast.info(`${stockQty} stock avilable only `)
   try {
     await dispatch(addToCart({ product_id, quantity, name, ratti,price ,image })).unwrap();

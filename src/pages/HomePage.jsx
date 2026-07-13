@@ -92,6 +92,7 @@ const HomePage = () => {
   } = useSelector((state) => state.product);
 
   // console.log(products);
+  // console.log(productCategories);
 
   // Filtering & UI state
   const [filterCategory, setFilterCategory] = useState("all"); // selected in sidebar
@@ -205,7 +206,7 @@ useEffect(() => {
       filters.sort,
     );
     return result;
-  }, [products, filters, filters.sort]); // filters.sort dependency add 
+  }, [products, filters, filters.sort, groupedCategories]); // filters.sort dependency add 
 
   // Total filtered products count (sum over all categories)
   const totalFilteredProducts = useMemo(() => {
@@ -213,7 +214,9 @@ useEffect(() => {
       (sum, cat) => sum + (categoryFilteredProducts[cat.id]?.length || 0),
       0,
     );
-  }, [categoryFilteredProducts]);
+  }, [categoryFilteredProducts,products,groupedCategories]);
+
+  // console.log("totalFilteredProducts",totalFilteredProducts)
 
   const handleAddToCart = async ({
     product_id,
@@ -227,7 +230,7 @@ useEffect(() => {
       if(stockQty < quantity) return toast.info(`${stockQty} stock avilable only `)
     try {
       await dispatch(
-        addToCart({ product_id, quantity, name, ratti, price, image }),
+        addToCart({ product_id, quantity, name, ratti, price, image, stockAvilable: stockQty}),
       ).unwrap();
       toast.success(`${name} added to cart!`);
       dispatch(fetchCart());
@@ -261,15 +264,16 @@ useEffect(() => {
     );
   if (error)
     return <div className="text-center py-10 text-red-500">Error: {error}</div>;
-  if (!products.length)
-    return <div className="text-center py-10">No products found</div>;
+  if (!products.length){
+    // console.log(products)
+    return <div className="text-center py-10">No products found</div>};
 
   // Sticky positioning calculations
   const homeNavTop = isNavbarVisible ? navbarHeight : 0;
   const sidebarTop = homeNavTop + 60 + 8 + 10; // approx HomeNav height
 
   return (
-    <div className=" md:px-2">
+    <div className=" md:px-2 ">
       <HeroBanner />
 
       <div className="flex gap-3 sm:gap-4 md:gap-6 mt-4">
@@ -288,7 +292,7 @@ useEffect(() => {
             />
           </div>
 
-          <div className="flex gap-2 sm:gap-4 md:gap-6 mt-4">
+          <div className="flex gap-2 sm:gap-4 md:gap-6 mt-4 ">
             {/* Sidebar */}
             <aside
               className={`
@@ -311,7 +315,7 @@ useEffect(() => {
             </aside>
 
             {/* Main content */}
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 overflow-x-hidden">
               <BestSellers />
 
               <div className="flex items-center justify-between mb-3 sm:mb-4">

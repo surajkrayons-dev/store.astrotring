@@ -70,6 +70,7 @@ const ProductCard = ({ product, addToCart, compact = false }) => {
   const ratingTextClass = compact ? "text-[8px]" : "text-[10px] sm:text-xs";
   const quickAddSize = compact ? "w-20 h-8" : "w-20 h-8";
   const quickAddIconSize = compact ? 10 : 14;
+  
 
   return (
     <div
