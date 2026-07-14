@@ -22,7 +22,6 @@ import {
   Printer,
   Download,
 } from "lucide-react";
-// MyOrderDetailsPage.jsx
 import html2canvas from "html2canvas-pro";
 import jsPDF from "jspdf";
 
@@ -37,6 +36,8 @@ const MyOrderDetailsPage = () => {
   const [cancelling, setCancelling] = useState(false);
   const invoiceRef = useRef(null);
   const [downloadInvoiceLoading, setDownloadInvoiceLoading] = useState(false);
+  const [showCancelReason, setShowCancelReason] = useState(false);
+  const [selectedCancelReasons, setSelectedCancelReasons] = useState([]);
 
   const handleDownloadInvoice = async () => {
     if (!order || !invoiceRef.current) {
@@ -143,25 +144,23 @@ const MyOrderDetailsPage = () => {
   const COD_SURCHARGE = order?.pricing?.cod_charge;
   const advancePaid = order?.pricing?.advance_paid_amount
   const remainingCod = order?.pricing?.remaining_cod_amount
-  
+
 
   const handleCancelOrder = async () => {
-    if (!window.confirm("Are you sure you want to cancel this order?")) return;
     setCancelling(true);
     try {
-     if (isCod) {
-       const res =await dispatch(cancelCodOrder(id)).unwrap();
-      //  console.log(res)
-      toast.success("Order cancelled successfully");
-      await dispatch(fetchOrderDetails(id)).unwrap();
+      if (isCod) {
+        await dispatch(cancelCodOrder({ orderId: id, cancel_reason: selectedCancelReasons })).unwrap();
+        await dispatch(fetchOrderDetails(id)).unwrap();
       } else {
-        // Online/prepaid cancellation (existing thunk)
-        await dispatch(cancelOrder(id)).unwrap();
-        toast.success("Order cancelled successfully");
+        await dispatch(cancelOrder({ orderId: id, cancel_reason: selectedCancelReasons })).unwrap();
         await dispatch(fetchOrderDetails(id)).unwrap();
       }
+      // Success – optionally clear reasons
+      setSelectedCancelReasons([]);
+      setShowCancelReason(false);
     } catch (err) {
-         console.error("Cancellation error:", err);
+      console.error("Cancellation error:", err);
     } finally {
       setCancelling(false);
     }
@@ -204,8 +203,8 @@ const MyOrderDetailsPage = () => {
                   Order On :{" "}
                   {order?.timestamps?.created_at
                     ? new Date(order.timestamps.created_at).toLocaleString(
-                        "en-IN",
-                      )
+                      "en-IN",
+                    )
                     : "N/A"}
                 </p>
 
@@ -228,15 +227,14 @@ const MyOrderDetailsPage = () => {
                 )}
               </div>
               <span
-                className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  order.status === "delivered"
+                className={`px-3 py-1 rounded-full text-xs font-medium ${order.status === "delivered"
                     ? "bg-green-100 text-green-800"
                     : order.status === "paid"
                       ? "bg-green-100 text-green-800"
                       : order.status === "cancelled"
                         ? "bg-red-100 text-red-800"
                         : "bg-yellow-100 text-yellow-800"
-                }`}
+                  }`}
               >
                 {order.status?.toUpperCase() || "PENDING"}
               </span>
@@ -294,7 +292,7 @@ const MyOrderDetailsPage = () => {
                 <div>
                   {canCancel ? (
                     <button
-                      onClick={handleCancelOrder}
+                      onClick={() => setShowCancelReason(true)}
                       disabled={cancelling}
                       className="group flex items-center gap-2 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -325,6 +323,54 @@ const MyOrderDetailsPage = () => {
                     </div>
                   )}
                 </div>
+                {showCancelReason && (
+                  <div className="fixed inset-0 flex items-center justify-center bg-black/60 backdrop-blur-md z-50">
+                    <div className="bg-white p-8 rounded-lg shadow-2xl max-w-md w-full">
+                      <h3 className="text-xl font-semibold mb-6 text-center">Select Cancel Reason</h3>
+                      <div className="space-y-3">
+                        {['I ordered the wrong product', 'I want to change the size/weight/quality.', 'I found a better price elsewhere.', 'I ordered by mistake.', 'Delivery is taking longer than expected.', 'I want to change my delivery address.', 'I placed another order instead.', 'Other (Please specify).'].map((reason) => (
+                          <label key={reason} className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              value={reason}
+                              checked={selectedCancelReasons.includes(reason)}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setSelectedCancelReasons(prev =>
+                                  checked ? [...prev, reason] : prev.filter(r => r !== reason)
+                                );
+                              }}
+                              className="h-4 w-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
+                            />
+                            <span className="text-gray-800">{reason}</span>
+                          </label>
+                        ))}
+                      </div>
+                      <div className="flex justify-between mt-6 space-x-2">
+                        <button
+                          onClick={() => {
+                            setShowCancelReason(false);
+                            setSelectedCancelReasons([]);
+                          }}
+                          className="flex-1 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 transition"
+                        >
+                          Back
+                        </button>
+                        <button
+                          disabled={selectedCancelReasons.length === 0}
+                          onClick={async () => {
+                           
+                            await handleCancelOrder();
+                           
+                          }}
+                          className="flex-1 py-2 bg-amber-600 text-white rounded disabled:opacity-50 hover:bg-amber-700 transition"
+                        >
+                          Confirm
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div className="text-right">
                   {/* <p className="text-sm text-gray-500">
                     Subtotal: ₹{subtotal.toLocaleString()}
@@ -350,8 +396,8 @@ const MyOrderDetailsPage = () => {
                       Advance Paid: -₹{advancePaid.toLocaleString()}
                     </p>
                   )}
-                  
-                  {remainingCod >0 && <p className="text-lg font-bold text-gray-900 mt-1">
+
+                  {remainingCod > 0 && <p className="text-lg font-bold text-gray-900 mt-1">
                     Total: ₹{remainingCod.toLocaleString()}
                   </p>}
                   {/* {!isCod  && <p className="text-lg font-bold text-gray-900 mt-1">
@@ -370,21 +416,21 @@ const MyOrderDetailsPage = () => {
                 <MapPin className="w-5 h-5" /> Delivery Address
               </h2>
               {order?.address?.snapshot ? (
-                <>
-                  <div className="flex gap-2 items-center">
+                <div className="flex flex-col gap-2">
+                  <div className="flex flex-col sm:flex-row items-start gap-2 sm:items-center">
                     <p className="text-gray-800 font-medium text-sm">
                       {order?.address?.snapshot.name},
                     </p>
-                    {/* <p className="text-gray-500 text-sm">Email: {order?.address?.snapshot.email}</p> */}
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-gray-500 text-sm">Email: {order?.address?.snapshot.email},</p>
+                    <p className="text-gray-500 text-sm">
                       Mobile: {order?.address?.snapshot.mobile},{" "}
                       {order?.address?.snapshot.alternative_mobile}
                     </p>
                   </div>
-                  <p className="text-gray-600 text-sm">
-                    Address: {order?.address?.snapshot.address}
+                  <p className="text-gray-500 text-sm">
+                    Address: {order?.address?.snapshot.address},
                   </p>
-                  <div className="flex gap-2 items-center">
+                  <div className="flex flex-col sm:flex-row items-start gap-2 sm:items-center">
                     <p className="text-gray-500 text-sm">
                       City: {order?.address?.snapshot.city},
                     </p>
@@ -398,7 +444,7 @@ const MyOrderDetailsPage = () => {
                       Pin Code: {order?.address?.snapshot.pincode}
                     </p>
                   </div>
-                </>
+                </div>
               ) : (
                 <p className="text-gray-500">Address not available</p>
               )}

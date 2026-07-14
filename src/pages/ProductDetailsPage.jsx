@@ -879,7 +879,7 @@ const ProductDetailsPage = () => {
             {/* Product info - mobile me left align, desktop me flex row */}
 
             <div className="flex-1 flex flex-row items-center gap-2 ">
-              <div className="font-bold text-gray-900 text-sm md:text-base line-clamp-1 truncate">
+              <div className="font-bold text-gray-900 text-sm md:text-base line-clamp-1 ">
                 {product?.name}
               </div>
               <div className="flex items-center md:gap-2">
