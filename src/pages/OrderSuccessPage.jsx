@@ -82,15 +82,6 @@ useEffect(() => {
 
   const generateInvoiceBase64 = async (element) => {
 
-     //wait for loading fonts
-  await document.fonts.ready;
-
-  //  some extra time for sefty
-  await new Promise((resolve) => setTimeout(resolve, 300));
-
-  // 3 Force reflow – important for hidden element
-  // (for element paint )
-  element.scrollHeight;
     const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
