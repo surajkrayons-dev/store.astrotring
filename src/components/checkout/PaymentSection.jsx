@@ -1,5 +1,5 @@
 // src/components/checkout/PaymentSection.jsx
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { ArrowRight, CreditCard, Info, Loader2 } from "lucide-react";
 
@@ -20,7 +20,7 @@ import { closeCartDrawer, closeCheckout } from "@/redux/slices/uiSlice";
 import {
   calculateDeliveryCharge,
   calculateCodCharge,
-  clearDeliveryCharge
+  clearDeliveryCharge,
 } from "@/redux/slices/extraCheckoutChargeSlice";
 
 const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID;
@@ -34,19 +34,41 @@ const PaymentSection = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const [codAvailable, setCodAvailable] = useState(true);
+
   // Mapped global states from user auth, cart, and payment slice
   const { isLoggedIn, user } = useSelector((state) => state.userAuth);
   const { items } = useSelector((state) => state.cart);
   let { appliedCoupon, couponDiscount } = useSelector((state) => state.coupon);
-  const { selectedAddressId } = useSelector((state) => state.address);
+  const { selectedAddressId, selectedAddress } = useSelector(
+    (state) => state.address,
+  );
   const { deliveryCharge, codCharge, isDeliveryLoading, isCodLoading } =
     useSelector((state) => state.extraCheckoutCharge);
-  const {
-    selectedPaymentMethod,
-    loading: globalPaymentLoading,
-  } = useSelector((state) => state.payment);
+  const { selectedPaymentMethod, loading: globalPaymentLoading } = useSelector(
+    (state) => state.payment,
+  );
 
-  console.log(appliedCoupon)
+  // console.log(appliedCoupon)
+
+
+    // Helper: Check if pincode falls in blocked ranges
+  const isPincodeBlocked = (pincode) => {
+    const pin = parseInt(pincode, 10);
+    if (isNaN(pin)) return false;
+    return (pin >= 800001 && pin <= 855117) || (pin >= 180001 && pin <= 194402);
+  };
+
+  console.log("selectedAddress", selectedAddress)
+
+  useEffect(() => {
+    if (selectedAddress?.pincode) {
+      const isBlocked = isPincodeBlocked(selectedAddress.pincode);
+      setCodAvailable(!isBlocked);
+    } else {
+      setCodAvailable(true);
+    }
+  }, [selectedAddress]);
 
   const cartTotal = items.reduce(
     (sum, item) => sum + item.price * item.quantity,
@@ -63,30 +85,38 @@ const PaymentSection = () => {
       : cartTotal + deliveryCharge - couponDiscount; // no cod charge in prepaid order
 
   // console.log(selectedAddressId);
-// PaymentSection.jsx
+  // PaymentSection.jsx
 
-useEffect(() => {
-  if (!selectedAddressId || !isLoggedIn) {
-    dispatch(clearDeliveryCharge());
-  }
-}, [selectedAddressId, dispatch]);
+  useEffect(() => {
+    if (!selectedAddressId || !isLoggedIn) {
+      dispatch(clearDeliveryCharge());
+    }
+  }, [selectedAddressId, dispatch]);
 
-// ✅ Delivery Charge – जब Address और Cart दोनों हों
-useEffect(() => {
-  if ( isLoggedIn && selectedAddressId && items.length > 0) {
-    dispatch(calculateDeliveryCharge({ 
-      address_id: selectedAddressId, 
-      coupon_code: appliedCoupon?.code 
-    }));
-  }
-}, [isLoggedIn, selectedAddressId, items.length, dispatch, appliedCoupon?.code]);
+  //  Delivery Charge – when Address and Cart both avilable
+  useEffect(() => {
+    if (isLoggedIn && selectedAddressId && items.length > 0) {
+      dispatch(
+        calculateDeliveryCharge({
+          address_id: selectedAddressId,
+          coupon_code: appliedCoupon?.code,
+        }),
+      );
+    }
+  }, [
+    isLoggedIn,
+    selectedAddressId,
+    items.length,
+    dispatch,
+    appliedCoupon?.code,
+  ]);
 
-// ✅ COD Charge – जब COD Selected हो, Address हो, Cart हो
-useEffect(() => {
-  if (  items.length > 0 && selectedPaymentMethod === "cod") {
-    dispatch(calculateCodCharge({ address_id: selectedAddressId }));
-  }
-}, [isLoggedIn, items.length, dispatch, selectedPaymentMethod]);
+  //  COD Charge – when COD Selected , Address , Cart avilable
+  useEffect(() => {
+    if (items.length > 0 && selectedPaymentMethod === "cod") {
+      dispatch(calculateCodCharge({ address_id: selectedAddressId }));
+    }
+  }, [isLoggedIn, items.length, dispatch, selectedPaymentMethod]);
 
   // Fallback to safety if address selection hasn't pre-populated grandTotal yet
   // const rawTotal = grandTotal || 0;
@@ -114,8 +144,6 @@ useEffect(() => {
     /* --- PATHWAY A: CASH ON DELIVERY ORDER GENERATION --- */
     if (selectedPaymentMethod === "cod") {
       try {
-        
-
         const data = await dispatch(
           createStandardCodOrder({
             amount: finalPayableAmount,
@@ -142,7 +170,6 @@ useEffect(() => {
           toast.error(data.message || "COD order failed");
         }
       } catch (err) {
-      
         toast.error(
           err ||
             "An error occurred while placing your COD order. Please try again.",
@@ -159,7 +186,6 @@ useEffect(() => {
       }
 
       try {
-      
         const orderData = await dispatch(
           createOnlineOrder({
             amount: finalPayableAmount,
@@ -169,7 +195,6 @@ useEffect(() => {
             address_id: selectedAddressId,
           }),
         ).unwrap();
-  
 
         if (!orderData.order_id) {
           toast.error(orderData.message || "Failed to create order.");
@@ -185,13 +210,12 @@ useEffect(() => {
           order_id: orderData.order_id,
           prefill: {
             name: user?.name || "Customer",
-            contact: user?.mobile , // 👈 यहाँ mobile prefill
+            contact: user?.mobile, // 👈 यहाँ mobile prefill
             email: user?.email || "customer@example.com",
           },
           theme: { color: "#f59e0b" },
           modal: {
             ondismiss: () => {
-             
               toast.info("Payment cancelled.");
             },
           },
@@ -221,7 +245,11 @@ useEffect(() => {
                 dispatch(closeCartDrawer());
                 dispatch(closeCheckout());
                 navigate("/order-success", {
-                  state: { orderData: verifyRes?.order?.order_id || verifyRes.data?.order?.order_id },
+                  state: {
+                    orderData:
+                      verifyRes?.order?.order_id ||
+                      verifyRes.data?.order?.order_id,
+                  },
                 });
               } else {
                 toast.error(verifyRes.message || "Verification failed.");
@@ -233,7 +261,6 @@ useEffect(() => {
           },
         };
 
-      
         const razorpay = new window.Razorpay(options);
         razorpay.on("payment.failed", (response) => {
           console.error(" Payment failed:", response.error);
@@ -249,6 +276,19 @@ useEffect(() => {
   };
 
   return (
+    <>
+       {/* Global loader overlay */}
+    {globalPaymentLoading && (
+      <div className="fixed inset-0 bg-white/10 backdrop-blur-sm flex flex-col items-center justify-center z-50  h-screen">
+        <Loader2 className="w-12 h-12 animate-spin text-amber-500" />
+        <p className="mt-4 text-sm font-medium text-gray-700">
+          Please do not refresh the page
+        </p>
+        <p className="text-xs text-gray-500">
+          We are processing your order...
+        </p>
+      </div>
+    )}
     <div className="w-full bg-white border border-gray-100 rounded-xl p-4 sm:p-5 shadow-sm space-y-5 text-left">
       {/* Module Navigation Branding Headers */}
       <div className="flex items-center gap-3">
@@ -289,25 +329,34 @@ useEffect(() => {
         </label>
 
         {/* Pathway 2: Cash on Delivery Channel */}
-        {appliedCoupon?.payment_type !== "prepaid" && <label
-          className={`flex items-center gap-3 p-3.5 border rounded-xl cursor-pointer transition-all ${selectedPaymentMethod === "cod" ? "border-amber-500 bg-amber-500/5 ring-1 ring-amber-500" : "border-gray-200 bg-white hover:border-gray-300"}`}
-        >
-          <input
-            type="radio"
-            name="payment_type"
-            checked={selectedPaymentMethod === "cod"}
-            onChange={() => dispatch(setPaymentMethod("cod"))}
-            className="h-4 w-4 text-amber-500 accent-amber-600 focus:ring-amber-500 border-gray-300 cursor-pointer"
-          />
-          <div className="text-left">
-            <p className="text-xs font-extrabold text-gray-800">
-              Cash on Delivery
-            </p>
-            <p className="text-[10px] text-gray-400 font-medium">
-              A non‑refundable COD charge of Rs.49 is required.
-            </p>
-          </div>
-        </label>}
+        {appliedCoupon?.payment_type !== "prepaid" && (
+          <label
+            className={`flex items-center gap-3 p-3.5 border rounded-xl cursor-pointer transition-all 
+      ${!codAvailable ? "opacity-50 cursor-not-allowed" : ""}
+      ${selectedPaymentMethod === "cod" && codAvailable ? "border-amber-500 bg-amber-500/5 ring-1 ring-amber-500" : "border-gray-200 bg-white hover:border-gray-300"}`}
+          >
+            <input
+              type="radio"
+              name="payment_type"
+              checked={selectedPaymentMethod === "cod"}
+              onChange={() => codAvailable && dispatch(setPaymentMethod("cod"))}
+              disabled={!codAvailable}
+              className="h-4 w-4 text-amber-500 accent-amber-600 focus:ring-amber-500 border-gray-300 cursor-pointer"
+            />
+            <div className="text-left">
+              <p className="text-xs font-extrabold text-gray-800">
+                Cash on Delivery
+              </p>
+              <p
+                className={`text-[10px] font-medium ${!codAvailable ? "text-red-700" : "text-gray-400"}`}
+              >
+                {!codAvailable
+                  ? " COD not available for this pincode"
+                  : "A non‑refundable COD charge of Rs.49 is required."}
+              </p>
+            </div>
+          </label>
+        )}
       </div>
 
       {/* Structured Billing Calculation Display Box */}
@@ -335,35 +384,34 @@ useEffect(() => {
             })}
           </span>
         </div>
-      
-      {/* Primary Conversion Submission CTA Anchor */}
-      <button
-        onClick={handleCheckoutProcess}
-        disabled={globalPaymentLoading || isDeliveryLoading || isCodLoading}
-        className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-100 disabled:text-gray-400 text-white font-extrabold text-xs uppercase tracking-wider rounded-md transition-all shadow-sm flex items-center justify-center gap-2 transform active:scale-[0.99] cursor-pointer"
-      >
-        {globalPaymentLoading ? (
-          <>
-            <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
-            <span className="animate-pulse normal-case tracking-normal font-bold text-gray-400">
-              Processing Transaction...
-            </span>
-          </>
-        ) : (
-          <>
-            <span>
-              {selectedPaymentMethod === "online"
-                ? "Proceed to Payment"
-                : "Confirm Order Placement"}
-            </span>
-            <ArrowRight size={20} />
-          </>
-        )}
-      </button>
-      </div>
 
-      
+        {/* Primary Conversion Submission CTA Anchor */}
+        <button
+          onClick={handleCheckoutProcess}
+          disabled={globalPaymentLoading || isDeliveryLoading || isCodLoading}
+          className="w-full py-3.5 bg-amber-500 hover:bg-amber-600 disabled:bg-gray-100 disabled:text-gray-400 text-white font-extrabold text-xs uppercase tracking-wider rounded-md transition-all shadow-sm flex items-center justify-center gap-2 transform active:scale-[0.99] cursor-pointer"
+        >
+          {globalPaymentLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin text-gray-400" />
+              <span className="animate-pulse normal-case tracking-normal font-bold text-gray-400">
+                Processing Transaction...
+              </span>
+            </>
+          ) : (
+            <>
+              <span>
+                {selectedPaymentMethod === "online"
+                  ? "Proceed to Payment"
+                  : "Confirm Order Placement"}
+              </span>
+              <ArrowRight size={20} />
+            </>
+          )}
+        </button>
+      </div>
     </div>
+    </>
   );
 };
 

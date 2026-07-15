@@ -1,7 +1,13 @@
 // src/components/checkout/AddressSection.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAddresses, addAddress, fetchPincodeDetails, setSelectedAddress } from "../../redux/slices/addressSlice";
+import {
+  fetchAddresses,
+  addAddress,
+  fetchPincodeDetails,
+  setSelectedAddress,
+  setSelectedAddressId,
+} from "../../redux/slices/addressSlice";
 import { toast } from "react-toastify";
 import { MapPin } from "lucide-react";
 
@@ -12,13 +18,13 @@ import { MapPin } from "lucide-react";
  */
 const AddressSection = () => {
   const dispatch = useDispatch();
-  
+
   // Redux global state
-  const { addresses, loading } = useSelector((state) => state.address);
+  const { addresses, loading, selectedAddressId, selectedAddress } =
+    useSelector((state) => state.address);
   const { isLoggedIn } = useSelector((state) => state.userAuth);
-  
+
   // Local active states
-  const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [showNewForm, setShowNewForm] = useState(false);
   const [adding, setAdding] = useState(false);
   const [pincodeLoading, setPincodeLoading] = useState(false);
@@ -29,17 +35,17 @@ const AddressSection = () => {
 
   // EXACTLY 10 FIELDS
   const [formData, setFormData] = useState({
-    name: "",           // 1. Name / Tag
-    email: "",         // 2. Email (mandatory)
-    country_code: "+91",// 3. Country Code
-    mobile: "",         // 4. Mobile Number
-    pincode: "",        // 5. Pincode
-    address: "",        // 6. Full Address Line
-    city: "",           // 7. City
-    state: "",          // 8. State
-    state_code: "",     // 9. State Code
-    country: "India",   // 10. Country
-    by_default: false,  // 11. Default Checklist Flag
+    name: "", // 1. Name / Tag
+    email: "", // 2. Email (mandatory)
+    country_code: "+91", // 3. Country Code
+    mobile: "", // 4. Mobile Number
+    pincode: "", // 5. Pincode
+    address: "", // 6. Full Address Line
+    city: "", // 7. City
+    state: "", // 8. State
+    state_code: "", // 9. State Code
+    country: "India", // 10. Country
+    by_default: false, // 11. Default Checklist Flag
   });
 
   // Fetch saved addresses on mount
@@ -54,19 +60,16 @@ const AddressSection = () => {
   // }, [dispatch, loading,isLoggedIn]);
 
   useEffect(() => {
-
-  if (isLoggedIn ) {
-    dispatch(fetchAddresses());
-  }
-}, [isLoggedIn, dispatch]);
-
+    if (isLoggedIn) {
+      dispatch(fetchAddresses());
+    }
+  }, [isLoggedIn, dispatch]);
 
 useEffect(() => {
- 
-  if (!loading && addresses.length === 0) {
-    setShowNewForm(true); 
-  } 
-}, [addresses, loading]);
+  
+    setShowNewForm(addresses.length === 0);
+  
+}, [addresses ]);
 
   // Debouncer Cleanup Hook
   useEffect(() => {
@@ -77,13 +80,15 @@ useEffect(() => {
 
   // Auto-select default/first address locally
   useEffect(() => {
-    if (!loading  && addresses.length > 0 && !selectedAddressId) {
-      const defaultAddr = addresses.find((addr) => Number(addr.by_default) === 1);
-      const addrToSelect = defaultAddr ? defaultAddr.id : addresses[0].id;
-      setSelectedAddressId(addrToSelect);
+    if (!loading && addresses.length > 0 && !selectedAddressId) {
+      const defaultAddr = addresses.find(
+        (addr) => Number(addr.by_default) === 1,
+      );
+      const addrToSelect = defaultAddr || addresses[0];
+      dispatch(setSelectedAddressId(addrToSelect.id));
       dispatch(setSelectedAddress(addrToSelect));
     }
-  }, [addresses, selectedAddressId, loading]);
+  }, [addresses, selectedAddressId, loading, dispatch]);
 
   // Standard input tracker
   const handleInputChange = (e) => {
@@ -112,7 +117,7 @@ useEffect(() => {
         setPincodeError("Not found. Enter manually.");
       }
     } catch (err) {
-      setPincodeError("Fetch failed. Enter manually.");
+      setPincodeError(err);
     } finally {
       setPincodeLoading(false);
     }
@@ -135,7 +140,6 @@ useEffect(() => {
   // Submit handling & payload submission
   const handleSaveAddress = async (e) => {
     e.preventDefault();
-    
 
     setAdding(true);
     const payload = {
@@ -147,7 +151,7 @@ useEffect(() => {
       const newAddress = await dispatch(addAddress(payload)).unwrap();
       toast.success("Address added successfully!");
       setShowNewForm(false);
-      
+
       // Reset Form State perfectly
       setFormData({
         name: "",
@@ -163,11 +167,12 @@ useEffect(() => {
         by_default: false,
       });
       setPincodeError("");
-      
+
       if (newAddress?.id) {
-        setSelectedAddressId(newAddress.id);
+        dispatch(setSelectedAddressId(newAddress.id));
+        dispatch(setSelectedAddress(newAddress));
       }
-      
+
       hasFetched.current = false;
       dispatch(fetchAddresses());
     } catch (err) {
@@ -178,12 +183,15 @@ useEffect(() => {
   };
 
   if (loading && addresses.length === 0) {
-    return <div className="text-center py-6 text-sm font-medium text-gray-500">Loading your addresses...</div>;
+    return (
+      <div className="text-center py-6 text-sm font-medium text-gray-500">
+        Loading your addresses...
+      </div>
+    );
   }
 
   return (
     <div className="w-full bg-white border border-gray-100 rounded-xl p-4 sm:p-5 shadow-sm space-y-4 text-left">
-      
       {/* Upper Action Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -191,7 +199,9 @@ useEffect(() => {
             <MapPin size={20} />
           </div>
           <div>
-            <h3 className="text-sm font-extrabold text-gray-900 tracking-tight">Delivery Address</h3>
+            <h3 className="text-sm font-extrabold text-gray-900 tracking-tight">
+              Delivery Address
+            </h3>
           </div>
         </div>
 
@@ -236,18 +246,20 @@ useEffect(() => {
                     value={addr.id}
                     checked={isTargeted}
                     onChange={() => {
-                      setSelectedAddressId(addr.id);
-                     dispatch(setSelectedAddress(addr.id))
+                      dispatch(setSelectedAddressId(addr.id));
+                      dispatch(setSelectedAddress(addr));
                     }}
                     className="h-4 w-4 text-amber-500 accent-amber-600 border-gray-300 focus:ring-amber-500 cursor-pointer"
                   />
                 </div>
-                
+
                 <p className="text-xs font-semibold text-gray-700 line-clamp-2 mb-2 leading-relaxed">
-                  {addr.address}, {addr.city}, {addr.state} ({addr.state_code}) - {addr.pincode}, {addr.country}
+                  {addr.address}, {addr.city}, {addr.state} ({addr.state_code})
+                  - {addr.pincode}, {addr.country}
                 </p>
                 <p className="text-[11px] font-medium text-gray-400 mt-auto flex items-center gap-1.5">
-                  <span className="text-xs">📞</span> {addr.country_code || "+91"} {addr.mobile}
+                  <span className="text-xs">📞</span>{" "}
+                  {addr.country_code || "+91"} {addr.mobile}
                 </p>
               </label>
             );
@@ -255,8 +267,10 @@ useEffect(() => {
         </div>
       ) : (
         /* --- MODE 2: HIGHLY OPTIMIZED 10-FIELD INTUITIVE GRID FORM --- */
-        <form onSubmit={handleSaveAddress} className="grid grid-cols-12 gap-3 p-4 bg-gray-50/50 rounded-xl border border-gray-200/60 transition-all">
-          
+        <form
+          onSubmit={handleSaveAddress}
+          className="grid grid-cols-12 gap-3 p-4 bg-gray-50/50 rounded-xl border border-gray-200/60 transition-all"
+        >
           {/*  Name / Address Tag */}
           <input
             type="text"
@@ -298,7 +312,12 @@ useEffect(() => {
             name="mobile"
             maxLength={10}
             value={formData.mobile}
-            onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value.replace(/\D/g, "") }))}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                mobile: e.target.value.replace(/\D/g, ""),
+              }))
+            }
             placeholder="Mobile Number *"
             className="col-span-9 sm:col-span-4 px-3 py-2 text-xs font-semibold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400/10 focus:border-amber-400 bg-white text-gray-800 transition-all placeholder:font-medium placeholder:text-gray-400"
           />
@@ -315,8 +334,16 @@ useEffect(() => {
               placeholder="Pincode *"
               className="w-full px-3 py-2 text-xs font-semibold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400/10 focus:border-amber-400 bg-white text-gray-800 transition-all placeholder:font-medium placeholder:text-gray-400"
             />
-            {pincodeLoading && <span className="absolute right-2 top-2.5 text-[9px] font-bold text-amber-500 animate-pulse">Syncing...</span>}
-            {pincodeError && <p className="text-[9px] text-amber-600 font-bold mt-0.5 pl-1 absolute bg-gray-50 px-1 rounded border border-gray-100 z-10">{pincodeError}</p>}
+            {pincodeLoading && (
+              <span className="absolute right-2 top-2.5 text-[9px] font-bold text-amber-500 animate-pulse">
+                Syncing...
+              </span>
+            )}
+            {pincodeError && (
+              <p className="text-[9px] text-amber-600 font-bold mt-0.5 pl-1 absolute bg-gray-50 px-1 rounded border border-gray-100 z-10">
+                {pincodeError}
+              </p>
+            )}
           </div>
 
           {/*  City Input */}
@@ -380,12 +407,17 @@ useEffect(() => {
               type="checkbox"
               name="by_default"
               checked={formData.by_default}
-              onChange={(e) => setFormData(prev => ({ ...prev, by_default: e.target.checked }))}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  by_default: e.target.checked,
+                }))
+              }
               className="h-4 w-4 text-amber-500 accent-amber-500 border-gray-300 rounded focus:ring-amber-500 cursor-pointer"
             />
             Set as default delivery location
           </label>
-          
+
           {/* Form Action Submit Button */}
           <button
             type="submit"
