@@ -9,21 +9,16 @@ const AllCatogries = () => {
 
 
 
-
   // No categories
   if (!productCategories || productCategories.length === 0) {
-    return (
-      <div className="w-full text-center text-gray-500 py-4">
-        No categories found.
-      </div>
-    );
+    return null;
   }
 
   return (
     <div className="w-full border-b border-gray-200 pb-3 px-4 sm:hidden">
       <div className="max-w-7xl mx-auto">
         <div className="flex gap-2 overflow-x-auto pb-2">
-          {productCategories.map((category) => (
+          {productCategories?.map((category) => (
             <div
               key={category.id }
               onClick={() => navigate(`/category/${category.slug}`)}

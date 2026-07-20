@@ -52,6 +52,22 @@ const UserLogin = () => {
     }
   }, [mode]);
 
+
+ // Sync state data on visibility lifecycle triggers and handle underlying body scrolling limits
+  useEffect(() => {
+    if (isLoginModalOpen) {
+    
+
+      // Lock viewport scrolling positions to avoid secondary movement conflicts behind modal panels
+      document.body.style.overflow = "hidden";
+    }
+
+    // Component unmount/dismiss cleanup function sequence
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isLoginModalOpen, dispatch]);
+
   // Close modal and reset fields when user logs in
   useEffect(() => {
     if (user) {
@@ -175,13 +191,10 @@ const UserLogin = () => {
 
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-[9999] ">
-      <div
-        className="absolute inset-0 backdrop-blur-[2px] bg-black/20"
-        onClick={() => dispatch(closeLoginModal())}
-      />
-      <div className="absolute inset-0 flex items-center justify-center p-4">
+      
+      <div className="absolute inset-0 flex items-center justify-center p-4 backdrop-blur-[2px] bg-black/20 ">
         <div
-          className="relative bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto scrollbar-hide"
+          className="relative bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] "
           onClick={(e) => e.stopPropagation()}
         >
           <div className="p-6">
@@ -228,6 +241,14 @@ const UserLogin = () => {
                       classNamePrefix="react-select"
                       isClearable={false}
                       isSearchable={true}
+                      formatOptionLabel={(option, { context }) => {
+                  //  Show only value in the input (context === 'value')
+                  if (context === "value") {
+                    return option.value; // e.g., "+91"
+                  }
+                  //  Show full label in dropdown menu
+                  return option.label; // e.g., "+91 (IN)"
+                }}
                       styles={{
                         control: (base) => ({
                           ...base,
@@ -235,15 +256,16 @@ const UserLogin = () => {
                           boxShadow: "none",
                           "&:hover": { borderColor: "#f59e0b" },
                           borderRadius: "0.5rem",
-                          minHeight: "2.5rem",
+                         
                           width: "100px",
-                          fontSize: "0.65rem",
-                          fontWeight: "bold",
+                          fontSize: "0.75rem",
+                          fontWeight: '600',
+                          textAlign: 'center'
                         }),
                         menu: (base) => ({
                           ...base,
                           zIndex: 9999,
-                          width: "220px",
+                          width: "200px",
                         }),
                         option: (base, state) => ({
                           ...base,
@@ -254,8 +276,8 @@ const UserLogin = () => {
                               : "white",
                           color: state.isSelected ? "white" : "#374151",
                           "&:active": { backgroundColor: "#f59e0b" },
-                          fontSize: "0.65rem",
-                          fontWeight: "bold",
+                          fontSize: "0.75rem",
+                          
                         }),
                       }}
                     />
@@ -268,7 +290,7 @@ const UserLogin = () => {
                       if (value.length <= 10) setMobile(value);
                     }}
                     placeholder="Enter 10-digit mobile"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-amber-500 focus:border-amber-500"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-amber-500 focus:border-amber-500 "
                     required
                   />
                 </div>
@@ -364,6 +386,14 @@ const UserLogin = () => {
                       classNamePrefix="react-select"
                       isClearable={false}
                       isSearchable={true}
+                      formatOptionLabel={(option, { context }) => {
+                  //  Show only value in the input (context === 'value')
+                  if (context === "value") {
+                    return option.value; // e.g., "+91"
+                  }
+                  //  Show full label in dropdown menu
+                  return option.label; // e.g., "+91 (IN)"
+                }}
                       styles={{
                         control: (base) => ({
                           ...base,
@@ -373,8 +403,9 @@ const UserLogin = () => {
                           borderRadius: "0.375rem",
                           minHeight: "2.5rem",
                           width: "100px",
-                          fontSize: "0.65rem",
-                          fontWeight: "bold",
+                          fontSize: "0.75rem",
+                          fontWeight: '600',
+                          textAlign: 'center'
                         }),
                         menu: (base) => ({
                           ...base,
@@ -390,8 +421,8 @@ const UserLogin = () => {
                               : "white",
                           color: state.isSelected ? "white" : "#374151",
                           "&:active": { backgroundColor: "#f59e0b" },
-                          fontSize: "0.65rem",
-                          fontWeight: "bold",
+                          fontSize: "0.75rem",
+                          
                         }),
                       }}
                     />

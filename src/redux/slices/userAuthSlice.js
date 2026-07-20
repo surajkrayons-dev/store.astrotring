@@ -9,7 +9,7 @@ export const userLogin = createAsyncThunk(
     try {
       const res = await api.post("/user/login", { mobile,country_code });
       // No token returned now, just success
-      console.log("userLOgin", res.data);
+      // console.log("userLOgin", res.data);
       return res.data; // { message: "OTP sent", ... }
     } catch (error) {
       return thunkApi.rejectWithValue(

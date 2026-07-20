@@ -342,6 +342,7 @@ const AddressSection = () => {
                     minHeight: "2.5rem",
                     fontSize: "0.65rem",
                     fontWeight: "bold",
+                     textAlign: 'center'
                   }),
                   menu: (base) => ({ ...base, zIndex: 9999 }),
                   option: (base, state) => ({

@@ -28,7 +28,7 @@ const AuthSection = () => {
   const { countryCodes, loading: loadingCodes } = useCountryCodes();
   const [countryCode, setCountryCode] = useState("+91");
 
-  console.log(selectedAddressId);
+  // console.log(selectedAddressId);
 
   const countryOptions = countryCodes.map((code) => ({
     value: code.value,

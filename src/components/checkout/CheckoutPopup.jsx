@@ -36,18 +36,18 @@ const CheckoutPopup = () => {
     };
   }, [isOpen, dispatch]);
 
-  // ✅ Handler – जब Header का Back बटन click हो
+  //  Handler – when back button clicked
   const handleBackClick = () => {
     setShowConfirm(true);
   };
 
-  // ✅ Confirm – Checkout बंद करो
+  //  Confirm – Checkout close
   const handleConfirmClose = () => {
     setShowConfirm(false);
     dispatch(closeCheckout());
   };
 
-  // ✅ Cancel – Modal बंद करो, Checkout खुला रहने दो
+  // ✅Cancel – Modal close, Checkout open
   const handleCancelClose = () => {
     setShowConfirm(false);
   };

@@ -57,7 +57,7 @@ const HeroBanner = () => {
             <div key={item.id} className="w-full h-full flex-shrink-0">
               {item.media_type === "video" ? (
                 <video
-                  src={item.media_url}
+                  src={item?.desktop_media}
                   autoPlay
                   muted
                   playsInline
@@ -70,14 +70,14 @@ const HeroBanner = () => {
                 <Link to={item?.url}>
                   {/* Desktop Image – hidden on mobile */}
                   <img
-                    src={item?.media_url}
+                    src={item?.desktop_media}
                     alt={`Banner ${item.id}`}
                     className="w-full h-full object-cover hidden sm:block"
                   />
                   {/* Mobile Image – shown only on mobile */}
-                  {item.mobile_media_url && (
+                  {item.mobile_media && (
                     <img
-                      src={item?.mobile_media_url}
+                      src={item?.mobile_media}
                       alt={`Banner ${item.id} mobile`}
                       className="w-full h-full object-cover block sm:hidden"
                     />
