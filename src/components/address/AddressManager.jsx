@@ -31,7 +31,7 @@ const AddressManager = () => {
     address: '',
     pincode: '',
     by_default: false,
-    state_code: '',   // ✅ changed from stateCode
+    state_code: '',   //  changed from stateCode
   });
   const [pincodeLoading, setPincodeLoading] = useState(false);
   const [pincodeError, setPincodeError] = useState('');
@@ -243,7 +243,7 @@ const AddressManager = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Label */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Label <span className="text-amber-600">*</span></label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Name <span className="text-amber-600">*</span></label>
               <input
                 type="text"
                 name="name"
@@ -302,7 +302,6 @@ const AddressManager = () => {
                 <Select
                   name="country_code"
                   options={countryOptions}
-                  defaultInputValue='+91'
                   value={countryOptions.find((opt) => opt.value === formData.country_code)}
                   onChange={(selected) =>
                     setFormData({ ...formData, country_code: selected ? selected.value : '' })

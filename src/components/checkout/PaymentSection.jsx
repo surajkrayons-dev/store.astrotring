@@ -59,7 +59,7 @@ const PaymentSection = () => {
     return (pin >= 800001 && pin <= 855117) || (pin >= 180001 && pin <= 194402);
   };
 
-  console.log("selectedAddress", selectedAddress)
+  // console.log("selectedAddress", selectedAddress)
 
   useEffect(() => {
     if (selectedAddress?.pincode) {

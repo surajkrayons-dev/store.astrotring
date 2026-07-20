@@ -118,7 +118,9 @@ const ProductReviews = ({ catId }) => {
         <div className=" items-start">
           <Slider slideCount={3} showBtn={false} >
           {reviews.map((review) => (
+             <div key={review.id} className="w-[280px] sm:w-[300px] md:w-[320px] flex-shrink-0">
             <ReviewCard key={review.id} review={review}  />
+            </div>
           ))}
          </Slider>
         </div>

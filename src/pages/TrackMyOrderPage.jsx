@@ -21,7 +21,7 @@ const TrackMyOrderPage = () => {
   const { isLoggedIn } = useSelector((state) => state.userAuth);
   const [currentStatusIndex, setCurrentStatusIndex] = useState(-1);
 
-  console.log(currentOrder)
+  // console.log(currentOrder)
 
   useEffect(() => {
     if (!isLoggedIn) {

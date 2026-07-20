@@ -94,7 +94,7 @@ const handleLogout = async () => {
 
   return (
     <nav
-      className={`w-full mb-4 sticky top-0 z-30 bg-white transition-all duration-500 ${
+      className={`w-full sm:mb-4 sticky top-0 z-30 bg-white transition-all duration-500 ${
         scrolled ? "shadow-md" : ""
       } ${isNavHidden ? "-translate-y-full" : "translate-y-0"}`}
     >
