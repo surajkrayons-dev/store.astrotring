@@ -79,8 +79,7 @@ const CheckoutPopup = () => {
                 ✓
               </span>
               <span>
-                You are successfully verified and logged in with your account
-                details.
+                You are successfully logged in.
               </span>
             </div>
           )}

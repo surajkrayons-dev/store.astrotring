@@ -318,17 +318,17 @@ useEffect(() => {
 
             {/* Main content */}
             <div className="flex-1 min-w-0 overflow-x-hidden">
-              <BestSellers />
+              <BestSellers onAddToCart={handleAddToCart}/>
 
-              <div className="flex items-center justify-between mt-2">
+              {/* <div className="flex items-center justify-between mt-2">
                 <span className="text-xs sm:text-sm text-stone-500 font-semibold">
                   {totalFilteredProducts} product
                   {totalFilteredProducts !== 1 ? "s" : ""} found
                 </span>
-              </div>
+              </div> */}
 
               {/* Always render categories, even when filters are active */}
-              <div className="space-y-4 ">
+              <div className="space-y-4 mt-4">
                 {groupedCategories.map((cat) => {
                   const catProducts = categoryFilteredProducts[cat.id] || [];
                   // if (catProducts.length === 0) return null;   // hide empty categories

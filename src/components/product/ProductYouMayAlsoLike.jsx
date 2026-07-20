@@ -23,9 +23,9 @@ const YouMayAlsoLikeCard = ({ product }) => {
   return (
         <Link
       to={`/product/${product.slug}`}
-      className="flex flex-col h-full bg-white rounded-sm md:rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition cursor-pointer group w-full"
+      className="flex flex-col h-full bg-white rounded-sm border border-gray-200 overflow-hidden hover:shadow-lg transition cursor-pointer group w-full"
     >
-      <div className="relative aspect-square bg-gray-100 flex items-center justify-center flex-shrink-0 md:p-2">
+      <div className="relative aspect-square bg-gray-100 flex items-center justify-center flex-shrink-0 ">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -70,7 +70,12 @@ const ProductYouMayAlsoLike = ({ products = [] }) => {
       <h2 className="text-xl font-bold text-gray-900 mb-4">You May Also Like</h2>
       <Slider slideCount={4}>
         {products.map((product) => (
+          <div
+              key={product.id}
+              className="w-[160px] sm:w-[180px] md:w-[200px] flex-shrink-0"
+            >
           <YouMayAlsoLikeCard key={product.id} product={product}  />
+          </div>
         ))}
       </Slider>
     </section>

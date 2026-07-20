@@ -7,6 +7,8 @@ import {
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import Select from "react-select";
+import { useCountryCodes } from "@/hooks/useCountryCodes";
 
 /**
  * AuthSection Component
@@ -22,9 +24,16 @@ const AuthSection = () => {
   const [isOtpSent, setIsOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   // const { isLoggedIn, user } = useSelector((state) => state.userAuth);
-   const { selectedAddressId } = useSelector((state) => state.address);
+  const { selectedAddressId } = useSelector((state) => state.address);
+  const { countryCodes, loading: loadingCodes } = useCountryCodes();
+  const [countryCode, setCountryCode] = useState("+91");
 
   console.log(selectedAddressId);
+
+  const countryOptions = countryCodes.map((code) => ({
+    value: code.value,
+    label: code.label,
+  }));
 
   /**
    * Submits mobile verification request to server endpoints to dispatch OTP token
@@ -38,7 +47,7 @@ const AuthSection = () => {
     setLoading(true);
     try {
       // Direct integration with your real slice action
-      await dispatch(userLogin(mobile)).unwrap();
+      await dispatch(userLogin({ mobile, country_code: countryCode })).unwrap();
       setIsOtpSent(true);
       toast.success("OTP sent successfully!");
     } catch (err) {
@@ -61,7 +70,7 @@ const AuthSection = () => {
     setLoading(true);
     try {
       // 1. Verify OTP with backend to set tokens in localStorage
-      await dispatch(userVerifyLoginOtp({ mobile, otp })).unwrap();
+      await dispatch(userVerifyLoginOtp({ mobile, otp, country_code: countryCode })).unwrap();
 
       // 2. Load authentic profile data directly into Redux state
       await dispatch(userProfile()).unwrap();
@@ -83,7 +92,6 @@ const AuthSection = () => {
         await dispatch(
           calculateDeliveryCharge({
             address_id: selectedAddressId,
-            
           }),
         );
       }
@@ -106,22 +114,69 @@ const AuthSection = () => {
       {/* Conditional Stage Form Management */}
       {!isOtpSent ? (
         /* --- STAGE 1: INITIAL PHONE NUMBER COLLECTION FORM --- */
-        <form onSubmit={handleSendOtp} className="flex flex-col sm:flex-row">
-          <div className="relative flex-1">
-            {/* Country Extension Selector Prefix Badge */}
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-xs font-bold text-gray-900 select-none">
-              +91
-            </span>
+        <form
+          onSubmit={handleSendOtp}
+          className="flex flex-col sm:flex-row gap-1"
+        >
+          <div className="flex items-center w-full gap-1 ">
+            {loadingCodes ? (
+              <div className="w-24 px-2 py-2 text-xs font-bold text-gray-400 border border-gray-200 rounded-xl bg-gray-50 text-center">
+                Loading...
+              </div>
+            ) : (
+              <Select
+                options={countryOptions}
+                value={countryOptions.find((opt) => opt.value === countryCode)}
+                onChange={(selected) =>
+                  setCountryCode(selected ? selected.value : "+91")
+                }
+                placeholder="Code"
+                classNamePrefix="react-select"
+                isClearable={false}
+                isSearchable={true}
+                formatOptionLabel={(option, { context }) => {
+                  if (context === "value") return option.value;
+                  return option.label;
+                }}
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    borderColor: "#d1d5db",
+                    boxShadow: "none",
+                    "&:hover": { borderColor: "#f59e0b" },
+                    borderRadius: "0.5rem",
+                    minHeight: "2.5rem",
+                    
+                    fontSize: "0.65rem",
+                    fontWeight: "bold",
+                  }),
+                  menu: (base) => ({ ...base, zIndex: 9999,  width: "110px", }),
+                  option: (base, state) => ({
+                    ...base,
+                    backgroundColor: state.isSelected
+                      ? "#f59e0b"
+                      : state.isFocused
+                        ? "#fef3c7"
+                        : "white",
+                    color: state.isSelected ? "white" : "#374151",
+                    "&:active": { backgroundColor: "#f59e0b" },
+                    fontSize: "0.65rem",
+                    whiteSpace: "nowrap"
+                  }),
+                }}
+              />
+            )}
             <input
               type="tel"
               maxLength={10}
               value={mobile}
               onChange={(e) => setMobile(e.target.value.replace(/\D/g, ""))}
               placeholder="Enter 10-digit mobile number"
-              className="w-full pl-12 pr-4 py-2.5 text-xs font-semibold tracking-wider border border-gray-200 bg-gray-50/50 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-50 focus:border-amber-500 transition-all placeholder:normal-case placeholder:font-medium placeholder:text-gray-400"
+              className="flex-1 px-4 py-2.5 text-xs font-semibold tracking-wider border border-gray-200 bg-gray-50/50 rounded-xl focus:outline-none focus:ring-1 focus:ring-amber-50 focus:border-amber-500 transition-all placeholder:normal-case placeholder:font-medium placeholder:text-gray-400"
               required
             />
           </div>
+
           <button
             type="submit"
             disabled={mobile.length !== 10 || loading}
@@ -135,7 +190,7 @@ const AuthSection = () => {
         <form onSubmit={handleVerifyOtp} className="space-y-3 animate-fade-in">
           {/* Dispatch Status Response Sub-alert */}
           <p className="text-xs text-green-600 font-semibold flex items-center gap-1 pl-0.5">
-            <span className="text-sm">✓</span> OTP send to <b>+91 {mobile}</b>.
+            <span className="text-sm">✓</span> OTP send to <b>{countryCode} {mobile}</b>.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-2.5">

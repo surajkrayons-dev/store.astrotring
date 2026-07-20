@@ -1,50 +1,45 @@
-
-import { useRef, useEffect } from "react";
+import { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, Autoplay, Mousewheel } from "swiper";
+import { Navigation, Autoplay, Mousewheel } from "swiper";
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
-const Slider = ({ children, slideCount, showBtn=true }) => {
+const Slider = ({ children, showBtn = true }) => {
   const prevRef = useRef(null);
   const nextRef = useRef(null);
 
   return (
-    <div className="relative ">
-      {/* Navigation buttons */}
-      {showBtn &&<button
-        ref={prevRef}
-        className="absolute left-0 md:-left-4 top-1/2 z-10 -translate-y-1/2 bg-gradient-to-br from-amber-100 to-amber-200 text-amber-900 font-bold shadow-[inset_0_0_0_1.5px_#fcd34d] rounded-full w-8 h-8 flex items-center justify-center cursor-pointer"
-      >
-        <FaArrowLeft />
-      </button>}
-     {showBtn && <button
-        ref={nextRef}
-        className="absolute right-0 md:-right-4 top-1/2 z-10 -translate-y-1/2 bg-gradient-to-br from-amber-100 to-amber-200 text-amber-900 font-bold shadow-[inset_0_0_0_1.5px_#fcd34d] rounded-full w-8 h-8 flex items-center justify-center cursor-pointer"
-      >
-        <FaArrowRight />
-      </button>}
+    <div className="relative overflow-hidden">   {/*  extra overflow hide */}
+      {showBtn && (
+        <button
+          ref={prevRef}
+          className="absolute left-2  top-1/3 z-10 -translate-y-1/2 bg-gradient-to-br from-amber-100 to-amber-200 text-amber-900 font-bold shadow-[inset_0_0_0_1.5px_#fcd34d] rounded-full w-8 h-8 flex items-center justify-center cursor-pointer"
+        >
+          <FaArrowLeft />
+        </button>
+      )}
+      {showBtn && (
+        <button
+          ref={nextRef}
+          className="absolute right-2  top-1/3 z-10 -translate-y-1/2 bg-gradient-to-br from-amber-100 to-amber-200 text-amber-900 font-bold shadow-[inset_0_0_0_1.5px_#fcd34d] rounded-full w-8 h-8 flex items-center justify-center cursor-pointer"
+        >
+          <FaArrowRight />
+        </button>
+      )}
 
       <Swiper
-      
-        modules={[Navigation, Pagination, Autoplay, Mousewheel]}
-        spaceBetween={10}
+        modules={[Navigation, Autoplay, Mousewheel]}
+        spaceBetween={8}
         loop={true}
+        slidesPerView={'auto'}               
         autoplay={{
           delay: 2500,
-          disableOnInteraction: false,   // autoplay continues after user interaction
+          disableOnInteraction: false,
           pauseOnMouseEnter: true,
         }}
-        mousewheel={{
-          forceToAxis: true, // only horizontal wheel movements scroll the slider
-        }}
-        breakpoints={{
-          0: { slidesPerView: 2 },
-          640: { slidesPerView: 3 },
-          1024: { slidesPerView: slideCount || 4 },
-        }}
+        mousewheel={{ forceToAxis: true }}
         navigation={{
           prevEl: prevRef.current,
           nextEl: nextRef.current,
@@ -55,7 +50,9 @@ const Slider = ({ children, slideCount, showBtn=true }) => {
         }}
       >
         {children?.map((child, index) => (
-          <SwiperSlide key={index}>{child}</SwiperSlide>
+          <SwiperSlide key={index} style={{ width: 'auto' }} className="flex-shrink-0">  
+            {child}
+          </SwiperSlide>
         ))}
       </Swiper>
     </div>

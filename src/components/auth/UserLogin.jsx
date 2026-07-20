@@ -15,6 +15,8 @@ import { Link } from "react-router-dom";
 import { api } from "../../redux/baseApi";
 import { X } from "lucide-react";
 import { fetchCart, mergeGuestCart } from "@/redux/slices/cartSlice";
+import Select from "react-select";
+import { useCountryCodes } from "@/hooks/useCountryCodes";
 
 const UserLogin = () => {
   const dispatch = useDispatch();
@@ -22,11 +24,17 @@ const UserLogin = () => {
   const { isLoginModalOpen } = useSelector((state) => state.ui);
   const [mode, setMode] = useState("login");
   const [step, setStep] = useState("mobile");
-  const [mobile, setMobile] = useState("");   // changed from email to mobile
+  const [mobile, setMobile] = useState(""); // changed from email to mobile
   const [otp, setOtp] = useState("");
   const [userType, setUserType] = useState("user");
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loadingBtn, setLoadingBtn] = useState(false);
+  const [countryCode, setCountryCode] = useState("+91");
+  const { countryCodes, loading: loadingCodes } = useCountryCodes();
+  const countryOptions = countryCodes.map((code) => ({
+    value: code.value,
+    label: code.label,
+  }));
 
   const [form, setForm] = useState({
     name: "",
@@ -64,7 +72,6 @@ const UserLogin = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    
     setForm((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => ({
       ...prev,
@@ -74,23 +81,23 @@ const UserLogin = () => {
   };
 
   // ========== MOBILE OTP LOGIN FLOW ==========
-const handleSendOtp = async (e) => {
-  e.preventDefault();
-  if (!mobile) {
-    toast.error("Please enter your mobile number");
-    return;
-  }
-  setLoadingBtn(true);
-  try {
-    await dispatch(userLogin(mobile)).unwrap();
-    setStep("otp");
-    toast.success("OTP sent to your mobile number");
-  } catch (err) {
-    toast.error(err || "Failed to send OTP");
-  } finally {
-    setLoadingBtn(false);
-  }
-};
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    if (!mobile) {
+      toast.error("Please enter your mobile number");
+      return;
+    }
+    setLoadingBtn(true);
+    try {
+      await dispatch(userLogin({ mobile, country_code: countryCode })).unwrap();
+      setStep("otp");
+      toast.success("OTP sent to your mobile number");
+    } catch (err) {
+      toast.error(err || "Failed to send OTP");
+    } finally {
+      setLoadingBtn(false);
+    }
+  };
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
@@ -101,21 +108,25 @@ const handleSendOtp = async (e) => {
     setLoadingBtn(true);
     try {
       // Pass mobile and otp to thunk (thunk must accept { mobile, otp })
-      await dispatch(userVerifyLoginOtp({ mobile, otp })).unwrap();
+      await dispatch(
+        userVerifyLoginOtp({ mobile, otp, country_code: countryCode }),
+      ).unwrap();
       await dispatch(userProfile()).unwrap();
 
       const mergeResult = await dispatch(mergeGuestCart()).unwrap();
       if (mergeResult.partial) {
-        toast.warning(`Some items couldn't be added: ${mergeResult.errors.join(', ')}`);
+        toast.warning(
+          `Some items couldn't be added: ${mergeResult.errors.join(", ")}`,
+        );
       } else if (mergeResult.merged) {
-        toast.success('Cart merged successfully');
+        toast.success("Cart merged successfully");
       }
 
       await dispatch(fetchCart());
       toast.success("Logged in successfully");
     } catch (err) {
       // console.log("error", err);
-      toast.error(err || 'Failed to merge cart');
+      toast.error(err || "Failed to merge cart");
     } finally {
       setLoadingBtn(false);
     }
@@ -125,7 +136,10 @@ const handleSendOtp = async (e) => {
   const handleSignup = async (e) => {
     e.preventDefault();
     if (!termsAccepted) {
-      setErrors({ fields: {}, form: "You must accept the Terms & Conditions to sign up." });
+      setErrors({
+        fields: {},
+        form: "You must accept the Terms & Conditions to sign up.",
+      });
       return;
     }
     const submitData = {
@@ -160,7 +174,7 @@ const handleSendOtp = async (e) => {
   if (!isLoginModalOpen) return null;
 
   return ReactDOM.createPortal(
-    <div className="fixed inset-0 z-[9999]">
+    <div className="fixed inset-0 z-[9999] ">
       <div
         className="absolute inset-0 backdrop-blur-[2px] bg-black/20"
         onClick={() => dispatch(closeLoginModal())}
@@ -186,7 +200,7 @@ const handleSendOtp = async (e) => {
               </button>
             </div>
 
-            {(errors.form) && (
+            {errors.form && (
               <p className="text-red-600 text-sm text-center mb-4">
                 {errors.form}
               </p>
@@ -195,19 +209,66 @@ const handleSendOtp = async (e) => {
             {/* LOGIN – MOBILE NUMBER STEP */}
             {mode === "login" && step === "mobile" && (
               <form onSubmit={handleSendOtp} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
+                <div className="flex items-center gap-1">
+                  {loadingCodes ? (
+                    <div className="w-24 px-2 py-2 text-xs font-bold text-gray-400 border border-gray-200 rounded-xl bg-gray-50 text-center">
+                      Loading...
+                    </div>
+                  ) : (
+                    <Select
+                    
+                      options={countryOptions}
+                      value={countryOptions.find(
+                        (opt) => opt.value === countryCode,
+                      )}
+                      onChange={(selected) =>
+                        setCountryCode(selected ? selected.value : "+91")
+                      }
+                      placeholder="Code"
+                      classNamePrefix="react-select"
+                      isClearable={false}
+                      isSearchable={true}
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          borderColor: "#d1d5db",
+                          boxShadow: "none",
+                          "&:hover": { borderColor: "#f59e0b" },
+                          borderRadius: "0.5rem",
+                          minHeight: "2.5rem",
+                          width: "100px",
+                          fontSize: "0.65rem",
+                          fontWeight: "bold",
+                        }),
+                        menu: (base) => ({
+                          ...base,
+                          zIndex: 9999,
+                          width: "220px",
+                        }),
+                        option: (base, state) => ({
+                          ...base,
+                          backgroundColor: state.isSelected
+                            ? "#f59e0b"
+                            : state.isFocused
+                              ? "#fef3c7"
+                              : "white",
+                          color: state.isSelected ? "white" : "#374151",
+                          "&:active": { backgroundColor: "#f59e0b" },
+                          fontSize: "0.65rem",
+                          fontWeight: "bold",
+                        }),
+                      }}
+                    />
+                  )}
                   <input
                     type="tel"
                     value={mobile}
-                      onChange={(e) => {
-                        const value = e.target.value.replace(/\D/g, ''); // sirf digits allow karo
-                          if (value.length <= 10) {   // max 10 digits
-                            setMobile(value);
-                          }
-                        }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-amber-500 focus:border-amber-500"
-                    placeholder="Enter mobile number"
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "");
+                      if (value.length <= 10) setMobile(value);
+                    }}
+                    placeholder="Enter 10-digit mobile"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-amber-500 focus:border-amber-500"
                     required
                   />
                 </div>
@@ -239,7 +300,9 @@ const handleSendOtp = async (e) => {
             {mode === "login" && step === "otp" && (
               <form onSubmit={handleVerifyOtp} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Enter OTP</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Enter OTP
+                  </label>
                   <input
                     type="text"
                     value={otp}
@@ -281,16 +344,58 @@ const handleSendOtp = async (e) => {
                   required
                 />
                 <div className="flex gap-2">
-                  <select
-                    name="country_code"
-                    value={form.country_code}
-                    onChange={handleChange}
-                    className="w-1/4 px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 focus:outline-none focus:ring-amber-500 focus:border-amber-500"
-                  >
-                    <option value="+91">+91</option>
-                    <option value="+1">+1</option>
-                    <option value="+44">+44</option>
-                  </select>
+                  {loadingCodes ? (
+                    <div className="w-1/4 px-3 py-2 text-xs font-bold text-gray-400 border border-gray-300 rounded-md bg-gray-50 text-center">
+                      Loading...
+                    </div>
+                  ) : (
+                    <Select
+                      options={countryOptions}
+                      value={countryOptions.find(
+                        (opt) => opt.value === form.country_code,
+                      )}
+                      onChange={(selected) =>
+                        setForm((prev) => ({
+                          ...prev,
+                          country_code: selected ? selected.value : "+91",
+                        }))
+                      }
+                      placeholder="Code"
+                      classNamePrefix="react-select"
+                      isClearable={false}
+                      isSearchable={true}
+                      styles={{
+                        control: (base) => ({
+                          ...base,
+                          borderColor: "#d1d5db",
+                          boxShadow: "none",
+                          "&:hover": { borderColor: "#f59e0b" },
+                          borderRadius: "0.375rem",
+                          minHeight: "2.5rem",
+                          width: "100px",
+                          fontSize: "0.65rem",
+                          fontWeight: "bold",
+                        }),
+                        menu: (base) => ({
+                          ...base,
+                          zIndex: 9999,
+                          width: "220px",
+                        }),
+                        option: (base, state) => ({
+                          ...base,
+                          backgroundColor: state.isSelected
+                            ? "#f59e0b"
+                            : state.isFocused
+                              ? "#fef3c7"
+                              : "white",
+                          color: state.isSelected ? "white" : "#374151",
+                          "&:active": { backgroundColor: "#f59e0b" },
+                          fontSize: "0.65rem",
+                          fontWeight: "bold",
+                        }),
+                      }}
+                    />
+                  )}
                   <input
                     name="mobile"
                     maxLength={10}
@@ -320,13 +425,22 @@ const handleSendOtp = async (e) => {
                   />
                   <label htmlFor="terms" className="text-xs text-gray-600">
                     I have read and agree to the{" "}
-                    <Link to="/terms-conditions" target="_blank" className="text-amber-600 hover:underline">
+                    <Link
+                      to="/terms-conditions"
+                      target="_blank"
+                      className="text-amber-600 hover:underline"
+                    >
                       Terms & Conditions
                     </Link>{" "}
                     and{" "}
-                    <Link to="/privacy-policy" target="_blank" className="text-amber-600 hover:underline">
+                    <Link
+                      to="/privacy-policy"
+                      target="_blank"
+                      className="text-amber-600 hover:underline"
+                    >
                       Privacy Policy
-                    </Link>.
+                    </Link>
+                    .
                   </label>
                 </div>
 
@@ -367,32 +481,11 @@ const handleSendOtp = async (e) => {
         </div>
       </div>
     </div>,
-    document.body
+    document.body,
   );
 };
 
 export default UserLogin;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // // components/auth/UserLogin.jsx
 // import { useEffect, useState } from "react";
@@ -438,16 +531,16 @@ export default UserLogin;
 //   if (user) {
 //     // ✅ Agar is session me merge ho chuka hai to skip
 //     if (localStorage.getItem('guestCartMerged')) return;
-    
+
 //     // Mark as merged immediately (before async call) to prevent double
 //     localStorage.setItem('guestCartMerged', 'true');
-    
+
 //     dispatch(mergeGuestCart()).then((result) => {
 //       if (result.payload?.merged) {
 //         toast.success("Your cart items have been saved!");
 //       }
-//       // CartPage already has useEffect to fetch cart        
-//        dispatch(fetchCart()) 
+//       // CartPage already has useEffect to fetch cart
+//        dispatch(fetchCart())
 //     });
 
 //     setForm({
@@ -509,10 +602,10 @@ export default UserLogin;
 //   try {
 //     await dispatch(userLogin({ username: form.username, password: form.password })).unwrap();
 //     toast.success("You are logged in");
-    
+
 //     // ✅ Close modal immediately
 //     dispatch(closeLoginModal());
-    
+
 //     // Fetch user profile in background (merge cart will happen in useEffect)
 //     await dispatch(userProfile()).unwrap();
 //   } catch (err) {

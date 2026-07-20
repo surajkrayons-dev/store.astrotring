@@ -861,6 +861,7 @@ const ProductDetailsPage = () => {
 
           {/* You May Also Like */}
           {suggestedProducts.length > 0 && (
+            
             <ProductYouMayAlsoLike products={suggestedProducts} />
           )}
           {/* product reviews */}

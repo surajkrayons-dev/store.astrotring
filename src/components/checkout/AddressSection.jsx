@@ -9,7 +9,9 @@ import {
   setSelectedAddressId,
 } from "../../redux/slices/addressSlice";
 import { toast } from "react-toastify";
-import { MapPin } from "lucide-react";
+import { Bold, MapPin } from "lucide-react";
+import { useCountryCodes } from "@/hooks/useCountryCodes";
+import Select from "react-select";
 
 /**
  * AddressSection Component
@@ -18,6 +20,7 @@ import { MapPin } from "lucide-react";
  */
 const AddressSection = () => {
   const dispatch = useDispatch();
+  const { countryCodes, loading: loadingCodes } = useCountryCodes();
 
   // Redux global state
   const { addresses, loading, selectedAddressId, selectedAddress } =
@@ -48,6 +51,11 @@ const AddressSection = () => {
     by_default: false, // 11. Default Checklist Flag
   });
 
+  // country options for country codes
+  const countryOptions = countryCodes.map((code) => ({
+    value: code.value,
+    label: code.label,
+  }));
   // Fetch saved addresses on mount
   // useEffect(() => {
   //   if (!hasFetched.current && !loading) {
@@ -65,11 +73,9 @@ const AddressSection = () => {
     }
   }, [isLoggedIn, dispatch]);
 
-useEffect(() => {
-  
+  useEffect(() => {
     setShowNewForm(addresses.length === 0);
-  
-}, [addresses ]);
+  }, [addresses]);
 
   // Debouncer Cleanup Hook
   useEffect(() => {
@@ -296,15 +302,63 @@ useEffect(() => {
           </div>
 
           {/*  Country Code */}
-          <input
-            type="text"
-            name="country_code"
-            required
-            value={formData.country_code}
-            onChange={handleInputChange}
-            placeholder="Code *"
-            className="col-span-3 sm:col-span-2 px-2 py-2 text-xs font-semibold text-center border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400/10 focus:border-amber-400 bg-white text-gray-800 transition-all placeholder:font-medium placeholder:text-gray-400"
-          />
+          <div className="col-span-4 sm:col-span-3">
+            {loadingCodes ? (
+              <div className="w-full px-2 py-2 text-xs font-semibold text-center border border-gray-200 rounded-lg bg-gray-100 text-gray-500">
+                Loading...
+              </div>
+            ) : (
+              <Select
+                name="country_code"
+                options={countryOptions}
+                value={countryOptions.find(
+                  (opt) => opt.value === formData.country_code,
+                )}
+                onChange={(selected) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    country_code: selected ? selected.value : "",
+                  }))
+                }
+                placeholder="Select country code"
+                classNamePrefix="react-select"
+                isClearable={false}
+                isSearchable={true}
+                formatOptionLabel={(option, { context }) => {
+                  //  Show only value in the input (context === 'value')
+                  if (context === "value") {
+                    return option.value; // e.g., "+91"
+                  }
+                  //  Show full label in dropdown menu
+                  return option.label; // e.g., "+91 (IN)"
+                }}
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    borderColor: "#d1d5db",
+                    boxShadow: "none",
+                    "&:hover": { borderColor: "#f59e0b" },
+                    borderRadius: "0.5rem",
+                    minHeight: "2.5rem",
+                    fontSize: "0.65rem",
+                    fontWeight: "bold",
+                  }),
+                  menu: (base) => ({ ...base, zIndex: 9999 }),
+                  option: (base, state) => ({
+                    ...base,
+                    backgroundColor: state.isSelected
+                      ? "#f59e0b"
+                      : state.isFocused
+                        ? "#fef3c7"
+                        : "white",
+                    color: state.isSelected ? "white" : "#374151",
+                    "&:active": { backgroundColor: "#f59e0b" },
+                    fontSize: "0.65rem",
+                  }),
+                }}
+              />
+            )}
+          </div>
 
           {/*  Mobile Number */}
           <input
@@ -319,7 +373,7 @@ useEffect(() => {
               }))
             }
             placeholder="Mobile Number *"
-            className="col-span-9 sm:col-span-4 px-3 py-2 text-xs font-semibold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400/10 focus:border-amber-400 bg-white text-gray-800 transition-all placeholder:font-medium placeholder:text-gray-400"
+            className="col-span-8 sm:col-span-4 px-3 py-2 text-xs font-semibold border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400/10 focus:border-amber-400 bg-white text-gray-800 transition-all placeholder:font-medium placeholder:text-gray-400"
           />
 
           {/*  Pincode Input (Compact with absolute loading text) */}

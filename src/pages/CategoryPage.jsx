@@ -96,11 +96,11 @@ useEffect(() => {
     <div className="min-h-screen bg-gray-50">
       {/* ---------- HEADER ---------- */}
       <div className="border-b border-gray-300 flex items-center justify-center">
-        <div className="max-w-full mx-auto px-4 pb-6">
-          <h1 className="text-5xl font-medium text-gray-900 capitalize uppercase">
-            {slug === "all" ? "All Products" : slug}
+        <div className="max-w-full mx-auto px-4 pb-4">
+          <h1 className="text-2xl sm:text-5xl font-bold text-gray-900 capitalize uppercase text-center ">
+            {slug.split("-").join("   ")}
           </h1>
-          <p className="text-gray-500 mt-1 text-sm text-center">
+          <p className="text-gray-500  text-sm text-center">
             Discover authentic & high-quality items
           </p>
         </div>
