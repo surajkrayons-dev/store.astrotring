@@ -21,11 +21,11 @@ const YouMayAlsoLikeCard = ({ product }) => {
   // };
 
   return (
-    <Link
+        <Link
       to={`/product/${product.slug}`}
-      className="bg-white rounded-sm md:rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition cursor-pointer group w-full"
+      className="flex flex-col h-full bg-white rounded-sm border border-gray-200 overflow-hidden hover:shadow-lg transition cursor-pointer group w-full"
     >
-      <div className="relative aspect-square bg-gray-100 flex items-center justify-center md:p-2">
+      <div className="relative aspect-square bg-gray-100 flex items-center justify-center flex-shrink-0 ">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -43,16 +43,10 @@ const YouMayAlsoLikeCard = ({ product }) => {
           </div>
         )}
       </div>
-      <div className="p-3">
+      <div className="flex flex-col flex-1 p-3">
         <h3 className="font-medium text-gray-800 text-sm truncate">
           {product?.name}
         </h3>
-        {/* <div className="flex items-center gap-1 mt-1">
-          <StarRating value={ratingValue} size={12} />
-          <span className="text-xs text-gray-500">
-            {ratingValue.toFixed(1)}
-          </span>
-        </div> */}
         <div className="mt-1 flex items-center gap-1 flex-wrap">
           <span className="text-amber-600 font-bold text-sm">
             ₹{afterPrice.toLocaleString()}
@@ -63,7 +57,6 @@ const YouMayAlsoLikeCard = ({ product }) => {
             </span>
           )}
         </div>
-        
       </div>
     </Link>
   );
@@ -74,10 +67,15 @@ const ProductYouMayAlsoLike = ({ products = [] }) => {
 
   return (
     <section>
-      <h2 className="text-xl font-bold text-gray-900 mb-6">You May Also Like</h2>
+      <h2 className="text-xl font-bold text-gray-900 mb-4">You May Also Like</h2>
       <Slider slideCount={4}>
         {products.map((product) => (
+          <div
+              key={product.id}
+              className="w-[160px] sm:w-[180px] md:w-[200px] flex-shrink-0"
+            >
           <YouMayAlsoLikeCard key={product.id} product={product}  />
+          </div>
         ))}
       </Slider>
     </section>

@@ -21,7 +21,7 @@ const CategorySection = ({ category, products, onAddToCart }) => {
   return (
     <div  id={`category-${category.slug}`} className="scroll-mt-[110px]">
       {/* Header with category icon, name, count, and navigation arrows */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           {/* <span className="text-xl sm:text-2xl">{category.icon}</span> */}
           <h3 className="text-base sm:text-lg font-bold whitespace-nowrap text-stone-900">

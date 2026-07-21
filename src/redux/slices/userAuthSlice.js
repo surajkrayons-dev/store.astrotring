@@ -4,12 +4,12 @@ import { success } from "zod";
 
 export const userLogin = createAsyncThunk(
   "user/login",
-  async (mobile, thunkApi) => {
+  async ({mobile, country_code}, thunkApi) => {
     // mobile number as argument
     try {
-      const res = await api.post("/user/login", { mobile });
+      const res = await api.post("/user/login", { mobile,country_code });
       // No token returned now, just success
-      console.log("userLOgin", res.data);
+      // console.log("userLOgin", res.data);
       return res.data; // { message: "OTP sent", ... }
     } catch (error) {
       return thunkApi.rejectWithValue(
@@ -21,9 +21,9 @@ export const userLogin = createAsyncThunk(
 
 export const userVerifyLoginOtp = createAsyncThunk(
   "user/verifyLoginOtp",
-  async ({ mobile, otp }, thunkApi) => {
+  async ({ mobile, otp, country_code }, thunkApi) => {
     try {
-      const res = await api.post("/user/verify-login-otp", { mobile, otp });
+      const res = await api.post("/user/verify-login-otp", { mobile, otp, country_code});
       if (res.data.token) {
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("role_id", res.data.user?.role_id);

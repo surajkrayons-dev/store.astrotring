@@ -3,7 +3,7 @@ import logo from "@/assets/logo.png";
 
 const AffiliateHeader = () => {
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50 px-2">
        <div className="max-w-7xl mx-auto  py-4 flex justify-between items-center">
           <Link to="/">
             <img src={logo} alt="logo" className="h-6 sm:h-8" />

@@ -18,6 +18,8 @@ const OrderSuccessPage = () => {
   const dispatch = useDispatch();
   const invoiceRef = useRef(null);
   const [downloadInvoiceLoading, setDownloadInvoiceLoading] = useState(false);
+  const [uploadToBackendInvoiceLoading, setUploadToBackendInvoiceLoading] =
+    useState(false);
   const [invoiceUploadAttempted, setInvoiceUploadAttempted] = useState(false);
 
   // Redux state se data lo
@@ -29,7 +31,7 @@ const OrderSuccessPage = () => {
 
   // Navigation state se orderId lo
   // const orderId = 366;
-   const orderId = location.state?.orderData;
+  const orderId = location.state?.orderData;
 
   // console.log(order);
 
@@ -45,52 +47,39 @@ const OrderSuccessPage = () => {
     };
   }, [dispatch, orderId]);
 
+  // ---------- add dataLayer for gtm tracking ----------
+  useEffect(() => {
+    if (order && items.length > 0) {
+      const transactionId = String(order?.payment?.transaction_id);
+      const totalValue = parseFloat(order.pricing?.total_amount) || 0;
+      const items = order.items || order.order_items || [];
+      const discount = order.pricing?.discount || 0;
 
+      // console.log(discount)
 
-    // ---------- add dataLayer for gtm tracking ----------
-useEffect(() => {
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: "purchase",
+        ecommerce: {
+          transaction_id: transactionId,
+          currency: "INR",
+          order_value: totalValue,
+          order_id: orderId,
+          coupan_discount: discount,
+          items: items.map((item) => ({
+            item_id: String(item.product_id || item.product.id),
+            name: String(item.name || item.product.name),
+            price: parseFloat(item.price) || 0,
+            quantity: parseInt(item.quantity),
+          })),
+        },
+      });
 
-  if (order && items.length > 0) {
-    const transactionId = String(order?.payment?.transaction_id);
-    const totalValue = parseFloat(order.pricing?.total_amount) || 0;
-    const items = order.items || order.order_items || [];
-     const discount = order.pricing?.discount || 0;
-
-    // console.log(discount)
-
-    window.dataLayer = window.dataLayer || [];
-    window.dataLayer.push({
-      event: 'purchase',
-      ecommerce: {
-        transaction_id: transactionId,
-        currency: 'INR',
-        order_value: totalValue,
-        order_id: orderId,
-        coupan_discount:discount,
-        items: items.map(item => ({
-          item_id: String(item.product_id || item.product.id),
-          name: String(item.name || item.product.name ),
-          price: parseFloat(item.price) || 0,
-          quantity: parseInt(item.quantity) 
-        }))
-      }
-    });
-
-    console.log("trackTransaction datalayer", window.dataLayer);
-  }
-}, [order]); 
+      console.log("trackTransaction datalayer", window.dataLayer);
+    }
+  }, [order]);
 
   const generateInvoiceBase64 = async (element) => {
-
-     //wait for loading fonts
-  await document.fonts.ready;
-
-  //  some extra time for sefty
-  await new Promise((resolve) => setTimeout(resolve, 300));
-
-  // 3 Force reflow – important for hidden element
-  // (for element paint )
-  element.scrollHeight;
     const canvas = await html2canvas(element, {
       scale: 2,
       useCORS: true,
@@ -120,7 +109,7 @@ useEffect(() => {
 
       //  Agar sirf online orders ke liye chahiye to
       // if (order.payment?.mode !== 'online' && order.status !== 'paid') return;
-
+      setUploadToBackendInvoiceLoading(true);
       try {
         const pdfBase64 = await generateInvoiceBase64(invoiceRef.current);
         await dispatch(
@@ -131,8 +120,13 @@ useEffect(() => {
         ).unwrap();
         // console.log(" Invoice auto-uploaded");
         setInvoiceUploadAttempted(true);
+        setUploadToBackendInvoiceLoading(false);
       } catch (err) {
         console.error(" Auto-upload failed:", err);
+        toast.info("You can download invoice manually.");
+      } finally {
+        // Always reset loader, even on error or early return inside try
+        setUploadToBackendInvoiceLoading(false);
       }
     };
     autoUpload();
@@ -161,11 +155,6 @@ useEffect(() => {
       setDownloadInvoiceLoading(false);
     }
   };
-
-  // Loading state
-  if (loading) {
-    return <Loader data="Please do not refresh, Loading order details..." />;
-  }
 
   // Error state - No orderId
   if (!orderId) {
@@ -276,6 +265,12 @@ useEffect(() => {
   const remainingCod = order?.pricing?.remaining_cod_amount;
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
+      {/* ✅ Loader overlay – सिर्फ tab dikhe jab loading/upload चल रहा हो */}
+      {(loading || uploadToBackendInvoiceLoading) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/20 backdrop-blur-xs">
+          <Loader data="Please do not refresh, Loading order details..." />
+        </div>
+      )}
       <div className="max-w-3xl mx-auto">
         {/* Success Header */}
         <div className="text-center mb-6">
@@ -503,17 +498,17 @@ useEffect(() => {
                     </tr>
                   )} */}
 
-                    <tr className="border-t-2 border-gray-300">
-                      <td
-                        colSpan="3"
-                        className="pt-2 text-right font-bold text-gray-800"
-                      >
-                        Total:
-                      </td>
-                      <td className="pt-2 text-right font-bold text-gray-800 text-sm">
-                        ₹{parseFloat(totalPaid).toLocaleString()}
-                      </td>
-                    </tr>
+                  <tr className="border-t-2 border-gray-300">
+                    <td
+                      colSpan="3"
+                      className="pt-2 text-right font-bold text-gray-800"
+                    >
+                      Total:
+                    </td>
+                    <td className="pt-2 text-right font-bold text-gray-800 text-sm">
+                      ₹{parseFloat(totalPaid).toLocaleString()}
+                    </td>
+                  </tr>
                 </tfoot>
               </table>
             </div>
@@ -600,6 +595,7 @@ useEffect(() => {
           position: "absolute",
           top: "-9999px",
           left: "-9999px",
+          //  visibility: 'hidden',
           width: "794px",
           background: "white",
           zIndex: -1,

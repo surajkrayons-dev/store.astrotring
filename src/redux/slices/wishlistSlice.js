@@ -117,8 +117,8 @@ const wishlistSlice = createSlice({
       })
       .addCase(removeFromWishlist.fulfilled, (state, action) => {
         state.loading = false;
-//  console.log('Full state before removal:', ...state);
-//           console.log('Items before removal:', ...state.items);
+        // console.log('Full state before removal:', ...state);
+        // console.log('Items before removal:', ...state.items);
         // Remove item by product_id from the local state
         state.items = state.items.filter(
           (item) => item.id !== action.payload.product_id,
