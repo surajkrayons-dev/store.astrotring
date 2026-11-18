@@ -2,6 +2,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { lazy, Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { userProfile } from "./redux/slices/userAuthSlice";
+import { api } from "./redux/baseApi";
 import Layout from "./components/layout/Layout";
 // import HomePage from "./pages/HomePage";
 // import CategoryPage from "./pages/CategoryPage";
@@ -77,6 +78,33 @@ function App() {
       dispatch(userProfile());
     }
   }, [token, user, dispatch]);
+
+  // Identify Adgebra traffic for both freshly logged-in users and users who
+  // already have a saved login token when they arrive from a landing page.
+  useEffect(() => {
+    if (!token) return;
+
+    try {
+      const rawAttribution = localStorage.getItem("astrotring_adgebra_attribution");
+      const attribution = rawAttribution ? JSON.parse(rawAttribution) : null;
+      const isActive = attribution?.expires_at && Number(attribution.expires_at) >= Date.now();
+
+      if (!isActive || !attribution?.tracking_id || !attribution?.visitor_key) return;
+
+      api.post(
+        "/adgebra/identify",
+        {
+          tracking_id: String(attribution.tracking_id),
+          visitor_key: String(attribution.visitor_key),
+        },
+        { headers: { "Content-Type": "application/json" } },
+      ).catch(() => {
+        // Attribution is optional and must never interrupt normal store usage.
+      });
+    } catch (error) {
+      // Ignore malformed or unavailable local attribution data.
+    }
+  }, [token]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
